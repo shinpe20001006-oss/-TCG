@@ -1,0 +1,16 @@
+# Render の「Blueprint」用設定。GitHub に push したあと、Render で New > Blueprint を選ぶだけで作られます。
+services:
+  - type: web
+    name: kumitate-tcg
+    runtime: node
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: node server.js
+    healthCheckPath: /api/ping
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false      # Neon の接続文字列を Render の画面で貼る(GitHub には載せない)
+      - key: CODE_PEPPER
+        generateValue: true   # 引き継ぎコードのハッシュに混ぜる秘密の文字列。変えると既存コードが使えなくなるので、一度決めたら変更しない
