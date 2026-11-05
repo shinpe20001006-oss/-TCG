@@ -122,6 +122,7 @@ h1 span{color:var(--eff)}
 .ga-lineup{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;font-size:13px}.ga-lineup h4{margin:0 0 2px;color:var(--muted);font-size:12px}
 .btn.big{font-size:17px;padding:12px 22px}.ga-lack{margin-left:10px;color:var(--danger,#d4452b);font-size:13px}
 .ga-misc{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}.ga-misc h3{margin:0 0 4px}.ga-ex{margin:6px 0}
+.ga-misc.mini{font-size:12px;padding:10px 14px;gap:14px}.ga-misc.mini h3{font-size:13px}.ga-misc.mini .btn{font-size:12px;padding:4px 10px}.ga-misc.mini .ga-ex{margin:2px 0}.ga-detail{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)}
 .ga-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:10px 0}
 .gslot{position:relative;min-height:150px;border:0;background:none;padding:0;cursor:pointer;color:var(--ink);font:inherit}
 .gslot .gback{position:absolute;inset:0;border-radius:10px;background:repeating-linear-gradient(45deg,#26324a,#26324a 8px,#2f3d5e 8px,#2f3d5e 16px);color:#fff;display:flex;align-items:center;justify-content:center;font-size:30px;font-family:var(--font-disp);border:2px solid #4a5f95}
@@ -321,7 +322,7 @@ h1 span{color:var(--eff)}
 </div>
 <div class="fxlayer" id="fx"></div>
 
-<div class="overlay solid" id="title" hidden><div class="titlebox"><h1 class="ttl">組み立て<span>TCG</span></h1><p class="tsub">キャラに「条件・対象・効果」を組み付けて戦うカードゲーム</p><div class="tbtns"><button class="tbtn" id="tDeck"><b>デッキ構築</b><span>カードを選んで、能力といっしょに保存する</span></button><button class="tbtn" id="tCpu"><b>CPU戦</b><span>作ったデッキで、CPUと対戦する</span></button><button class="tbtn" id="tGacha"><b>ガチャ</b><span>カードパックを開ける(準備中)</span></button><button class="tbtn" id="tPvp"><b>対人戦</b><span>ルームコードで友達と対戦(オンライン版のみ)</span></button></div><div class="tmini"><button class="btn" id="tWatch">CPU同士を観戦</button><button class="btn" id="tRules">ルール</button><button class="btn" id="tAcct" hidden>アカウント</button></div><p class="tmsg" id="titleMsg"></p></div></div>
+<div class="overlay solid" id="title" hidden><div class="titlebox"><h1 class="ttl">組み立て<span>TCG</span></h1><p class="tsub">キャラに「条件・対象・効果」を組み付けて戦うカードゲーム</p><div class="tbtns"><button class="tbtn" id="tDeck"><b>デッキ構築</b><span>カードを選んで、能力といっしょに保存する</span></button><button class="tbtn" id="tCpu"><b>CPU戦</b><span>作ったデッキで、CPUと対戦する</span></button><button class="tbtn" id="tGacha"><b>ガチャ</b><span>カードパックを開ける</span></button><button class="tbtn" id="tPvp"><b>対人戦</b><span>ルームコードで友達と対戦(オンライン版のみ)</span></button></div><div class="tmini"><button class="btn" id="tWatch">CPU同士を観戦</button><button class="btn" id="tRules">ルール</button><button class="btn" id="tAcct" hidden>アカウント</button></div><p class="tmsg" id="titleMsg"></p></div></div>
 <div class="overlay solid" id="builder" hidden><div class="dsheet"><div class="dhead"><h2>デッキ構築</h2><button class="btn" id="dBack">タイトルへ</button></div><div class="dbody"><section class="dcat" id="dCat"></section><aside class="dside" id="dSide"></aside></div></div></div>
 <div class="overlay solid" id="gacha" hidden><div id="gachaBox"></div></div>
 <div class="overlay" id="lobby" hidden><div class="sheet" role="dialog"><h2>対人戦</h2><div id="lbMenu"><label class="lbl">名前<input id="lbName" maxlength="16" value="プレイヤー"></label><div class="btns"><button class="btn primary" id="lbCreate">ルームを作る</button></div><label class="lbl">ルームコードで参加<input id="lbInput" maxlength="6" placeholder="ABCDE" autocapitalize="characters"></label><div class="btns"><button class="btn" id="lbJoin">参加する</button></div></div><div id="lbWait" hidden><p>このコードを相手に伝えてください。</p><p class="lbcode" id="lbCode"></p><p>相手の参加を待っています…</p></div><p class="tmsg" id="lbMsg"></p><div class="btns"><button class="btn" id="lbBack">戻る</button></div></div></div>
@@ -383,19 +384,22 @@ const COND={
   wounded:{name:'HPが半分以下になったとき',inc:1},
   enter:{name:'場に出たとき',inc:2}, effected:{name:'効果を受けたとき',inc:1}, allygrave:{name:'味方が墓地に送られたとき',inc:1},
   allyenter:{name:'味方が場に出たとき',inc:1}, foeenter:{name:'敵が場に出たとき',inc:2}, foegrave:{name:'敵が墓地に送られたとき',inc:1},
-  myturn:{name:'自身のターンのとき',inc:3}, foeturn:{name:'相手のターンのとき',inc:3}
+  myturn:{name:'自身のターンのとき',inc:3}, foeturn:{name:'相手のターンのとき',inc:3},
+  foeattacks:{name:'敵が攻撃したとき',inc:5}, foeweak:{name:'劣勢のとき',inc:2}, abil:{name:'能力を使ったとき',inc:1}
 };
 const TARG={
   topatk:{name:'ATK最大の敵1枚を',inc:2}, weakally:{name:'HP最小の味方1枚を',inc:2},
   self:{name:'自分を',inc:2}, allyone:{name:'味方1枚を選択',inc:2}, foeone:{name:'敵1枚を選択',inc:3},
   select:{name:'選択した1枚を',inc:4}, others:{name:'自分以外の味方全員を',inc:2},
-  friends:{name:'味方の全員を',inc:3}, enemies:{name:'敵の全員を',inc:5}, all:{name:'全体の全員を',inc:4}
+  friends:{name:'味方の全員を',inc:3}, enemies:{name:'敵の全員を',inc:5}, all:{name:'全体の全員を',inc:4},
+  lowfoe:{name:'HP最小の敵1枚を',inc:2}, topally:{name:'ATK最大の味方1枚を',inc:2}, foetwo:{name:'敵2枚を選択',inc:4}
 };
 const EFF={
   ping:{name:'1ダメージを与える',inc:1}, attack:{name:'攻撃する',inc:2}, atkup:{name:'ATK+1(このターン)',inc:1},
   makeattack:{name:'攻撃させる',inc:3}, heal:{name:'HPを'+HEAL+'回復する',inc:1}, shield:{name:'シールドを張る',inc:2},
   poison:{name:'毒を与える',inc:1}, freeze:{name:'凍結させる',inc:1}, atkdown:{name:'ATKを-1する',inc:1},
-  silence:{name:'沈黙させる',inc:1}, grow:{name:'ATKを鍛える(永続+1)',inc:2}, trigger:{name:'スキルを発動させる',inc:1}, bounce:{name:'手札に戻す',inc:3}
+  silence:{name:'沈黙させる',inc:1}, grow:{name:'ATKを鍛える(永続+1)',inc:2}, trigger:{name:'スキルを発動させる',inc:1}, bounce:{name:'手札に戻す',inc:3},
+  swapatk:{name:'ATKを入れ替える',inc:2}, fortify:{name:'最大HPを+2する',inc:1}, execute:{name:'HP2以下なら倒す',inc:3}
 };
 const SK={cond:COND,targ:TARG,eff:EFF};
 const DESC={
@@ -403,21 +407,24 @@ const DESC={
     wounded:'ダメージでHPが最大の半分以下になったとき(1体につき1回だけ)。',
     enter:'このユニットが場に出た直後(同じキャラは1ターンに1回まで)。',effected:'他のカードの効果の対象になったとき(基本攻撃と自分のスキルは除く)。',
     allygrave:'自分以外の味方が墓地に送られたとき(プレイヤーが「墓地に送る」で直接送った場合は発動しない)。',allyenter:'自分以外の味方が場に出たとき。',foeenter:'敵が場に出たとき。',foegrave:'敵が墓地に送られたとき。',
-    myturn:'自分のターン開始時。',foeturn:'相手のターン開始時。'},
+    myturn:'自分のターン開始時。',foeturn:'相手のターン開始時。',
+    foeattacks:'敵のカードが攻撃するたび(基本攻撃と「攻撃する」の効果。誰を攻撃しても発動。回数の制限なし)。',foeweak:'自分のターン開始時に、敵の場のカードが自分の場より多いとき。',abil:'自分が能力を使ったとき(自分の場で、この条件を持つカードがそれぞれ発動する)。'},
   targ:{topatk:'敵のうちATKが最大の1枚(同値は先に出た方)。自動で決まる。',weakally:'味方のうちHPが最小の1枚(自分を含む)。自動で決まる。',
     self:'このカードだけ。',allyone:'味方の場のカード1枚を選ぶ(自分を含む)。',foeone:'敵の場のカード1枚を選ぶ。',
     select:'場のカード1枚を選ぶ(敵味方どちらでもよい)。',others:'自分以外の味方の場のカード全部。',friends:'味方の場のカード全部(自分を含む)。',
-    enemies:'敵の場のカード全部。',all:'敵味方の場のカード全部(自分を含む)。'},
+    enemies:'敵の場のカード全部。',all:'敵味方の場のカード全部(自分を含む)。',
+    lowfoe:'敵のうちHPが最小の1枚(同値は先に出た方)。自動で決まる。',topally:'味方のうちATKが最大の1枚(自分を含む。同値は先に出た方)。自動で決まる。',foetwo:'敵の場のカードを2枚まで選ぶ(敵が1枚なら1枚)。「攻撃する」は、ダメージが半分ずつ(切り上げ)になる。'},
   eff:{ping:'ATKに関係なく1ダメージ(攻撃ではない)。',attack:'このカードのATK分のダメージ(対象が2つ以上なら半分、切り上げ)。',
     atkup:'対象のATKを、このターンの終わりまで+1する。',makeattack:'対象が、自分のATK分のダメージを、発動者の敵に与える。',
     heal:'対象のHPを'+HEAL+'回復する(最大HPまで)。',shield:'対象の次の1回のダメージ(攻撃・1ダメージ)を無効にする。毒は防げない。同じカードは1ターンに1回しか張れない。',
     poison:'対象は自分のターン開始時に1ダメージを受ける(合計'+POISON_TURNS+'回)。',freeze:'対象は、持ち主の次のターンに基本攻撃できない。',
     atkdown:'対象のATKを永続で-1する(0まで)。',silence:'対象のスキルが、持ち主の次のターンの終わりまで発動しなくなる。',
     grow:'対象のATKを永続で+1する(元のATK+2まで)。',trigger:'対象のスキルを条件を無視して発動させる(この効果は不発)。',
-    bounce:'対象を手札に戻す。敵に使うとスキルは墓地へ、キャラだけ手札に戻る。'}
+    bounce:'対象を手札に戻す。敵に使うとスキルは墓地へ、キャラだけ手札に戻る。',
+    swapatk:'このカードと対象のATKを、永続で入れ替える(自分を対象にしたときは不発)。',fortify:'対象の最大HPだけを+2する(現在のHPは増えない。例:HP4/4が4/6になる。永続で、元のHP+4まで)。「HPが半分以下になったとき」は、HPが減ったときだけ判定する。',execute:'対象のHPが2以下なら、墓地に送る(ダメージではないので装甲・シールド・耐久は無視)。HPが3以上なら不発。'}
 };
-const TSIDE={self:'f',allyone:'f',weakally:'f',others:'f',friends:'f',foeone:'e',topatk:'e',enemies:'e',select:'m',all:'m'};
-const EKIND={ping:'harm',attack:'harm',poison:'harm',freeze:'harm',silence:'harm',atkdown:'harm',atkup:'help',grow:'help',heal:'help',shield:'help',makeattack:'att',trigger:'trig',bounce:'bounce'};
+const TSIDE={lowfoe:'e',foetwo:'e',topally:'f',self:'f',allyone:'f',weakally:'f',others:'f',friends:'f',foeone:'e',topatk:'e',enemies:'e',select:'m',all:'m'};
+const EKIND={ping:'harm',attack:'harm',poison:'harm',freeze:'harm',silence:'harm',atkdown:'harm',atkup:'help',grow:'help',heal:'help',shield:'help',makeattack:'att',trigger:'trig',bounce:'bounce',swapatk:'harm',fortify:'help',execute:'harm'};
 const ABIL={
   fortress:{name:'籠城の構え',cd:4,desc:'次の相手のターン、自分のライフへの直接攻撃を無効にする。'},
   reaper:{name:'死神の鎌',cd:12,start:8,desc:'敵のカード1枚を選んで墓地に送る。ターン8になるまでは使えない。'},
@@ -429,7 +436,7 @@ const ABIL={
   trap:{name:'巧妙な罠',cd:18,desc:'次の相手のターン、相手が最初に召喚したカードを即座に墓地に送る。使ったことは相手に知らされない。'}
 };
 const AB_KEYS=Object.keys(ABIL);
-const REPEAT=new Set(['myturn','foeturn']), WIDE=new Set(['friends','enemies','all','others']);
+const REPEAT=new Set(['myturn','foeturn','foeweak']), WIDE=new Set(['friends','enemies','all','others','foetwo']);
 let SURV=SURCHARGE;
 const sur=(c,t,e)=>((REPEAT.has(c)&&WIDE.has(t))?SURV:0)+((e==='bounce'&&WIDE.has(t))?3:0);
 const ROWS=[
@@ -451,21 +458,25 @@ const ROWS=[
   ['captain','救護隊長',2,2,4,{cond:'myturn',targ:'friends',eff:'heal'}],
   ['bastion','城壁の守護者',6,3,9,null,{guard:1,armor:1}],
   ['ironclad','鉄甲の重騎士',6,4,7,{eff:'attack'},{armor:1}],
-  ['colossus','巨躯の守護神',7,4,8,{cond:'attacked'},{guard:1}],
   ['warlord','双刃の覇者',7,5,6,null,{double:1}],
   ['thorn','棘皮の古竜',6,3,8,{eff:'ping'},{counter:1,armor:1}],
   ['valkyrie','戦乙女',6,4,6,{targ:'self'},{double:1}],
   ['sentinel','不落の砦',5,3,4,{cond:'attacked',targ:'self',eff:'shield'},{guard:1}],
   ['plaguelord','黒死の将',5,2,4,{cond:'enter',targ:'enemies',eff:'poison'},{armor:1}],
   ['lance','一閃の槍帝',4,6,5,{targ:'foeone'},{pierce:1}],
+  ['warking','不屈の戦王',3,7,5,{targ:'all'},{adapt:1}],
+  ['swift','韋駄天',3,3,4,{cond:'enter'},{haste:1}],
+  ['wardgod','無類の護神',5,2,10,{eff:'heal'},{endure:1}],
+  ['fool','愚者の城',4,4,7,{cond:'attacked',eff:'silence'},{armor:5,decay:1}],
+  ['undead','アンデッドモンスター',5,5,3,{targ:'self'},{undead:1}],
   ['veteran','古参兵',4,4,6,null],['charger','突撃兵',4,6,4,null],['elite','精兵',5,4,8,null],
   ['paladin','墓守',4,4,5,{cond:'allygrave'}],['trainer','猟兵',4,4,5,{cond:'foegrave'}],['mercenary','傭兵',4,4,5,{cond:'wounded'}],
   ['glacier','番兵',3,4,5,{cond:'grave'}],['scribe','書記',4,4,5,{cond:'effected'}],
   ['curse','呪い師',2,3,5,{cond:'foeturn',eff:'atkdown'}],['tide','潮読み',2,1,3,{cond:'foeenter',eff:'bounce'}],
   ['venomblade','毒使い',3,3,4,{cond:'attacks',targ:'foeone',eff:'poison'}]
 ];
-const KWD={pierce:'貫通:このカードの攻撃(基本攻撃・「攻撃する」の効果)は、相手の装甲とシールドを無視する。シールドは破壊され、ダメージは通る。能力「追い討ち」には効かない。',guard:'守護:このカードがいる間、相手の基本攻撃はこのカード(守護を持つカード)にしか向けられない。',armor:'装甲:攻撃で受けるダメージが減る(最低0)。毒・1ダメージ・直接ダメージには効かない。',counter:'反撃:基本攻撃を受けて生き残ったとき、攻撃してきたカードにATK分のダメージを返す。',double:'連撃:1ターンに基本攻撃を2回できる。'};
-const kwName=(k,v)=>({guard:'守護',armor:'装甲'+v,counter:'反撃',double:'連撃',pierce:'貫通'})[k];
+const KWD={pierce:'貫通:このカードの攻撃(基本攻撃・「攻撃する」の効果)は、相手の装甲とシールドを無視する。シールドは破壊され、ダメージは通る。能力「追い討ち」には効かない。',guard:'守護:このカードがいる間、相手の基本攻撃はこのカード(守護を持つカード)にしか向けられない。',armor:'装甲:攻撃で受けるダメージが減る(最低0)。毒・1ダメージ・直接ダメージには効かない。',counter:'反撃:基本攻撃を受けて生き残ったとき、攻撃してきたカードにATK分のダメージを返す。',double:'連撃:1ターンに基本攻撃を2回できる。',adapt:'適応:毒・凍結・沈黙・手札に戻る効果を受けない。',haste:'速攻:場に出たターンから基本攻撃ができる。',endure:'耐久:死ぬダメージを受けても、HP1で耐える。1回のみ。',decay:'自壊:毎ターンの終わり(自分のターンも相手のターンも)に、自身が1ダメージを受ける。',undead:'死者:このカードへの回復とダメージが反転する(ダメージで回復、回復でダメージ)。回復は最大HPまで。'};
+const kwName=(k,v)=>({guard:'守護',armor:'装甲'+v,counter:'反撃',double:'連撃',pierce:'貫通',adapt:'適応',haste:'速攻',endure:'耐久',decay:'自壊',undead:'死者'})[k];
 const CHARS=ROWS.map(([key,name,b,atk,hp,fix,kw])=>({key,name,b,cost:b,atk,hp,hpBase:hp,fix,kw:kw||{}}));
 function recost(){CHARS.forEach(c=>{let cost=c.b;if(c.fix)TYPES.forEach(t=>{if(c.fix[t])cost+=Math.max(0,SK[t][c.fix[t]].inc-1);});c.cost=cost;});}
 recost();
@@ -473,7 +484,8 @@ const isComplete=ch=>!!(ch.fix&&ch.fix.cond&&ch.fix.targ&&ch.fix.eff);
 const cardCost=ch=>ch.cost+(isComplete(ch)?sur(ch.fix.cond,ch.fix.targ,ch.fix.eff):0);
 const SKILL_DECK=[
   ['cond','attacked',2],['cond','attacks',2],['cond','grave',2],['cond','wounded',2],['cond','enter',2],['cond','effected',1],['cond','allygrave',1],
-  ['cond','allyenter',1],['cond','foeenter',1],['cond','foegrave',1],['cond','myturn',1],['cond','foeturn',1],
+  ['cond','allyenter',1],['cond','foeenter',1],['cond','foegrave',1],['cond','myturn',1],['cond','foeturn',1],['cond','foeattacks',1],['cond','foeweak',1],['cond','abil',1],
+  ['targ','lowfoe',1],['targ','topally',1],['targ','foetwo',1],['eff','swapatk',1],['eff','fortify',1],['eff','execute',1],
   ['targ','self',2],['targ','allyone',2],['targ','foeone',2],['targ','select',2],['targ','topatk',1],['targ','weakally',1],
   ['targ','others',1],['targ','friends',1],['targ','enemies',1],['targ','all',1],
   ['eff','ping',2],['eff','attack',3],['eff','atkup',2],['eff','makeattack',1],['eff','heal',2],['eff','shield',2],['eff','poison',1],
@@ -529,7 +541,7 @@ const atkQuota=i=>ATKQ>0?ATKQ:(ATKLIM?Math.ceil(G.p[i].field.length/2):99);
 const atkUsed=i=>G.p[i].atkUsedTurn===G.turn?G.p[i].atkUsed:0;
 const atkLeft=i=>Math.max(0,atkQuota(i)-atkUsed(i));
 const hasteOk=u=>HASTE>0&&u.char.cost<=HASTE;
-const canBasicAttack=u=>u.alive&&(u.summonedTurn!==G.turn||hasteOk(u))&&(u.atkTurn!==G.turn||u.atkN<maxAtks(u))&&!frozen(u)&&atkLeft(u.owner)>0&&!(DIRECT1&&!G.p[1-u.owner].field.length&&G.p[u.owner].directTurn===G.turn);
+const canBasicAttack=u=>u.alive&&(u.summonedTurn!==G.turn||hasteOk(u)||!!(u.char.kw&&u.char.kw.haste))&&(u.atkTurn!==G.turn||u.atkN<maxAtks(u))&&!frozen(u)&&atkLeft(u.owner)>0&&!(DIRECT1&&!G.p[1-u.owner].field.length&&G.p[u.owner].directTurn===G.turn);
 const guardsOf=i=>G.p[i].field.filter(u=>u.char.kw&&u.char.kw.guard);
 const basicPool=i=>{const g=guardsOf(i);if(g.length)return g;let f=G.p[i].field;if(UNTG){const nf=f.filter(u=>u.summonedTurn+1!==G.turn);if(nf.length)f=nf;}return f;};
 const canAct=()=>!!G&&!G.busy&&!G.over&&G.phase==='main'&&!UI.prompt&&isHuman(ME);
@@ -584,7 +596,7 @@ function makeUnit(owner,ch,picks){
 }
 
 /* ---------- log / fx ---------- */
-function log(msg,cls){if(HEADLESS)return;logs.push({msg,cls:cls||'sys'});if(logs.length>400)logs.shift();}
+function log(msg,cls){if(typeof window!=='undefined'&&window.__logspy)window.__logspy(msg);if(HEADLESS)return;logs.push({msg,cls:cls||'sys'});if(logs.length>400)logs.shift();}
 function popup(key,text,cls){
   if(HEADLESS)return;
   const el=document.querySelector('[data-key="'+key+'"]');if(!el)return;
@@ -604,6 +616,7 @@ function qpush(u,ev){if(u.alive&&!silenced(u)&&u.slots.cond.key===ev)queue.push(
 function emit(ev,u,direct){
   if(ev==='attacks'){
     if(u.alive&&!silenced(u)&&u.slots.cond.key==='attacks'&&u.condAtkTurn!==G.turn){u.condAtkTurn=G.turn;queue.push({unit:u,event:ev});}
+    G.p[1-u.owner].field.slice().sort(byTurn).forEach(v=>qpush(v,'foeattacks'));
   }else if(ev==='grave'){
     if(u.slots.cond.key==='grave'&&!silenced(u))queue.push({unit:u,event:'grave'});
     if(!direct)G.p[u.owner].field.slice().sort(byTurn).forEach(v=>qpush(v,'allygrave'));
@@ -620,12 +633,26 @@ function emitEnter(u){
 function emitTurnStart(idx){
   G.p[idx].field.slice().sort((a,b)=>a.order-b.order).forEach(u=>qpush(u,'myturn'));
   G.p[1-idx].field.slice().sort((a,b)=>a.order-b.order).forEach(u=>qpush(u,'foeturn'));
+  if(G.p[1-idx].field.length>G.p[idx].field.length)G.p[idx].field.slice().sort((a,b)=>a.order-b.order).forEach(u=>qpush(u,'foeweak'));
+}
+async function decayTick(idx){
+  for(const u of G.p[idx].field.slice()){
+    if(!u.alive||!(u.char.kw&&u.char.kw.decay))continue;
+    u.hp-=1;popup('u'+u.uid,'自壊 -1','dmg');flash('u'+u.uid,'hit',450);
+    log(un(u)+'が自壊で1ダメージ(HP'+Math.max(u.hp,0)+'/'+u.maxHp+')',sideOf(u));
+    render();await wait(420);
+    if(u.hp<=0)sendToGrave(u,'自壊した');
+    else if(!u.woundedDone&&u.hp*2<=u.maxHp){u.woundedDone=true;emit('wounded',u);}
+  }
 }
 async function poisonTick(idx){
   for(const u of G.p[idx].field.slice()){
     if(!u.alive||u.poison<=0)continue;
-    u.poison--;u.hp-=1;popup('u'+u.uid,'毒 -1','dmg');flash('u'+u.uid,'hit',450);
+    u.poison--;
+    if(u.char.kw&&u.char.kw.undead){u.hp=Math.min(u.maxHp,u.hp+1);popup('u'+u.uid,'毒 +1','buff');log(un(u)+'は死者なので毒で1回復した(HP'+u.hp+'/'+u.maxHp+')',sideOf(u));render();await wait(420);continue;}
+    u.hp-=1;popup('u'+u.uid,'毒 -1','dmg');flash('u'+u.uid,'hit',450);
     log(un(u)+'が毒で1ダメージ(HP'+Math.max(u.hp,0)+'/'+u.maxHp+')',sideOf(u));
+    if(u.hp<=0&&u.char.kw&&u.char.kw.endure&&!u.endureUsed){u.endureUsed=true;u.hp=1;popup('u'+u.uid,'耐久','info');log(un(u)+'は耐久でHP1で耐えた。',sideOf(u));}
     render();await wait(420);
     if(u.hp<=0)sendToGrave(u,'毒で倒れた');
     else if(!u.woundedDone&&u.hp*2<=u.maxHp){u.woundedDone=true;emit('wounded',u);}
@@ -691,6 +718,15 @@ async function hit(src,t,dmg,mode,np){
     render();await wait(550);return;
   }
   const v=t.unit;if(!v.alive)return;
+  if(v.char.kw&&v.char.kw.undead){
+    const h=Math.min(dmg,v.maxHp-v.hp);v.hp+=h;popup('u'+v.uid,'+'+h,'buff');flash('u'+v.uid,'fire',450);
+    log(un(src)+'→'+un(v)+':死者なのでダメージが回復になった(+'+h+' HP'+v.hp+'/'+v.maxHp+')',sideOf(src));
+    render();await wait(480);
+    if(isAtk)emit('attacked',v);
+    if(mode!=='basic'&&mode!=='counter'&&src!==v)emit('effected',v);
+    if(mode==='basic'&&v.alive&&((v.char.kw&&v.char.kw.counter)||CTR>0)&&src&&src.alive&&src.uid!==undefined&&src!==v)await hit(v,{unit:src},(v.char.kw&&v.char.kw.counter)?atkOf(v):Math.ceil(atkOf(v)*CTR),'counter');
+    return;
+  }
   const counterBack=async()=>{
     if(mode==='basic'&&v.alive&&((v.char.kw&&v.char.kw.counter)||CTR>0)&&src&&src.alive&&src.uid!==undefined&&src!==v){
       log('↩ '+un(v)+'の反撃!',sideOf(v));popup('u'+v.uid,'反撃','info');render();await wait(300);
@@ -717,6 +753,8 @@ async function hit(src,t,dmg,mode,np){
     await counterBack();
     return;
   }
+  const endured=v.hp-dmg<=0&&v.char.kw&&v.char.kw.endure&&!v.endureUsed;
+  if(endured){v.endureUsed=true;dmg=v.hp-1;popup('u'+v.uid,'耐久','info');log(un(v)+'は耐久でHP1で耐えた。',sideOf(v));}
   v.hp-=dmg;popup('u'+v.uid,'-'+dmg,'dmg');flash('u'+v.uid,'hit',450);
   log(un(src)+'→'+un(v)+'に'+dmg+'ダメージ(HP'+Math.max(v.hp,0)+'/'+v.maxHp+')',sideOf(src));
   render();await wait(480);
@@ -750,7 +788,17 @@ async function runEffect(u,targ,eff){
   else if(targ==='enemies'){targets=F.field.map(unit=>({unit}));if(dmgEff&&!targets.length)targets=[plr()];}
   else if(targ==='all'){targets=P.field.concat(F.field).map(unit=>({unit}));if(dmgEff&&!F.field.length)targets.push(plr());}
   else if(targ==='weakally'){if(P.field.length)targets=[{unit:P.field.reduce((m,x)=>x.hp<m.hp?x:m)}];}
+  else if(targ==='lowfoe'){if(F.field.length)targets=[{unit:F.field.reduce((m,x)=>x.hp<m.hp?x:m)}];else if(dmgEff)targets=[plr()];}
+  else if(targ==='topally'){if(P.field.length)targets=[{unit:P.field.reduce((m,x)=>atkOf(x)>atkOf(m)?x:m)}];}
   else if(targ==='topatk'){if(F.field.length)targets=[{unit:F.field.reduce((m,x)=>atkOf(x)>atkOf(m)?x:m)}];else if(dmgEff)targets=[plr()];}
+  else if(targ==='foetwo'){
+    const o1=F.field.map(unit=>({unit}));
+    if(o1.length){
+      targets=[await choose(me,o1,text+'(1枚目)',ctx)];
+      const rest=F.field.filter(x=>x!==targets[0].unit).map(unit=>({unit}));
+      if(rest.length)targets.push(await choose(me,rest,text+'(2枚目)',ctx));
+    }else if(dmgEff)targets=[plr()];
+  }
   else{
     let opts;
     if(targ==='allyone')opts=P.field.map(unit=>({unit}));
@@ -800,6 +848,8 @@ async function runEffect(u,targ,eff){
     for(const v of unitsOf()){
       if(!v.alive)continue;
       let pop=null,cls='buff',msg='';
+      if(v.char.kw&&v.char.kw.adapt&&(eff==='poison'||eff==='freeze'||eff==='silence'||eff==='bounce')){popup('u'+v.uid,'適応','info');log(un(v)+'は適応で効果を受けない。',sideOf(v));render();await wait(380);continue;}
+      if(eff==='heal'&&v.char.kw&&v.char.kw.undead){const dd=HEAL;v.hp-=dd;popup('u'+v.uid,'-'+dd,'dmg');flash('u'+v.uid,'hit',450);log(un(v)+'は死者なので回復がダメージになった(HP'+Math.max(v.hp,0)+'/'+v.maxHp+')',sideOf(v));render();await wait(450);if(v.hp<=0)sendToGrave(v,'回復で倒れた');else{if(v!==u)emit('effected',v);if(!v.woundedDone&&v.hp*2<=v.maxHp){v.woundedDone=true;emit('wounded',v);}}continue;}
       if(eff==='atkup'){if(v.tmpTurn!==G.turn){v.tmpTurn=G.turn;v.tmpAtk=0;}v.tmpAtk++;pop='ATK+1';msg=un(v)+'のATKがこのターン'+atkOf(v)+'になった。';}
       else if(eff==='grow'){if(v.atk<Math.min(ATKMAX,v.char.atk+2))v.atk++;pop='ATK+1';msg=un(v)+'のATKが'+v.atk+'になった(永続)。';}
       else if(eff==='atkdown'){v.atk=Math.max(0,v.atk-1);pop='ATK-1';cls='dmg';msg=un(v)+'のATKが'+v.atk+'になった(永続)。';}
@@ -807,6 +857,15 @@ async function runEffect(u,targ,eff){
       else if(eff==='shield'){v.shield=true;pop='盾';msg=un(v)+'にシールドが張られた。';}
       else if(eff==='poison'){v.poison=POISON_TURNS;pop='毒';cls='dmg';msg=un(v)+'が毒を受けた。';}
       else if(eff==='freeze'){v.frozenTurn=nextTurnOf(v.owner);pop='凍結';cls='dmg';msg=un(v)+'は次のターン攻撃できない。';}
+      else if(eff==='swapatk'){
+        if(v===u){pop='不発';cls='info';msg='自分とは入れ替えられない。';}
+        else{const t0=u.atk;u.atk=v.atk;v.atk=t0;pop='ATK入替';cls='info';popup('u'+u.uid,'ATK'+u.atk,'info');msg=un(u)+'と'+un(v)+'のATKが入れ替わった('+un(u)+'ATK'+u.atk+' / '+un(v)+'ATK'+v.atk+')。';}
+      }
+      else if(eff==='fortify'){const g=Math.max(0,Math.min(2,v.char.hp+4-v.maxHp));v.maxHp+=g;pop=g?'最大HP+'+g:'上限';msg=un(v)+'の最大HPが'+v.maxHp+'になった(HP'+v.hp+'/'+v.maxHp+')。';}
+      else if(eff==='execute'){
+        if(v.hp<=2){log(un(u)+'の処刑:'+un(v)+'を倒した。',sideOf(v));popup('u'+v.uid,'処刑','dmg');flash('u'+v.uid,'hit',450);render();await wait(450);sendToGrave(v,'処刑された');render();await wait(300);continue;}
+        pop='不発';cls='info';msg=un(v)+'はHPが3以上なので処刑できない。';
+      }
       else if(eff==='silence'){v.silenceTurn=nextTurnOf(v.owner);pop='沈黙';cls='dmg';msg=un(v)+'のスキルが封じられた。';}
       else if(eff==='bounce'){returnToHand(v,v.owner!==u.owner);render();await wait(500);continue;}
       popup('u'+v.uid,pop,cls);log(msg,sideOf(v));
@@ -979,6 +1038,8 @@ async function turn(idx){
   const mm=seatMode(idx);
   if(mm==='ui')await humanMain();else if(mm==='cpu')await cpuMainFor(idx);else await remoteMainFor(idx);
   if(G.over)return;
+  await act(async()=>{await decayTick(idx);await decayTick(1-idx);});
+  if(G.over)return;
   {const P=G.p[idx];if(P.peeked){P.peeked=false;P.foreLock=null;P.abUsed=G.turn;log('👁 '+sname(idx)+'は予知の眼を使わずにターンを終えた(使用済み扱い)。',idx===ME?'me':'foe');}}
   await handLimit(idx);
 }
@@ -1104,7 +1165,7 @@ async function abilityBody(idx){
   const pub=m=>log(m,idx===ME?'me':'foe');
   const named=idx===ME||G.auto;
   const ctx={me:idx,eff:k};
-  const use=()=>{P.foreLock=null;P.peeked=false;P.abUsed=G.turn;G.abUses[k]=(G.abUses[k]||0)+1;};
+  const use=()=>{P.foreLock=null;P.peeked=false;P.abUsed=G.turn;G.abUses[k]=(G.abUses[k]||0)+1;P.field.slice().sort(byTurn).forEach(v=>qpush(v,'abil'));};
   const announce=()=>{P.abRevealed=true;pub('✦ '+sname(idx)+'が能力「'+A.name+'」を使った。');};
   if(k==='fortress'){
     use();announce();P.fortressTurn=G.turn+1;popup('P'+idx,'籠城','info');flash('P'+idx,'fire',700);render();await wait(500);
@@ -1249,10 +1310,14 @@ function cpuPick(opts,ctx){
         case 'trigger':s=fr?((t.slots.eff.key==='trigger'||t.slots.eff.key==='bounce')?-60:2+A):-100;break;
         case 'reaper':s=fr?-100:ucost(t)*2+A*2+t.hp*0.3;break;
         case 'pursuit':s=fr?-100:((t.hp<=(ctx.atk||1)?30:0)+A*2+ucost(t));break;
+        case 'swapatk':s=fr?-50:(A>=4?A*2+ucost(t)*0.3:-15);break;
+        case 'fortify':s=fr?((t.maxHp<t.char.hp+4)?ucost(t)*0.3+(t.hp<t.maxHp?4:1):-20):-100;break;
+        case 'execute':s=fr?-100:(t.hp<=2?ucost(t)*3+A*2+10:-60);break;
         case 'discount':s=fr?ucost(t):-100;break;
         default:s=0;
       }
     }
+    if(o.unit&&o.unit.char.kw&&o.unit.char.kw.undead&&o.unit.owner!==me&&(eff==='attack'||eff==='ping'||eff==='pursuit'||eff==='poison'||eff==='reaper'))s-=80;
     s+=Math.random()*0.5;
     if(s>bs){bs=s;best=o;}
   });
@@ -1262,7 +1327,8 @@ function cpuAttackTarget(idx,u){
   const F=basicPool(1-idx);
   if(!G.p[1-idx].field.length)return{player:1-idx};
   const ar=t=>(t.char.kw&&t.char.kw.armor)||0,eff=t=>Math.max(0,atkOf(u)-ar(t));
-  const kills=F.filter(t=>t.hp<=eff(t)&&eff(t)>0&&!t.shield),pool=kills.length?kills:F;
+  const F2=F.filter(t=>!(t.char.kw&&t.char.kw.undead)),FF=F2.length?F2:F;
+  const kills=FF.filter(t=>t.hp<=eff(t)&&eff(t)>0&&!t.shield),pool=kills.length?kills:FF;
   const val=t=>atkOf(t)*2+ucost(t)+(t.hp<=eff(t)?10:0)-(t.shield?8:0)-(eff(t)===0?30:0);
   return{unit:pool.reduce((m,x)=>val(x)>val(m)?x:m)};
 }
@@ -1586,7 +1652,7 @@ const OLD_PRESETS=[
    chars:pc('snake:3 mistwitch bombmaker plaguelord frost knight:2 archer:2 scout:2 apprentice:2 shield heavy mage dragoon medic'),
    skills:pc('cond.myturn:3 cond.foeturn cond.enter:2 cond.attacks:2 cond.attacked:2 targ.enemies:2 targ.foeone:2 targ.select:2 targ.topatk:2 targ.self targ.friends eff.poison:3 eff.freeze eff.atkdown eff.attack:3 eff.ping eff.atkup')},
   {name:'大型と守り',preset:true,ab:'fortress',
-   chars:pc('shield:2 heavy maiden guardian counter bastion colossus giant general medic captain apprentice:2 scout:2 archer:2 knight:2'),
+   chars:pc('shield:2 heavy maiden guardian counter bastion  giant general medic captain apprentice:2 scout:2 archer:2 knight:2'),
    skills:pc('cond.attacked:2 cond.wounded:2 cond.myturn:2 cond.foeturn cond.allygrave cond.attacks:2 targ.self:2 targ.friends:2 targ.weakally targ.allyone targ.others targ.topatk targ.select:2 eff.shield eff.heal eff.grow:2 eff.attack:3 eff.atkup:2 eff.ping')}
 ];
 const STARTER_DECK={name:'スターターデッキ',preset:true,ab:'pursuit',
@@ -1596,7 +1662,7 @@ const PRESETS=[STARTER_DECK];
 let memDecks=[],storageOk=true;
 const LS_KEY='kumitate-tcg-decks-v1';
 function loadDecks(){
-  try{const raw=localStorage.getItem(LS_KEY);const a=raw?JSON.parse(raw):[];if(Array.isArray(a)){memDecks=a.filter(d=>d&&typeof d.name==='string'&&d.chars&&d.skills);}}
+  try{const raw=localStorage.getItem(LS_KEY);const a=raw?JSON.parse(raw):[];if(Array.isArray(a)){memDecks=a.filter(d=>d&&typeof d.name==='string'&&d.chars&&d.skills);memDecks.forEach(d=>{for(const k of Object.keys(d.chars))if(!CHAR_BY[k])delete d.chars[k];});}}
   catch(e){storageOk=false;}
   return memDecks;
 }
@@ -1806,14 +1872,33 @@ function showTitle(){
 /* ---------- ガチャ(この端末内に保存する版。サーバー判定版は後日) ---------- */
 const GK='kumitate.gacha.v1',E_MS=20*60*1000,E_CAP=150,E_START=100,PACK_COST=50,PITY_N=100;
 const RVAL={1:1,2:3,3:10};
-const PACKS=[{id:'p1',name:'第1弾 槍帝降臨',feature:'lance',r3:['warlord','valkyrie','ironclad','thorn'],r2:['archmage','dragoon','giant','sniper','assassin','bombmaker','venomblade','trainer','glacier','tide','charger'],featW:1.2,
-  blurb:'貫く槍が、守りを砕く。攻撃性能の高いカードが多め。'}];
+// live=発売済み(目玉やレア3が天井交換・登録ボーナスの対象になる) / open=今引けるパック。古い弾は復刻(open:true)が来るまで引けない。
+// p2〜p6は仮案(live/open:false)。オフラインのテスト版(Artifact)では全部引ける。
+const PACKS=[
+ {id:'p1',name:'第1弾 槍帝降臨',art:['槍帝','降臨'],feature:'lance',r3:['warlord','valkyrie','ironclad','thorn'],r2:['archmage','dragoon','giant','sniper','assassin','bombmaker','venomblade','trainer','glacier','tide','charger'],featW:1.2,live:true,open:true,
+  blurb:'貫く槍が、守りを砕く。攻撃性能の高いカードが多め。'},
+ {id:'p2',name:'第2弾 不落の城塞',art:['城塞','不落'],feature:'wardgod',r3:['bastion','sentinel','ironclad','thorn'],r2:['general','giant','elite','priest','captain','night','veteran','paladin','mercenary','glacier','scribe','curse'],featW:1.2,live:false,open:false,
+  blurb:'倒れない護神が、盤面を支える。守りと回復のカードが多め。【仮案】'},
+ {id:'p3',name:'第3弾 疾風迅雷',art:['迅雷','疾風'],feature:'swift',r3:['lance','warlord','valkyrie','plaguelord'],r2:['dragoon','archmage','charger','assassin','sniper','bombmaker','venomblade','trainer','drummer','tide','mistwitch','mercenary'],featW:1.2,live:false,open:false,
+  blurb:'出た瞬間に駆け抜ける。速攻と攻撃のカードが多め。【仮案】'},
+ {id:'p4',name:'第4弾 朽ちる契約',art:['契約','朽ちる'],feature:'fool',r3:['plaguelord','thorn','warlord','sentinel'],r2:['paladin','trainer','glacier','scribe','mistwitch','bombmaker','curse','dragoon','assassin','veteran','tide','mercenary'],featW:1.2,live:false,open:false,
+  blurb:'朽ちゆく城が、攻撃者を黙らせる。墓地と呪いのカードが多め。【仮案】'},
+ {id:'p5',name:'第5弾 死者の行進',art:['死者','行進'],feature:'undead',r3:['plaguelord','valkyrie','bastion','ironclad'],r2:['paladin','trainer','glacier','priest','captain','mercenary','curse','scribe','night','elite','drummer','sniper'],featW:1.2,live:false,open:false,
+  blurb:'墓から起き上がる者たち。墓地のカードが多め。【仮案】'},
+ {id:'p6',name:'第6弾 適応の森',art:['適応','の森'],feature:'warking',r3:['lance','thorn','sentinel','valkyrie'],r2:['mistwitch','curse','tide','scribe','glacier','venomblade','priest','giant','general','elite','drummer','archmage'],featW:1.2,live:false,open:false,
+  blurb:'どんな状態異常も効かない王。状態異常と全体効果のカードが多め。【仮案】'}
+];
+const packLive=p=>p.live||!!window.__OFFLINE__, packOpen=p=>p.open||!!window.__OFFLINE__;
+const openPacks=()=>PACKS.filter(packOpen);
+let gaPackIdx=0,gaDetail=false;
+const curPack=()=>{const L=openPacks();return L[Math.min(gaPackIdx,L.length-1)];};
+const released=c=>rare(c)!==3||PACKS.some(p=>p.live&&(p.feature===c.key||p.r3.includes(c.key)));
 const GA={on:false,s:null,ok:true};
 const starterInv=()=>{const i={chars:{},skills:{}};Object.entries(STARTER_DECK.chars).forEach(([k,n])=>{i.chars[k]=n;});Object.entries(STARTER_DECK.skills).forEach(([k,n])=>{i.skills[k]=n;});return i;};
 function gaBonus(inv){ // 登録ボーナス:スターターに加え10枚(レア3を1・レア2を2・レア1を2・スキル5)。上限枚数は超えない
   const pk=a=>a[Math.floor(Math.random()*a.length)];
   const takeC=(list,n)=>{for(let i=0,g=0;i<n&&g++<300;){const c=pk(list);if((inv.chars[c.key]||0)>=maxCopies(c))continue;inv.chars[c.key]=(inv.chars[c.key]||0)+1;i++;}};
-  takeC(CHARS.filter(c=>rare(c)===3),1);takeC(CHARS.filter(c=>rare(c)===2),2);takeC(CHARS.filter(c=>rare(c)===1),2);
+  takeC(CHARS.filter(c=>rare(c)===3&&released(c)),1);takeC(CHARS.filter(c=>rare(c)===2),2);takeC(CHARS.filter(c=>rare(c)===1),2);
   for(let i=0,g=0;i<5&&g++<300;){const id=pk(SKILL_IDS);if((inv.skills[id]||0)>=3)continue;inv.skills[id]=(inv.skills[id]||0)+1;i++;}
 }
 function gaFresh(){const inv=starterInv();gaBonus(inv);return{v:1,inv,energy:E_START,t:Date.now(),pity:0,opened:0,bonus:1};}
@@ -1822,6 +1907,7 @@ function gaInit(){
   GA.on=true;let s=null;
   try{const raw=localStorage.getItem(GK);if(raw)s=JSON.parse(raw);}catch(e){GA.ok=false;}
   if(!s||s.v!==1||!s.inv){s=gaFresh();GA.s=s;storeLocal([]);gaSave();}else{GA.s=s;if(!s.bonus){gaBonus(s.inv);s.bonus=1;gaSave();}}
+  {const R={colossus:10};let g=0;for(const k of Object.keys(GA.s.inv.chars))if(!CHAR_BY[k]){g+=(R[k]||1)*GA.s.inv.chars[k];delete GA.s.inv.chars[k];}if(g){GA.s.energy+=g;gaSave();}}
   gaTick();
 }
 function gaTick(now){
@@ -1909,18 +1995,19 @@ function gaFlip(i){
 }
 function gaRender(){
   if(!$('gacha')||$('gacha').hidden)return;
-  gaTick();const s=GA.s,pack=PACKS[0],feat=CHAR_BY[pack.feature],ex=gaExcess();
+  gaTick();const s=GA.s,pack=curPack(),feat=CHAR_BY[pack.feature],ex=gaExcess();
   const pct=Math.min(100,s.energy/E_CAP*100);
   let h='<div class="dsheet"><div class="dhead"><h2>ガチャ</h2><button class="btn" id="gaBack">タイトルへ</button></div>';
   h+='<section class="ga-en"><div class="ga-enrow"><span>エナジー <b>'+s.energy+'</b> / '+E_CAP+'</span><span class="ga-next">'+(s.energy>=E_CAP?'上限です':'次の+1まで '+fmtMs(gaNextMs()))+'</span></div><div class="track"><i style="width:'+pct+'%"></i></div><small>20分で1回復。余ったカードをエナジーに変換もできます。</small></section>';
   if(gaShown.length){
     h+='<section class="ga-open"><h3>開封結果</h3><div class="ga-grid">'+gaShown.map((c,i)=>'<button class="gslot '+(gaRev.has(i)?'up':'')+' '+(c.rarity===3?'big':'')+'" data-g="flip" data-i="'+i+'"><span class="gback">?</span>'+(gaRev.has(i)?gaCardHTML(c,false):'')+'</button>').join('')+'</div><div class="dbtnrow" id="gaRow">'+gaRowHTML()+'</div></section>';
   }else{
-    h+='<section class="ga-pack"><div class="ga-pk"><div class="pk-art"><b>槍帝</b><span>降臨</span></div><div><h3>'+pack.name+'</h3><p>'+pack.blurb+'</p><p class="ga-rate">1パック11枚(ランダム10枚+最後にキャラ1枚確定)。レア3は約13%で入っていて、目玉は他の1.2倍出やすい。</p></div></div>';
+    if(openPacks().length>1)h+='<div class="dtoggle">'+openPacks().map((p,i)=>'<button class="btn'+(p===pack?' primary':'')+'" data-g="pk" data-i="'+i+'">'+p.name+(p.open?'':'(仮)')+'</button>').join('')+'</div>';
+    h+='<section class="ga-pack"><div class="ga-pk"><div class="pk-art"><b>'+pack.art[0]+'</b><span>'+pack.art[1]+'</span></div><div><h3>'+pack.name+'</h3><p>'+pack.blurb+'</p></div></div>';
     h+='<div class="ga-feat"><span class="ga-tag">目玉</span>'+gaCardHTML({kind:'char',key:pack.feature,rarity:3})+'</div>';
-    h+='<div class="ga-lineup"><div><h4>レア3</h4>'+pack.r3.map(k=>CHAR_BY[k].name).join('・')+'・<b>'+feat.name+'</b></div><div><h4>レア2</h4>'+pack.r2.map(k=>CHAR_BY[k].name).join('・')+'</div><div><h4>レア1・スキル</h4>全種類</div></div>';
-    h+='<div class="dbtnrow"><button class="btn primary big" data-g="open"'+(s.energy>=PACK_COST&&!gaBusy?'':' disabled')+'>1パック引く(エナジー '+PACK_COST+')</button>'+(s.energy>=PACK_COST?'':'<span class="ga-lack">あと '+(PACK_COST-s.energy)+' 必要</span>')+'</div></section>';
-    h+='<section class="ga-misc"><div><h3>天井</h3><div class="track"><i style="width:'+Math.min(100,s.pity/PITY_N*100)+'%"></i></div><small>'+s.pity+' / '+PITY_N+'パック。たまると好きなカード1枚と交換できます。</small><div class="dbtnrow"><button class="btn" data-g="pity"'+(s.pity>=PITY_N?'':' disabled')+'>好きなカードと交換</button></div></div>';
+    h+='<div class="dbtnrow"><button class="btn primary big" data-g="open"'+(s.energy>=PACK_COST&&!gaBusy?'':' disabled')+'>1パック引く(エナジー '+PACK_COST+')</button><button class="btn" data-g="detail">'+(gaDetail?'詳細を閉じる':'詳細')+'</button>'+(s.energy>=PACK_COST?'':'<span class="ga-lack">あと '+(PACK_COST-s.energy)+' 必要</span>')+'</div>'
+      +(gaDetail?'<div class="ga-detail"><div class="ga-lineup"><div><h4>レア3</h4>'+pack.r3.map(k=>CHAR_BY[k].name).join('・')+'・<b>'+feat.name+'</b>(目玉)</div><div><h4>レア2</h4>'+pack.r2.map(k=>CHAR_BY[k].name).join('・')+'</div><div><h4>レア1・スキル</h4>全種類</div></div><p class="ga-rate">1パック11枚。ランダム10枚は、キャラ約40%・スキル約60%(スキルは全種類が同じ確率)。キャラのレア度は、レア1が70%・レア2が28%・レア3が2%。最後の1枚はキャラ確定で、レア1が54%・レア2が40%・レア3が6%。目玉は、他のレア3の1.2倍出やすい。</p></div>':'')+'</section>';
+    h+='<section class="ga-misc mini"><div><h3>天井</h3><div class="track"><i style="width:'+Math.min(100,s.pity/PITY_N*100)+'%"></i></div><small>'+s.pity+' / '+PITY_N+'パック。たまると好きなカード1枚と交換できます。</small><div class="dbtnrow"><button class="btn" data-g="pity"'+(s.pity>=PITY_N?'':' disabled')+'>好きなカードと交換</button></div></div>';
     h+='<div><h3>余りカードの変換</h3><small>デッキの上限枚数を超えた分が対象です。レア1=1、レア2=3、レア3=10、スキル=1。</small><p class="ga-ex">余り <b>'+ex.count+'</b> 枚 → <b>+'+ex.total+'</b> エナジー</p><div class="dbtnrow"><button class="btn" data-g="conv"'+(ex.count?'':' disabled')+'>すべて変換する</button></div></div></section>';
   }
   if(gaErr)h+='<div class="dmsg" style="color:var(--danger)">'+gaErr+'</div>';
@@ -1938,10 +2025,10 @@ function gaOpenScreen(){
   clearInterval(gaTimer);gaTimer=setInterval(()=>{if($('gacha').hidden){clearInterval(gaTimer);return;}if(!gaShown.length)gaRender();},1000);
 }
 async function gaPity(){
-  const c=await openPick('交換するカード','天井の交換です。好きなカードを1枚選べます。',[{html:'<b>キャラ</b><span>全'+CHARS.length+'種</span>'},{html:'<b>スキル</b><span>全'+SKILL_IDS.length+'種</span>'}],true);
+  const c=await openPick('交換するカード','天井の交換です。好きなカードを1枚選べます。',[{html:'<b>キャラ</b><span>全'+CHARS.filter(released).length+'種</span>'},{html:'<b>スキル</b><span>全'+SKILL_IDS.length+'種</span>'}],true);
   if(c<0)return;
   let items,keys;
-  if(c===0){const L=CHARS.slice().sort((a,b)=>rare(b)-rare(a)||a.cost-b.cost);keys=L.map(x=>x.key);items=L.map(x=>({html:'<b>'+x.name+'</b><span>'+gaStars(rare(x))+' コスト'+cardCost(x)+' ATK'+x.atk+'/HP'+x.hp+'</span><small>所持 '+gaCount('char',x.key)+'</small>'}));}
+  if(c===0){const L=CHARS.filter(released).sort((a,b)=>rare(b)-rare(a)||a.cost-b.cost);keys=L.map(x=>x.key);items=L.map(x=>({html:'<b>'+x.name+'</b><span>'+gaStars(rare(x))+' コスト'+cardCost(x)+' ATK'+x.atk+'/HP'+x.hp+'</span><small>所持 '+gaCount('char',x.key)+'</small>'}));}
   else{keys=SKILL_IDS;items=SKILL_IDS.map(id=>{const [t,k]=id.split('.');return{html:'<b>'+SK[t][k].name+'</b><span>'+TLABEL[t]+'スキル</span><small>所持 '+gaCount('skill',id)+'</small>'};});}
   const j=await openPick('交換するカード','1枚選んでください。',items,true);
   if(j<0)return;
@@ -1956,11 +2043,13 @@ function gaClick(e){
   const b=e.target.closest('button');if(!b)return;
   if(b.id==='gaBack'){clearInterval(gaTimer);$('gacha').hidden=true;showTitle();return;}
   const a=b.dataset.g;if(!a)return;
+  if(a==='pk'){gaPackIdx=+b.dataset.i;gaRender();return;}
+  if(a==='detail'){gaDetail=!gaDetail;gaRender();return;}
   if(a==='open'){
     if(ACC.on){
       if(gaBusy)return;gaBusy=true;gaErr='';
-      api('/api/gacha/open','POST',{pack:PACKS[0].id}).then(r=>{gaSyncSrv(r.state);gaShown=r.cards;gaRev=new Set();}).catch(e=>{gaErr=e.message;api('/api/gacha').then(gaSyncSrv).catch(()=>{});}).then(()=>{gaBusy=false;gaRender();});
-    }else{const r=gaOpen(PACKS[0]);if(r){gaShown=r;gaRev=new Set();}gaRender();}
+      api('/api/gacha/open','POST',{pack:curPack().id}).then(r=>{gaSyncSrv(r.state);gaShown=r.cards;gaRev=new Set();}).catch(e=>{gaErr=e.message;api('/api/gacha').then(gaSyncSrv).catch(()=>{});}).then(()=>{gaBusy=false;gaRender();});
+    }else{const r=gaOpen(curPack());if(r){gaShown=r;gaRev=new Set();}gaRender();}
   }
   else if(a==='flip')gaFlip(+b.dataset.i);
   else if(a==='all'){gaShown.forEach((c,i)=>gaFlip(i));}
