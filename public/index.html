@@ -151,7 +151,12 @@ h1 span{color:var(--eff)}
 .dtab.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
 .dcard{background:var(--panel);border:2px solid var(--line);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;min-width:0}
-.dcard.has{border-color:var(--ink)}
+.dcard.has{border-color:var(--ink);background:color-mix(in srgb,var(--good) 10%,var(--panel))}
+.dcard.none{opacity:.5;background:var(--panel2);border-style:dashed;filter:grayscale(.7)}
+.dcard.none .dc-main b{color:var(--muted)}
+.own{font-size:11px;font-weight:800;padding:1px 8px;border-radius:99px;align-self:flex-start;background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good);border:1px solid var(--good)}
+.own.zero{background:transparent;color:var(--muted);border-color:var(--line)}
+.dtoggle{margin:2px 0 8px;display:flex;gap:6px;flex-wrap:wrap}
 .dcard.sk.cond{border-left:6px solid var(--cond)}.dcard.sk.targ{border-left:6px solid var(--targ)}.dcard.sk.eff{border-left:6px solid var(--eff)}
 .dc-main{display:flex;justify-content:space-between;gap:6px;align-items:baseline}
 .dc-cost{font-weight:900;font-size:16px;background:var(--panel2);border-radius:6px;padding:0 7px}
@@ -1702,7 +1707,7 @@ async function chooseDeck(){
   return i<0?null:ds[i];
 }
 /* デッキ構築画面 */
-const ED={d:null,tab:'char',msg:'',editing:null};
+const ED={d:null,tab:'char',msg:'',editing:null,onlyOwn:false};
 function edOpen(){
   if(!ED.d){ED.d=cloneDeck(PRESETS[0]);ED.d.name='';ED.editing=null;}
   $('title').hidden=true;$('builder').hidden=false;edRender();
@@ -1713,20 +1718,22 @@ function fixText(c){
 }
 function edCatalogHTML(){
   const d=ED.d,tabs=[['char','キャラ'],['cond','条件'],['targ','対象'],['eff','効果']];
-  let h='<div class="dtabs">'+tabs.map(([k,n])=>'<button class="dtab '+(ED.tab===k?'on':'')+'" data-d="tab" data-id="'+k+'">'+n+(k==='char'?' '+cnt(d.chars)+'/'+DECK_C:' '+typeCnt(d,k))+'</button>').join('')+'</div>'+(ED.tab==='char'?'<div class="dmsg" style="margin:4px 0">レア3: '+bigCnt(d.chars)+' / '+BIG_MAX+'枚まで</div>':'')+'<div class="dgrid">';
+  let h='<div class="dtabs">'+tabs.map(([k,n])=>'<button class="dtab '+(ED.tab===k?'on':'')+'" data-d="tab" data-id="'+k+'">'+n+(k==='char'?' '+cnt(d.chars)+'/'+DECK_C:' '+typeCnt(d,k))+'</button>').join('')+'</div>'+(ED.tab==='char'?'<div class="dmsg" style="margin:4px 0">レア3: '+bigCnt(d.chars)+' / '+BIG_MAX+'枚まで</div>':'')+(OWN()?'<div class="dtoggle"><button class="btn'+(ED.onlyOwn?' primary':'')+'" data-d="own">'+(ED.onlyOwn?'持っているカードだけ表示中':'持っているカードだけ表示')+'</button></div>':'')+'<div class="dgrid">';
   if(ED.tab==='char'){
     CHARS.slice().sort((a,b)=>a.cost-b.cost||a.name.localeCompare(b.name,'ja')).forEach(c=>{
-      const n=d.chars[c.key]||0,mx=capC(c),full=cnt(d.chars)>=DECK_C,ow=OWN();
-      h+='<div class="dcard '+(n?'has':'')+'"><div class="dc-main"><b>'+c.name+'</b><span class="dc-cost">'+cardCost(c)+'</span></div>'
-        +'<div class="dc-sub">ATK '+c.atk+' / HP '+c.hp+(isBig(c)?' ・レア3':'')+(ow?' ・所持'+(ow.chars[c.key]||0):'')+'</div>'
+      const n=d.chars[c.key]||0,mx=capC(c),full=cnt(d.chars)>=DECK_C,ow=OWN(),have=ow?(ow.chars[c.key]||0):null;
+      if(ED.onlyOwn&&ow&&!have&&!n)return;
+      h+='<div class="dcard '+(n?'has':'')+(ow&&!have?' none':'')+'"><div class="dc-main"><b>'+c.name+'</b><span class="dc-cost">'+cardCost(c)+'</span></div>'
+        +'<div class="dc-sub">ATK '+c.atk+' / HP '+c.hp+(isBig(c)?' ・レア3':'')+'</div>'+(ow?'<span class="own'+(have?'':' zero')+'">'+(have?'所持 '+have+'枚':'未所持')+'</span>':'')
         +'<div class="dc-fix">'+fixText(c)+'</div>'+(Object.keys(c.kw||{}).length?'<div class="u-state">'+kwTags(c)+'</div>':'')
         +'<div class="dc-ctl"><button data-d="dec" data-id="c:'+c.key+'"'+(n?'':' disabled')+'>−</button><span>'+n+'</span><button data-d="inc" data-id="c:'+c.key+'"'+(n>=mx||full||(isBig(c)&&bigCnt(d.chars)>=BIG_MAX)?' disabled':'')+'>＋</button></div></div>';
     });
   }else{
     Object.keys(SK[ED.tab]).forEach(k=>{
-      const id=ED.tab+'.'+k,n=d.skills[id]||0,full=cnt(d.skills)>=DECK_S,ow=OWN();
-      h+='<div class="dcard sk '+ED.tab+' '+(n?'has':'')+'"><div class="dc-main"><b>'+SK[ED.tab][k].name+'</b><span class="dc-cost">+'+SK[ED.tab][k].inc+'</span></div>'
-        +'<div class="dc-sub">'+DESC[ED.tab][k]+(ow?' ・所持'+(ow.skills[id]||0):'')+'</div>'
+      const id=ED.tab+'.'+k,n=d.skills[id]||0,full=cnt(d.skills)>=DECK_S,ow=OWN(),have=ow?(ow.skills[id]||0):null;
+      if(ED.onlyOwn&&ow&&!have&&!n)return;
+      h+='<div class="dcard sk '+ED.tab+' '+(n?'has':'')+(ow&&!have?' none':'')+'"><div class="dc-main"><b>'+SK[ED.tab][k].name+'</b><span class="dc-cost">+'+SK[ED.tab][k].inc+'</span></div>'
+        +'<div class="dc-sub">'+DESC[ED.tab][k]+'</div>'+(ow?'<span class="own'+(have?'':' zero')+'">'+(have?'所持 '+have+'枚':'未所持')+'</span>':'')
         +'<div class="dc-ctl"><button data-d="dec" data-id="s:'+id+'"'+(n?'':' disabled')+'>−</button><span>'+n+'</span><button data-d="inc" data-id="s:'+id+'"'+(n>=capS(ED.tab,k)||full?' disabled':'')+'>＋</button></div></div>';
     });
   }
@@ -1772,6 +1779,7 @@ function edClick(e){
     if(kind==='c'&&delta>0&&isBig(CHAR_BY[key])&&bigCnt(o)>=BIG_MAX)return;
     if(n===0)delete o[key];else o[key]=n;
   }
+  else if(a==='own')ED.onlyOwn=!ED.onlyOwn;
   else if(a==='ab')d.ab=id;
   else if(a==='save')edSave();
   else if(a==='fill'){ED.d=randomDeck(d,true);ED.d.name=d.name;ED.msg='空きをおまかせで埋めました。';}
@@ -1802,12 +1810,18 @@ const PACKS=[{id:'p1',name:'第1弾 槍帝降臨',feature:'lance',r3:['warlord',
   blurb:'貫く槍が、守りを砕く。攻撃性能の高いカードが多め。'}];
 const GA={on:false,s:null,ok:true};
 const starterInv=()=>{const i={chars:{},skills:{}};Object.entries(STARTER_DECK.chars).forEach(([k,n])=>{i.chars[k]=n;});Object.entries(STARTER_DECK.skills).forEach(([k,n])=>{i.skills[k]=n;});return i;};
-function gaFresh(){return{v:1,inv:starterInv(),energy:E_START,t:Date.now(),pity:0,opened:0};}
+function gaBonus(inv){ // 登録ボーナス:スターターに加え10枚(レア3を1・レア2を2・レア1を2・スキル5)。上限枚数は超えない
+  const pk=a=>a[Math.floor(Math.random()*a.length)];
+  const takeC=(list,n)=>{for(let i=0,g=0;i<n&&g++<300;){const c=pk(list);if((inv.chars[c.key]||0)>=maxCopies(c))continue;inv.chars[c.key]=(inv.chars[c.key]||0)+1;i++;}};
+  takeC(CHARS.filter(c=>rare(c)===3),1);takeC(CHARS.filter(c=>rare(c)===2),2);takeC(CHARS.filter(c=>rare(c)===1),2);
+  for(let i=0,g=0;i<5&&g++<300;){const id=pk(SKILL_IDS);if((inv.skills[id]||0)>=3)continue;inv.skills[id]=(inv.skills[id]||0)+1;i++;}
+}
+function gaFresh(){const inv=starterInv();gaBonus(inv);return{v:1,inv,energy:E_START,t:Date.now(),pity:0,opened:0,bonus:1};}
 function gaSave(){try{localStorage.setItem(GK,JSON.stringify(GA.s));}catch(e){GA.ok=false;}}
 function gaInit(){
   GA.on=true;let s=null;
   try{const raw=localStorage.getItem(GK);if(raw)s=JSON.parse(raw);}catch(e){GA.ok=false;}
-  if(!s||s.v!==1||!s.inv){s=gaFresh();GA.s=s;storeLocal([]);gaSave();}else GA.s=s;
+  if(!s||s.v!==1||!s.inv){s=gaFresh();GA.s=s;storeLocal([]);gaSave();}else{GA.s=s;if(!s.bonus){gaBonus(s.inv);s.bonus=1;gaSave();}}
   gaTick();
 }
 function gaTick(now){
