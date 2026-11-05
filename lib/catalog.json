@@ -296,9 +296,9 @@
     "curse"
    ],
    "featW": 1.2,
-   "live": false,
-   "open": false,
-   "blurb": "倒れない護神が、盤面を支える。守りと回復のカードが多め。【仮案】"
+   "live": true,
+   "open": true,
+   "blurb": "倒れない護神が、盤面を支える。守りと回復のカードが多め。"
   },
   {
    "id": "p3",
@@ -329,9 +329,9 @@
     "mercenary"
    ],
    "featW": 1.2,
-   "live": false,
-   "open": false,
-   "blurb": "出た瞬間に駆け抜ける。速攻と攻撃のカードが多め。【仮案】"
+   "live": true,
+   "open": true,
+   "blurb": "出た瞬間に駆け抜ける。速攻と攻撃のカードが多め。"
   },
   {
    "id": "p4",
