@@ -1870,17 +1870,17 @@ function showTitle(){
   $('builder').hidden=true;$('result').hidden=true;$('pick').hidden=true;$('rules').hidden=true;$('titleMsg').textContent='';$('title').hidden=false;
 }
 /* ---------- ガチャ(この端末内に保存する版。サーバー判定版は後日) ---------- */
-const GK='kumitate.gacha.v1',E_MS=20*60*1000,E_CAP=150,E_START=100,PACK_COST=50,PITY_N=100;
+const GK='kumitate.gacha.v1',E_MS=10*60*1000,E_CAP=150,E_START=100,PACK_COST=50,PITY_N=100;
 const RVAL={1:1,2:3,3:10};
 // live=発売済み(目玉やレア3が天井交換・登録ボーナスの対象になる) / open=今引けるパック。古い弾は復刻(open:true)が来るまで引けない。
-// p2〜p6は仮案(live/open:false)。オフラインのテスト版(Artifact)では全部引ける。
+// p4〜p6は仮案(live/open:false)。オフラインのテスト版(Artifact)では全部引ける。
 const PACKS=[
  {id:'p1',name:'第1弾 槍帝降臨',art:['槍帝','降臨'],feature:'lance',r3:['warlord','valkyrie','ironclad','thorn'],r2:['archmage','dragoon','giant','sniper','assassin','bombmaker','venomblade','trainer','glacier','tide','charger'],featW:1.2,live:true,open:true,
   blurb:'貫く槍が、守りを砕く。攻撃性能の高いカードが多め。'},
- {id:'p2',name:'第2弾 不落の城塞',art:['城塞','不落'],feature:'wardgod',r3:['bastion','sentinel','ironclad','thorn'],r2:['general','giant','elite','priest','captain','night','veteran','paladin','mercenary','glacier','scribe','curse'],featW:1.2,live:false,open:false,
-  blurb:'倒れない護神が、盤面を支える。守りと回復のカードが多め。【仮案】'},
- {id:'p3',name:'第3弾 疾風迅雷',art:['迅雷','疾風'],feature:'swift',r3:['lance','warlord','valkyrie','plaguelord'],r2:['dragoon','archmage','charger','assassin','sniper','bombmaker','venomblade','trainer','drummer','tide','mistwitch','mercenary'],featW:1.2,live:false,open:false,
-  blurb:'出た瞬間に駆け抜ける。速攻と攻撃のカードが多め。【仮案】'},
+ {id:'p2',name:'第2弾 不落の城塞',art:['城塞','不落'],feature:'wardgod',r3:['bastion','sentinel','ironclad','thorn'],r2:['general','giant','elite','priest','captain','night','veteran','paladin','mercenary','glacier','scribe','curse'],featW:1.2,live:true,open:true,
+  blurb:'倒れない護神が、盤面を支える。守りと回復のカードが多め。'},
+ {id:'p3',name:'第3弾 疾風迅雷',art:['迅雷','疾風'],feature:'swift',r3:['lance','warlord','valkyrie','plaguelord'],r2:['dragoon','archmage','charger','assassin','sniper','bombmaker','venomblade','trainer','drummer','tide','mistwitch','mercenary'],featW:1.2,live:true,open:true,
+  blurb:'出た瞬間に駆け抜ける。速攻と攻撃のカードが多め。'},
  {id:'p4',name:'第4弾 朽ちる契約',art:['契約','朽ちる'],feature:'fool',r3:['plaguelord','thorn','warlord','sentinel'],r2:['paladin','trainer','glacier','scribe','mistwitch','bombmaker','curse','dragoon','assassin','veteran','tide','mercenary'],featW:1.2,live:false,open:false,
   blurb:'朽ちゆく城が、攻撃者を黙らせる。墓地と呪いのカードが多め。【仮案】'},
  {id:'p5',name:'第5弾 死者の行進',art:['死者','行進'],feature:'undead',r3:['plaguelord','valkyrie','bastion','ironclad'],r2:['paladin','trainer','glacier','priest','captain','mercenary','curse','scribe','night','elite','drummer','sniper'],featW:1.2,live:false,open:false,
@@ -1998,7 +1998,7 @@ function gaRender(){
   gaTick();const s=GA.s,pack=curPack(),feat=CHAR_BY[pack.feature],ex=gaExcess();
   const pct=Math.min(100,s.energy/E_CAP*100);
   let h='<div class="dsheet"><div class="dhead"><h2>ガチャ</h2><button class="btn" id="gaBack">タイトルへ</button></div>';
-  h+='<section class="ga-en"><div class="ga-enrow"><span>エナジー <b>'+s.energy+'</b> / '+E_CAP+'</span><span class="ga-next">'+(s.energy>=E_CAP?'上限です':'次の+1まで '+fmtMs(gaNextMs()))+'</span></div><div class="track"><i style="width:'+pct+'%"></i></div><small>20分で1回復。余ったカードをエナジーに変換もできます。</small></section>';
+  h+='<section class="ga-en"><div class="ga-enrow"><span>エナジー <b>'+s.energy+'</b> / '+E_CAP+'</span><span class="ga-next">'+(s.energy>=E_CAP?'上限です':'次の+1まで '+fmtMs(gaNextMs()))+'</span></div><div class="track"><i style="width:'+pct+'%"></i></div><small>10分で1回復。余ったカードをエナジーに変換もできます。</small></section>';
   if(gaShown.length){
     h+='<section class="ga-open"><h3>開封結果</h3><div class="ga-grid">'+gaShown.map((c,i)=>'<button class="gslot '+(gaRev.has(i)?'up':'')+' '+(c.rarity===3?'big':'')+'" data-g="flip" data-i="'+i+'"><span class="gback">?</span>'+(gaRev.has(i)?gaCardHTML(c,false):'')+'</button>').join('')+'</div><div class="dbtnrow" id="gaRow">'+gaRowHTML()+'</div></section>';
   }else{
