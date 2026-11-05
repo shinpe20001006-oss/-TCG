@@ -42,13 +42,17 @@
   "captain": 2,
   "bastion": 1,
   "ironclad": 1,
-  "colossus": 1,
   "warlord": 1,
   "thorn": 1,
   "valkyrie": 1,
   "sentinel": 1,
   "plaguelord": 1,
   "lance": 1,
+  "warking": 1,
+  "swift": 1,
+  "wardgod": 1,
+  "fool": 1,
+  "undead": 1,
   "veteran": 2,
   "charger": 2,
   "elite": 2,
@@ -104,13 +108,17 @@
   "captain": 2,
   "bastion": 3,
   "ironclad": 3,
-  "colossus": 3,
   "warlord": 3,
   "thorn": 3,
   "valkyrie": 3,
   "sentinel": 3,
   "plaguelord": 3,
   "lance": 3,
+  "warking": 3,
+  "swift": 3,
+  "wardgod": 3,
+  "fool": 3,
+  "undead": 3,
   "veteran": 2,
   "charger": 2,
   "elite": 2,
@@ -136,6 +144,9 @@
   "cond.foegrave": 3,
   "cond.myturn": 3,
   "cond.foeturn": 3,
+  "cond.foeattacks": 3,
+  "cond.foeweak": 3,
+  "cond.abil": 3,
   "targ.topatk": 3,
   "targ.weakally": 3,
   "targ.self": 3,
@@ -146,6 +157,9 @@
   "targ.friends": 3,
   "targ.enemies": 3,
   "targ.all": 3,
+  "targ.lowfoe": 3,
+  "targ.topally": 3,
+  "targ.foetwo": 3,
   "eff.ping": 3,
   "eff.attack": 3,
   "eff.atkup": 3,
@@ -158,7 +172,10 @@
   "eff.silence": 3,
   "eff.grow": 3,
   "eff.trigger": 3,
-  "eff.bounce": 3
+  "eff.bounce": 3,
+  "eff.swapatk": 3,
+  "eff.fortify": 3,
+  "eff.execute": 3
  },
  "abilities": [
   "fortress",
@@ -221,6 +238,10 @@
   {
    "id": "p1",
    "name": "第1弾 槍帝降臨",
+   "art": [
+    "槍帝",
+    "降臨"
+   ],
    "feature": "lance",
    "r3": [
     "warlord",
@@ -242,7 +263,174 @@
     "charger"
    ],
    "featW": 1.2,
+   "live": true,
+   "open": true,
    "blurb": "貫く槍が、守りを砕く。攻撃性能の高いカードが多め。"
+  },
+  {
+   "id": "p2",
+   "name": "第2弾 不落の城塞",
+   "art": [
+    "城塞",
+    "不落"
+   ],
+   "feature": "wardgod",
+   "r3": [
+    "bastion",
+    "sentinel",
+    "ironclad",
+    "thorn"
+   ],
+   "r2": [
+    "general",
+    "giant",
+    "elite",
+    "priest",
+    "captain",
+    "night",
+    "veteran",
+    "paladin",
+    "mercenary",
+    "glacier",
+    "scribe",
+    "curse"
+   ],
+   "featW": 1.2,
+   "live": false,
+   "open": false,
+   "blurb": "倒れない護神が、盤面を支える。守りと回復のカードが多め。【仮案】"
+  },
+  {
+   "id": "p3",
+   "name": "第3弾 疾風迅雷",
+   "art": [
+    "迅雷",
+    "疾風"
+   ],
+   "feature": "swift",
+   "r3": [
+    "lance",
+    "warlord",
+    "valkyrie",
+    "plaguelord"
+   ],
+   "r2": [
+    "dragoon",
+    "archmage",
+    "charger",
+    "assassin",
+    "sniper",
+    "bombmaker",
+    "venomblade",
+    "trainer",
+    "drummer",
+    "tide",
+    "mistwitch",
+    "mercenary"
+   ],
+   "featW": 1.2,
+   "live": false,
+   "open": false,
+   "blurb": "出た瞬間に駆け抜ける。速攻と攻撃のカードが多め。【仮案】"
+  },
+  {
+   "id": "p4",
+   "name": "第4弾 朽ちる契約",
+   "art": [
+    "契約",
+    "朽ちる"
+   ],
+   "feature": "fool",
+   "r3": [
+    "plaguelord",
+    "thorn",
+    "warlord",
+    "sentinel"
+   ],
+   "r2": [
+    "paladin",
+    "trainer",
+    "glacier",
+    "scribe",
+    "mistwitch",
+    "bombmaker",
+    "curse",
+    "dragoon",
+    "assassin",
+    "veteran",
+    "tide",
+    "mercenary"
+   ],
+   "featW": 1.2,
+   "live": false,
+   "open": false,
+   "blurb": "朽ちゆく城が、攻撃者を黙らせる。墓地と呪いのカードが多め。【仮案】"
+  },
+  {
+   "id": "p5",
+   "name": "第5弾 死者の行進",
+   "art": [
+    "死者",
+    "行進"
+   ],
+   "feature": "undead",
+   "r3": [
+    "plaguelord",
+    "valkyrie",
+    "bastion",
+    "ironclad"
+   ],
+   "r2": [
+    "paladin",
+    "trainer",
+    "glacier",
+    "priest",
+    "captain",
+    "mercenary",
+    "curse",
+    "scribe",
+    "night",
+    "elite",
+    "drummer",
+    "sniper"
+   ],
+   "featW": 1.2,
+   "live": false,
+   "open": false,
+   "blurb": "墓から起き上がる者たち。墓地のカードが多め。【仮案】"
+  },
+  {
+   "id": "p6",
+   "name": "第6弾 適応の森",
+   "art": [
+    "適応",
+    "の森"
+   ],
+   "feature": "warking",
+   "r3": [
+    "lance",
+    "thorn",
+    "sentinel",
+    "valkyrie"
+   ],
+   "r2": [
+    "mistwitch",
+    "curse",
+    "tide",
+    "scribe",
+    "glacier",
+    "venomblade",
+    "priest",
+    "giant",
+    "general",
+    "elite",
+    "drummer",
+    "archmage"
+   ],
+   "featW": 1.2,
+   "live": false,
+   "open": false,
+   "blurb": "どんな状態異常も効かない王。状態異常と全体効果のカードが多め。【仮案】"
   }
  ]
 }
