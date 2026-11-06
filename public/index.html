@@ -322,7 +322,7 @@ h1 span{color:var(--eff)}
 </div>
 <div class="fxlayer" id="fx"></div>
 
-<div class="overlay solid" id="title" hidden><div class="titlebox"><h1 class="ttl">組み立て<span>TCG</span></h1><p class="tsub">キャラに「条件・対象・効果」を組み付けて戦うカードゲーム</p><div class="tbtns"><button class="tbtn" id="tDeck"><b>デッキ構築</b><span>カードを選んで、能力といっしょに保存する</span></button><button class="tbtn" id="tCpu"><b>CPU戦</b><span>作ったデッキで、CPUと対戦する</span></button><button class="tbtn" id="tGacha"><b>ガチャ</b><span>カードパックを開ける</span></button><button class="tbtn" id="tPvp"><b>対人戦</b><span>ルームコードで友達と対戦(オンライン版のみ)</span></button></div><div class="tmini"><button class="btn" id="tWatch">CPU同士を観戦</button><button class="btn" id="tRules">ルール</button><button class="btn" id="tAcct" hidden>アカウント</button></div><p class="tmsg" id="titleMsg"></p></div></div>
+<div class="overlay solid" id="title" hidden><div class="titlebox"><h1 class="ttl">組み立て<span>TCG</span></h1><p class="tsub">キャラに「条件・対象・効果」を組み付けて戦うカードゲーム</p><div class="tbtns"><button class="tbtn" id="tDeck"><b>デッキ構築</b><span>カードを選んで、能力といっしょに保存する</span></button><button class="tbtn" id="tCpu"><b>CPU戦</b><span>作ったデッキで、CPUと対戦する</span></button><button class="tbtn" id="tGacha"><b>ガチャ</b><span>カードパックを開ける(準備中)</span></button><button class="tbtn" id="tPvp"><b>対人戦</b><span>ルームコードで友達と対戦(オンライン版のみ)</span></button></div><div class="tmini"><button class="btn" id="tWatch">CPU同士を観戦</button><button class="btn" id="tRules">ルール</button><button class="btn" id="tAcct" hidden>アカウント</button></div><p class="tmsg" id="titleMsg"></p></div></div>
 <div class="overlay solid" id="builder" hidden><div class="dsheet"><div class="dhead"><h2>デッキ構築</h2><button class="btn" id="dBack">タイトルへ</button></div><div class="dbody"><section class="dcat" id="dCat"></section><aside class="dside" id="dSide"></aside></div></div></div>
 <div class="overlay solid" id="gacha" hidden><div id="gachaBox"></div></div>
 <div class="overlay" id="lobby" hidden><div class="sheet" role="dialog"><h2>対人戦</h2><div id="lbMenu"><label class="lbl">名前<input id="lbName" maxlength="16" value="プレイヤー"></label><div class="btns"><button class="btn primary" id="lbCreate">ルームを作る</button></div><label class="lbl">ルームコードで参加<input id="lbInput" maxlength="6" placeholder="ABCDE" autocapitalize="characters"></label><div class="btns"><button class="btn" id="lbJoin">参加する</button></div></div><div id="lbWait" hidden><p>このコードを相手に伝えてください。</p><p class="lbcode" id="lbCode"></p><p>相手の参加を待っています…</p></div><p class="tmsg" id="lbMsg"></p><div class="btns"><button class="btn" id="lbBack">戻る</button></div></div></div>
@@ -405,7 +405,7 @@ const SK={cond:COND,targ:TARG,eff:EFF};
 const DESC={
   cond:{attacked:'攻撃を受けて、HPが残ったとき。',attacks:'このカードが攻撃したとき(同じカードで1ターンに1回まで)。',grave:'このカードが墓地に送られたとき。',
     wounded:'ダメージでHPが最大の半分以下になったとき(1体につき1回だけ)。',
-    enter:'このユニットが場に出た直後(同じキャラは1ターンに1回まで)。',effected:'他のカードの効果の対象になったとき(基本攻撃と自分のスキルは除く)。',
+    enter:'このユニットが場に出た直後。',effected:'他のカードの効果の対象になったとき(基本攻撃と自分のスキルは除く)。',
     allygrave:'自分以外の味方が墓地に送られたとき(プレイヤーが「墓地に送る」で直接送った場合は発動しない)。',allyenter:'自分以外の味方が場に出たとき。',foeenter:'敵が場に出たとき。',foegrave:'敵が墓地に送られたとき。',
     myturn:'自分のターン開始時。',foeturn:'相手のターン開始時。',
     foeattacks:'敵のカードが攻撃するたび(基本攻撃と「攻撃する」の効果。誰を攻撃しても発動。回数の制限なし)。',foeweak:'自分のターン開始時に、敵の場のカードが自分の場より多いとき。',abil:'自分が能力を使ったとき(自分の場で、この条件を持つカードがそれぞれ発動する)。'},
@@ -624,8 +624,6 @@ function emit(ev,u,direct){
   }else qpush(u,ev);
 }
 function emitEnter(u){
-  if(u.char.enterTurn===G.turn){log(un(u)+'はこのターンすでに場に出ているので、「場に出たとき」は発動しない。','sys');return;}
-  u.char.enterTurn=G.turn;
   emit('enter',u);
   G.p[u.owner].field.filter(v=>v!==u).sort(byTurn).forEach(v=>qpush(v,'allyenter'));
   G.p[1-u.owner].field.slice().sort(byTurn).forEach(v=>qpush(v,'foeenter'));
@@ -874,6 +872,25 @@ async function runEffect(u,targ,eff){
     }
   }
 }
+/* 対戦報酬(オンラインのみ。サーバーが回数・金額・両者の結果の一致を判定する) */
+async function rewardReport(kind,res,match){
+  const say=t=>{const e=$('resultText');if(e&&!e.dataset.rw){e.dataset.rw='1';}if(e)e.textContent=e.textContent.replace(/ ／ エナジー.*$/,'').replace(/ ／ 今日の.*$/,'')+t;};
+  try{
+    if(kind==='cpu'){
+      if(res!=='win')return;
+      const r=await api('/api/reward/cpu','POST',{});
+      if(r.state)gaSyncSrv(r.state);
+      say(r.gained?' ／ エナジー +'+r.gained+' を獲得':' ／ 今日のCPU戦の報酬は上限に達しています');
+      return;
+    }
+    for(let i=0;i<14;i++){
+      const r=await api('/api/reward/pvp','POST',{match,result:res});
+      if(r.status==='granted'||r.status==='capped'){if(r.state)gaSyncSrv(r.state);say(r.gained?' ／ エナジー +'+r.gained+' を獲得':' ／ 今日の対人戦の報酬は上限に達しています');return;}
+      if(r.status==='rejected')return;
+      await new Promise(ok=>setTimeout(ok,2500));
+    }
+  }catch(e){}
+}
 function checkOver(){
   if(!G||G.over)return;
   const a=G.p[ME].life<=0,b=G.p[1-ME].life<=0;
@@ -888,6 +905,7 @@ function checkOver(){
     $('resultText').textContent=G.over==='draw'?'両者のライフが同時に0になりました。':(G.over==='win'?'相手のライフを0にしました。ターン'+G.turn+'で決着。':'ライフが0になりました。別の組み立てで再挑戦しましょう。');
   }
   log('ゲーム終了:'+$('resultTitle').textContent,'turn');
+  if(!G.auto&&!G.bot&&ACC.on&&G.over!=='draw')rewardReport(G.net?'pvp':'cpu',G.over,G.net?PV.match:'');
   render();
   setTimeout(()=>{if(G&&G.over)$('result').hidden=false;},700);
 }
@@ -1870,7 +1888,7 @@ function showTitle(){
   $('builder').hidden=true;$('result').hidden=true;$('pick').hidden=true;$('rules').hidden=true;$('titleMsg').textContent='';$('title').hidden=false;
 }
 /* ---------- ガチャ(この端末内に保存する版。サーバー判定版は後日) ---------- */
-const GK='kumitate.gacha.v1',E_MS=10*60*1000,E_CAP=150,E_START=100,PACK_COST=50,PITY_N=100;
+const GK='kumitate.gacha.v1',E_MS=10*60*1000,E_CAP=300,E_START=100,PACK_COST=50,PITY_N=100;
 const RVAL={1:1,2:3,3:10};
 // live=発売済み(目玉やレア3が天井交換・登録ボーナスの対象になる) / open=今引けるパック。古い弾は復刻(open:true)が来るまで引けない。
 // p4〜p6は仮案(live/open:false)。オフラインのテスト版(Artifact)では全部引ける。
@@ -1919,7 +1937,8 @@ function gaTick(now){
 function gaSyncSrv(st){
   const now=Date.now();
   ACC.owned=st.inv;
-  GA.s={v:1,inv:ACC.owned,energy:st.energy,t:st.energy>=E_CAP?now:now+st.nextMs-E_MS,pity:st.pity,opened:st.opened};
+  const rw=st.reward||(GA.s&&GA.s.reward)||null;
+  GA.s={v:1,inv:ACC.owned,energy:st.energy,t:st.energy>=E_CAP?now:now+st.nextMs-E_MS,pity:st.pity,opened:st.opened,reward:rw};
 }
 let gaBusy=false,gaErr='';
 const gaNextMs=()=>GA.s.energy>=E_CAP?0:Math.max(0,E_MS-(Date.now()-GA.s.t));
@@ -1998,7 +2017,7 @@ function gaRender(){
   gaTick();const s=GA.s,pack=curPack(),feat=CHAR_BY[pack.feature],ex=gaExcess();
   const pct=Math.min(100,s.energy/E_CAP*100);
   let h='<div class="dsheet"><div class="dhead"><h2>ガチャ</h2><button class="btn" id="gaBack">タイトルへ</button></div>';
-  h+='<section class="ga-en"><div class="ga-enrow"><span>エナジー <b>'+s.energy+'</b> / '+E_CAP+'</span><span class="ga-next">'+(s.energy>=E_CAP?'上限です':'次の+1まで '+fmtMs(gaNextMs()))+'</span></div><div class="track"><i style="width:'+pct+'%"></i></div><small>10分で1回復。余ったカードをエナジーに変換もできます。</small></section>';
+  h+='<section class="ga-en"><div class="ga-enrow"><span>エナジー <b>'+s.energy+'</b> / '+E_CAP+'</span><span class="ga-next">'+(s.energy>=E_CAP?'上限です':'次の+1まで '+fmtMs(gaNextMs()))+'</span></div><div class="track"><i style="width:'+pct+'%"></i></div><small>10分で1回復。余ったカードをエナジーに変換もできます。</small>'+(s.reward?'<small class="ga-rw" style="display:block;margin-top:2px">対戦報酬(今日): CPU戦に勝つと +5(' +s.reward.cpu+'/'+s.reward.cpuMax+'勝) ／ 対人戦は勝ち +10・負け +5('+s.reward.pvp+'/'+s.reward.pvpMax+'戦)</small>':'')+'</section>';
   if(gaShown.length){
     h+='<section class="ga-open"><h3>開封結果</h3><div class="ga-grid">'+gaShown.map((c,i)=>'<button class="gslot '+(gaRev.has(i)?'up':'')+' '+(c.rarity===3?'big':'')+'" data-g="flip" data-i="'+i+'"><span class="gback">?</span>'+(gaRev.has(i)?gaCardHTML(c,false):'')+'</button>').join('')+'</div><div class="dbtnrow" id="gaRow">'+gaRowHTML()+'</div></section>';
   }else{
@@ -2104,7 +2123,7 @@ function pvBegin(seed){
   if(PV.started||!PV.opp)return;
   const od=PV.opp.deck;
   if(!od||typeof od!=='object'||!od.chars||!od.skills||validateDeck(od).length){pvMsg('相手のデッキが不正です。');return;}
-  PV.started=true;PV.ss=0;PV.rs=0;$('lobby').hidden=true;
+  PV.started=true;PV.ss=0;PV.rs=0;PV.match=PV.code+':'+seed;$('lobby').hidden=true;
   NET={send:m=>{TRACE.push('>'+JSON.stringify(m));if(TRACE.length>40)TRACE.shift();pvSend({t:'g',s:++PV.ss,m});},onDesync:why=>{$('resultTitle').textContent='同期エラー';$('resultText').textContent='対戦データが食い違ったため、対戦を終了しました。('+why+')';$('result').hidden=false;},
     onLeft:()=>{if(HEADLESS)return;$('resultTitle').textContent='相手が退出しました';$('resultText').textContent='対戦相手との接続が切れました。';$('result').hidden=false;}};
   netClear();
@@ -2163,7 +2182,7 @@ async function sim(n,opt){
   }finally{HEADLESS=sv.HEADLESS;CPURANDOM=sv.CPURANDOM;LIFE=sv.LIFE;HPMULT=sv.HPMULT;speed=sv.speed;}
   return out;
 }
-window.__tcg={bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({maxCopies,KWD,ABIL,AB_KEYS,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
+window.__tcg={bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover,rewardReport},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({maxCopies,KWD,ABIL,AB_KEYS,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
   tune:m=>{Object.keys(m).forEach(k=>{if(k==='sur'){SURV=m[k];return;}const [ty,key]=k.split('.');if(ty==='ab'){if(key.endsWith('_s'))ABIL[key.slice(0,-2)].start=m[k];else ABIL[key].cd=m[k];return;}SK[ty][key].inc=m[k];});recost();},
   cfg:o=>{if(o.cap!==undefined)CAP=o.cap;if(o.firstdraw!==undefined)FIRSTDRAW=o.firstdraw;if(o.hp!==undefined)HPMULT=o.hp;if(o.life!==undefined)LIFE=o.life;if(o.handmax!==undefined)HANDMAX=o.handmax;if(o.atkq!==undefined)ATKQ=o.atkq;if(o.ctr!==undefined)CTR=o.ctr;if(o.untg!==undefined)UNTG=o.untg;if(o.autosw!==undefined)AUTOSW=o.autosw;if(o.catch!==undefined)CATCH=o.catch;if(o.catchn!==undefined)CATCHN=o.catchn;if(o.grace!==undefined)GRACE=o.grace;if(o.haste!==undefined)HASTE=o.haste;if(o.sweep){const w=o.sweep;if(w.on!==undefined)SWEEP_ON=w.on;if(w.t!==undefined)SWEEP_T=w.t;if(w.life!==undefined)SWEEP_LIFE=w.life;if(w.diff!==undefined)SWEEP_DIFF=w.diff;}}};
 if(typeof document!=='undefined'&&$('board')){initMenus();showTitle();accInit().then(()=>{if(!ACC.on&&!GA.on)gaInit();});}
