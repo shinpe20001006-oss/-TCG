@@ -360,6 +360,11 @@ body.fx-lite .unit.st-shield::before,body.fx-lite .unit.st-frozen::after,body.fx
 @keyframes ulunge{0%{transform:none}42%{transform:translate(var(--dx),var(--dy)) scale(1.06)}100%{transform:none}}
 @media (prefers-reduced-motion:reduce){.unit.fx-lunge{animation:none}}
 body.fx-lite .unit.fx-lunge{animation:none}
+.unity{font-weight:900;border-radius:999px;padding:1px 8px;border:1.5px solid currentColor}
+.unity.t-w{color:#B3361B}.unity.t-m{color:#7A3FC4}.unity.t-b{color:#2F7D32}.unity.t-k{color:#2F6F8F}
+:root[data-theme="dark"] .unity.t-w{color:#FF8A6E}:root[data-theme="dark"] .unity.t-m{color:#C9A0FF}:root[data-theme="dark"] .unity.t-b{color:#8FDB94}:root[data-theme="dark"] .unity.t-k{color:#8FD0EE}
+.unitybar{font-size:12px;border:1.5px dashed var(--line);border-radius:10px;padding:6px 10px;margin:6px 0;color:var(--muted,#667)}
+.unitybar.on{border-style:solid;border-color:#E0A800;background:color-mix(in srgb,#E0A800 14%,transparent);color:var(--ink)}
 
 </style>
 
@@ -412,10 +417,10 @@ body.fx-lite .unit.fx-lunge{animation:none}
       <li>デッキ:キャラ20枚・スキル30枚で作ります(同名3枚まで。大型キャラは1枚まで)。デッキごとに能力を1つ選び、名前を付けて保存できます。連鎖(1回の行動で2つ以上のスキルが続けて発動すること)が起きると、画面に「N連鎖!」と出ます。</li>
       <li>追い上げ:自分のターン開始時に、相手の場のコスト合計が自分より6以上多いと、ドローが2枚増えます(出し負けたときの救済です)。</li>
       <li>大掃除:1ゲームに1回、自分のメインフェーズにライフ5を払って宣言できます。お互いの場にいる、ユニットのコストが9以下のカードをすべて破壊します(破壊されたカードのスキルは通常どおり発動します)。出し負けたときの巻き返し用です。</li>
-      <li>毒は持ち主のターン開始時に1ダメージ(3回)、凍結は持ち主の次のターンの基本攻撃を封じ、沈黙は次のターンの終わりまでスキルを止めます。シールドは次の1回のダメージを無効にします(毒は防げません)。</li>
+      <li>毒は持ち主のターン開始時に1ダメージ(3回)、凍結は持ち主の次のターンの基本攻撃を封じ(持ち主のターン中に受けたときは、そのターンの残りの基本攻撃を封じ)、沈黙は次のターンの終わりまでスキルを止めます。シールドは次の1回のダメージを無効にします(毒は防げません)。</li>
       <li>デモ版の決め事:攻撃させるは、対象が発動者の敵を攻撃します。山札が尽きたら墓地を戻して3ダメージ。100ターンで引き分けです。デモのスキル山札は全種類入りの共通デッキで、全体の約70%は「条件・対象・効果」を1枚ずつ含む3枚1組(組の中の順番はランダム)で並び、残りはばらばらに混ざります。種類の偏りによる手札事故を減らすための仕組みです。</li>
     </ul>
-    <h3>能力</h3><p>戦闘前に能力を1つ選びます。自分のメインフェーズに1回使え、使ったあとは決まったターン数(画面左上のターン表示で数えます)が過ぎるまで再使用できません。相手も能力を持っていて、使われるまで何かは分かりません。</p><ul id="abref"></ul><h3>スキル早見表</h3>
+    <h3>属性統一</h3><p>キャラには戦士・魔術・獣・機械のいずれかの属性があります。デッキのキャラ20枚のうち15枚以上が同じ属性だと、その属性に応じた恩恵が受けられます。<br>戦士統一:レア1のキャラのHP+1 / 魔術統一:自分のターン2回に1回、ドローで引ける枚数+1 / 機械統一:能力の再使用ターン数-2(最低1) / 獣統一:攻撃(通常攻撃・スキルの攻撃)が10%でクリティカル(ダメージ+2。追い討ち・1ダメージ・反撃は対象外)</p><h3>能力</h3><p>戦闘前に能力を1つ選びます。自分のメインフェーズに1回使え、使ったあとは決まったターン数(画面左上のターン表示で数えます)が過ぎるまで再使用できません。相手も能力を持っていて、使われるまで何かは分かりません。</p><ul id="abref"></ul><h3>スキル早見表</h3>
     <div class="tbl"><table id="ref"></table></div>
     <div class="btns"><button class="btn primary" id="btnRulesClose">閉じる</button></div>
   </div>
@@ -450,7 +455,7 @@ const TARG={
   topatk:{name:'ATK最大の敵1枚を',inc:2}, weakally:{name:'HP最小の味方1枚を',inc:2},
   self:{name:'自分を',inc:2}, allyone:{name:'味方1枚を選択',inc:2}, foeone:{name:'敵1枚を選択',inc:3},
   select:{name:'選択した1枚を',inc:4}, others:{name:'自分以外の味方全員を',inc:2},
-  friends:{name:'味方の全員を',inc:3}, enemies:{name:'敵の全員を',inc:5}, all:{name:'全体の全員を',inc:4},
+  friends:{name:'味方の全員を',inc:3}, tagself:{name:'味方の、このカードの属性全員に',inc:2}, tagally:{name:'味方の、選択したカードの属性全員に',inc:2}, tagfoe:{name:'敵の、選択したカードの属性全員に',inc:3}, enemies:{name:'敵の全員を',inc:5}, all:{name:'全体の全員を',inc:4},
   lowfoe:{name:'HP最小の敵1枚を',inc:2}, topally:{name:'ATK最大の味方1枚を',inc:2}, foetwo:{name:'敵2枚を選択',inc:4}
 };
 const EFF={
@@ -471,33 +476,33 @@ const DESC={
     foeattacks:'敵のカードが攻撃するたび(基本攻撃と「攻撃する」の効果。誰を攻撃しても発動。回数の制限なし)。',foeweak:'自分のターン開始時に、敵の場のカードが自分の場より多いとき。',abil:'自分が能力を使ったとき(自分の場で、この条件を持つカードがそれぞれ発動する)。'},
   targ:{topatk:'敵のうちATKが最大の1枚(同値は先に出た方)。自動で決まる。',weakally:'味方のうちHPが最小の1枚(自分を含む)。自動で決まる。',
     self:'このカードだけ。',allyone:'味方の場のカード1枚を選ぶ(自分を含む)。',foeone:'敵の場のカード1枚を選ぶ。',
-    select:'場のカード1枚を選ぶ(敵味方どちらでもよい)。',others:'自分以外の味方の場のカード全部。',friends:'味方の場のカード全部(自分を含む)。',
+    select:'場のカード1枚を選ぶ(敵味方どちらでもよい)。',tagself:'味方の場の、このカードと同じ属性(戦士・魔術・獣・機械)のカード全部(自分を含む)。',tagally:'味方の場のカード1枚を選び、それと同じ属性の味方のカード全部(選んだカードを含む)。',tagfoe:'敵の場のカード1枚を選び、それと同じ属性の敵のカード全部(選んだカードを含む)。',others:'自分以外の味方の場のカード全部。',friends:'味方の場のカード全部(自分を含む)。',
     enemies:'敵の場のカード全部。',all:'敵味方の場のカード全部(自分を含む)。',
     lowfoe:'敵のうちHPが最小の1枚(同値は先に出た方)。自動で決まる。',topally:'味方のうちATKが最大の1枚(自分を含む。同値は先に出た方)。自動で決まる。',foetwo:'敵の場のカードを2枚まで選ぶ(敵が1枚なら1枚)。「攻撃する」は、ダメージが半分ずつ(切り上げ)になる。'},
   eff:{ping:'ATKに関係なく1ダメージ(攻撃ではない)。',attack:'このカードのATK分のダメージ(対象が2つ以上なら半分、切り上げ)。',
     atkup:'対象のATKを、このターンの終わりまで+1する。',makeattack:'対象が、自分のATK分のダメージを、発動者の敵に与える。',
     heal:'対象のHPを'+HEAL+'回復する(最大HPまで)。',shield:'対象の次の1回のダメージ(攻撃・1ダメージ)を無効にする。毒は防げない。同じカードは1ターンに1回しか張れない。',
-    poison:'対象は自分のターン開始時に1ダメージを受ける(合計'+POISON_TURNS+'回)。',freeze:'対象は、持ち主の次のターンに基本攻撃できない。',
+    poison:'対象は自分のターン開始時に1ダメージを受ける(合計'+POISON_TURNS+'回)。',freeze:'対象は、持ち主の次のターンに基本攻撃できない(持ち主のターン中に受けたときは、そのターンの残りの基本攻撃ができない)。',
     atkdown:'対象のATKを永続で-1する(0まで)。',silence:'対象のスキルが、持ち主の次のターンの終わりまで発動しなくなる。',
     grow:'対象のATKを永続で+1する(元のATK+2まで)。',trigger:'対象のスキルを条件を無視して発動させる(この効果は不発)。',
     bounce:'対象を手札に戻す。敵に使うとスキルは墓地へ、キャラだけ手札に戻る。「敵が場に出たとき」と組み合わせて対象が「敵の全員」のときは、出てきた敵1体だけが戻る。',
     cure:'対象の毒・凍結・沈黙をすべて治す(何もなければ不発)。',
     swapatk:'このカードと対象のATKを、永続で入れ替える(自分を対象にしたときは不発)。',fortify:'対象の最大HPだけを+2する(現在のHPは増えない。例:HP4/4が4/6になる。永続で、元のHP+4まで)。「HPが半分以下になったとき」は、HPが減ったときだけ判定する。',execute:'対象のHPが2以下なら、墓地に送る(ダメージではないので装甲・シールド・耐久は無視)。HPが3以上なら不発。'}
 };
-const TSIDE={lowfoe:'e',foetwo:'e',topally:'f',self:'f',allyone:'f',weakally:'f',others:'f',friends:'f',foeone:'e',topatk:'e',enemies:'e',select:'m',all:'m'};
+const TSIDE={lowfoe:'e',foetwo:'e',topally:'f',self:'f',allyone:'f',weakally:'f',others:'f',friends:'f',foeone:'e',topatk:'e',enemies:'e',select:'m',all:'m',tagself:'f',tagally:'f',tagfoe:'e'};
 const EKIND={ping:'harm',attack:'harm',poison:'harm',freeze:'harm',silence:'harm',atkdown:'harm',atkup:'help',grow:'help',heal:'help',shield:'help',makeattack:'att',trigger:'trig',bounce:'bounce',swapatk:'harm',fortify:'help',execute:'harm',cure:'help'};
 const ABIL={
-  fortress:{name:'籠城の構え',cd:4,desc:'次の相手のターン、自分のライフへの直接攻撃を無効にする。'},
+  fortress:{name:'籠城の構え',cd:6,desc:'次の相手のターン、自分のライフへの直接攻撃を無効にする。'},
   reaper:{name:'死神の鎌',cd:12,start:8,desc:'敵のカード1枚を選んで墓地に送る。ターン8になるまでは使えない。'},
   foresight:{name:'予知の眼',cd:16,desc:'キャラ山札かスキル山札を選び、上から8枚を見て1枚を手札に加える。その山札はシャッフルされる。'},
-  revive:{name:'蘇生の魔術',cd:4,desc:'キャラ墓地からランダムで1枚を手札に加える。'},
+  revive:{name:'蘇生の魔術',cd:6,desc:'キャラ墓地からランダムで1枚を手札に加える。'},
   discount:{name:'経費削減',cd:3,desc:'自分の場のユニット1体か、手札のキャラ1枚のコストを-3する。'},
   cleanse:{name:'聖なる癒し',cd:2,desc:'味方全員の沈黙・凍結・毒を解除する。'},
   pursuit:{name:'追い討ち',cd:14,desc:'敵のカード1枚を選び、自分の場で最も高いATKで攻撃する。'},
   trap:{name:'巧妙な罠',cd:18,desc:'次の相手のターン、相手が最初に召喚したカードを即座に墓地に送る。使ったことは相手に知らされない。'}
 };
 const AB_KEYS=Object.keys(ABIL);
-const REPEAT=new Set(['myturn','foeturn','foeweak']), WIDE=new Set(['friends','enemies','all','others','foetwo']);
+const REPEAT=new Set(['myturn','foeturn','foeweak']), WIDE=new Set(['friends','enemies','all','others','foetwo','tagself','tagally','tagfoe']);
 let SURV=SURCHARGE;
 const sur=(c,t,e)=>((REPEAT.has(c)&&WIDE.has(t))?SURV:0)+((e==='bounce'&&WIDE.has(t))?5:0);
 const ROWS=[
@@ -555,7 +560,7 @@ const cardCost=ch=>ch.cost+(isComplete(ch)?sur(ch.fix.cond,ch.fix.targ,ch.fix.ef
 const SKILL_DECK=[
   ['cond','attacked',2],['cond','attacks',2],['cond','grave',2],['cond','wounded',2],['cond','enter',2],['cond','effected',1],['cond','allygrave',1],
   ['cond','allyenter',1],['cond','foeenter',1],['cond','foegrave',1],['cond','myturn',1],['cond','foeturn',1],['cond','foeattacks',1],['cond','foeweak',1],['cond','abil',1],['cond','ailed',1],
-  ['targ','lowfoe',1],['targ','topally',1],['targ','foetwo',1],['eff','swapatk',1],['eff','fortify',1],['eff','execute',1],['eff','cure',1],
+  ['targ','lowfoe',1],['targ','topally',1],['targ','foetwo',1],['targ','tagself',1],['targ','tagally',1],['targ','tagfoe',1],['eff','swapatk',1],['eff','fortify',1],['eff','execute',1],['eff','cure',1],
   ['targ','self',2],['targ','allyone',2],['targ','foeone',2],['targ','select',2],['targ','topatk',1],['targ','weakally',1],
   ['targ','others',1],['targ','friends',1],['targ','enemies',1],['targ','all',1],
   ['eff','ping',2],['eff','attack',3],['eff','atkup',2],['eff','makeattack',1],['eff','heal',2],['eff','shield',2],['eff','poison',1],
@@ -621,7 +626,7 @@ const wait=ms=>{const rid=G.runId;if(HEADLESS||speed===0)return rid!==G.runId?Pr
 const nextTurnOf=owner=>G.cur===owner?G.turn+2:G.turn+1;
 
 /* ---------- setup ---------- */
-function newPlayer(){return{life:LIFE,hand:[],cdeck:[],sdeck:[],cgrave:[],sgrave:[],field:[],ab:null,abUsed:-99,abRevealed:false,fortressTurn:-99,trapTurn:-99,trapHide:false,swept:false};}
+function newPlayer(){return{unity:null,life:LIFE,hand:[],cdeck:[],sdeck:[],cgrave:[],sgrave:[],field:[],ab:null,abUsed:-99,abRevealed:false,fortressTurn:-99,trapTurn:-99,trapHide:false,swept:false};}
 let BUNDLE=0.7;const BUNDLE_SET=v=>{BUNDLE=v;};
 function arrangeSkills(cards){
   const by={cond:[],targ:[],eff:[]};shuffle(cards.slice()).forEach(c=>by[c.type].push(c));
@@ -635,7 +640,12 @@ function arrangeSkills(cards){
   shuffle([].concat(by.cond,by.targ,by.eff)).forEach(c=>deck.splice(Math.floor(rnd()*(deck.length+1)),0,c));
   return deck;
 }
+const UNITY_MIN=15;
+function unityTag(chars){const n={};Object.entries(chars||{}).forEach(([k,c])=>{const t=CHAR_BY[k]&&CHAR_BY[k].tag;if(t)n[t]=(n[t]||0)+c;});for(const t in n)if(n[t]>=UNITY_MIN)return t;return null;}
+const UNITY_TXT={w:'レア1のキャラのHP+1',m:'自分のターン2回に1回、ドロー枚数+1',k:'能力の再使用ターン数-2',b:'攻撃(通常攻撃・スキルの攻撃)が10%でクリティカル(ダメージ+2)。追い討ち・1ダメージ・反撃は対象外'};
+function beastCrit(u){if(!u||G.p[u.owner].unity!=='b'||!(rnd()<0.10))return 0;popup('u'+u.uid,'クリティカル!','dmg');log('💥 '+un(u)+'のクリティカル!ダメージ+2(獣統一)',sideOf(u));return 2;}
 function buildDecks(P,deck){
+  P.unity=deck?unityTag(deck.chars):null;
   if(deck){
     const cs=[];Object.entries(deck.chars).forEach(([k,n])=>{const c=CHAR_BY[k];for(let i=0;i<n;i++)cs.push(Object.assign({uid:++uidc,kind:'char',enterTurn:-1},c));});
     P.cdeck=shuffle(cs);
@@ -655,13 +665,15 @@ function init(auto,decks,opts){
   ME=opts.net?opts.me:0;UI={selChar:null,picks:{},selUnit:null,mode:null,attacker:null,prompt:null,hint:'',flash:{},drawRes:null,endRes:null,discardRes:null};
   buildDecks(G.p[0],decks&&decks[0]);buildDecks(G.p[1],decks&&decks[1]);
 }
+function logUnity(){[0,1].forEach(i=>{const t=G.p[i].unity;if(t)log('✨ '+sname(i)+'は属性統一【'+TAGNAME[t]+'統一】:'+UNITY_TXT[t],i===ME?'me':'foe');});}
 function makeUnit(owner,ch,picks){
   const slots={};
   TYPES.forEach(t=>{
     const f=ch.fix&&ch.fix[t];
     slots[t]=f?{key:f,fixed:true,card:null}:{key:picks[t].key,fixed:false,card:picks[t]};
   });
-  return{uid:ch.uid,owner,char:ch,slots,atk:ch.atk,hp:ch.hp,maxHp:ch.hp,order:++orderc,summonedTurn:G.turn,atkTurn:-1,atkN:0,condAtkTurn:-1,alive:true,costDown:ch.costDown||0,
+  const hpB=(G.p[owner].unity==='w'&&rare(ch)===1)?1:0;
+  return{uid:ch.uid,owner,char:ch,slots,atk:ch.atk,hp:ch.hp+hpB,maxHp:ch.hp+hpB,order:++orderc,summonedTurn:G.turn,atkTurn:-1,atkN:0,condAtkTurn:-1,alive:true,costDown:ch.costDown||0,
     tmpAtk:0,tmpTurn:-1,shield:false,poison:0,frozenTurn:-99,silenceTurn:-99,woundedDone:false};
 }
 
@@ -925,6 +937,9 @@ async function runEffect(u,targ,eff){
   let targets=[];
   if(targ==='self'){if(u.alive)targets=[{unit:u}];}
   else if(targ==='friends')targets=P.field.map(unit=>({unit}));
+  else if(targ==='tagself'){const tg=u.char.tag;targets=P.field.filter(x=>x.char.tag===tg).map(unit=>({unit}));}
+  else if(targ==='tagally'){if(P.field.length){const c1=await choose(me,P.field.map(unit=>({unit})),text,ctx);const tg=c1.unit.char.tag;targets=P.field.filter(x=>x.char.tag===tg).map(unit=>({unit}));}}
+  else if(targ==='tagfoe'){const o=F.field.map(unit=>({unit}));if(dmgEff&&!o.length)o.push(plr());if(o.length){const c1=await choose(me,o,text,ctx);if(c1.unit){const tg=c1.unit.char.tag;targets=F.field.filter(x=>x.char.tag===tg).map(unit=>({unit}));}else targets=[c1];}}
   else if(targ==='others')targets=P.field.filter(x=>x!==u).map(unit=>({unit}));
   else if(targ==='enemies'){targets=F.field.map(unit=>({unit}));if(dmgEff&&!targets.length)targets=[plr()];
     if(eff==='bounce'&&u.slots.cond.key==='foeenter'&&targets.length){const sj=(u.trigSubj&&u.trigSubj.alive&&F.field.includes(u.trigSubj))?u.trigSubj:F.field.reduce((m,x)=>x.order>m.order?x:m);targets=[{unit:sj}];}}
@@ -957,7 +972,7 @@ async function runEffect(u,targ,eff){
     for(const t of targets){
       if(t.unit&&!t.unit.alive)continue;
       const a=atkOf(u);
-      await hit(u,t,many?Math.ceil(a/2):a,'skill');
+      await hit(u,t,(many?Math.ceil(a/2):a)+beastCrit(u),'skill');
     }
   }else if(eff==='ping'){
     for(const t of targets){if(t.unit&&!t.unit.alive)continue;await hit(u,t,1,'ping');}
@@ -974,7 +989,7 @@ async function runEffect(u,targ,eff){
       log(un(a)+'が攻撃させられた。',sideOf(a));
       emit('attacks',a);
       if(a!==u)emit('effected',a);
-      await hit(a,v,atkOf(a),'skill');
+      await hit(a,v,atkOf(a)+beastCrit(a),'skill');
     }
   }else if(eff==='trigger'){
     for(const v of unitsOf()){
@@ -998,7 +1013,7 @@ async function runEffect(u,targ,eff){
       else if(eff==='heal'){const h=Math.min(HEAL,v.maxHp-v.hp);v.hp+=h;woundReset(v);pop='+'+h;msg=un(v)+'のHPが'+h+'回復した(HP'+v.hp+'/'+v.maxHp+')。';}
       else if(eff==='shield'){v.shield=true;pop='盾';msg=un(v)+'にシールドが張られた。';}
       else if(eff==='poison'){v.poison=POISON_TURNS;pop='毒';cls='dmg';msg=un(v)+'が毒を受けた。';emit('ailed',v);}
-      else if(eff==='freeze'){v.frozenTurn=nextTurnOf(v.owner);pop='凍結';cls='dmg';msg=un(v)+'は次のターン攻撃できない。';emit('ailed',v);}
+      else if(eff==='freeze'){const now=G.cur===v.owner;v.frozenTurn=now?G.turn:G.turn+1;pop='凍結';cls='dmg';msg=un(v)+(now?'は凍結して、このターンはもう攻撃できない。':'は次のターン攻撃できない。');emit('ailed',v);}
       else if(eff==='swapatk'){
         if(v===u){pop='不発';cls='info';msg='自分とは入れ替えられない。';}
         else{const t0=u.atk;u.atk=v.atk;v.atk=t0;pop='ATK入替';cls='info';popup('u'+u.uid,'ATK'+u.atk,'info');msg=un(u)+'と'+un(v)+'のATKが入れ替わった('+un(u)+'ATK'+u.atk+' / '+un(v)+'ATK'+v.atk+')。';}
@@ -1158,7 +1173,7 @@ async function basicAttackBody(u,tgt){
   {const P=G.p[u.owner];P.atkUsed=atkUsed(u.owner)+1;P.atkUsedTurn=G.turn;}
   log(un(u)+'が攻撃!',sideOf(u));
   emit('attacks',u);
-  await hit(u,tgt,atkOf(u),'basic');
+  await hit(u,tgt,atkOf(u)+beastCrit(u),'basic');
 }
 function humanMain(){return new Promise(res=>{G.phase='main';UI.endRes=res;render();});}
 function discardCard(i,card){
@@ -1195,6 +1210,8 @@ async function turn(idx){
   if(G.over)return;
   if(AUTOSW&&G.turn%AUTOSW===0){await act(()=>sweepBody(idx,true));if(G.over)return;}
   let dn=first?FIRSTDRAW:3;
+  G.p[idx].uTurns=(G.p[idx].uTurns||0)+1;
+  if(G.p[idx].unity==='m'&&G.p[idx].uTurns%2===0)dn+=1;
   if(CATCH>0&&!first&&fieldCost(1-idx)-fieldCost(idx)>=CATCH){dn+=CATCHN;log('📈 追い上げ!'+sname(idx)+'は相手より場のコストが'+CATCH+'以上少ないので、ドローが'+CATCHN+'枚増える。',idx===ME?'me':'foe');}
   if(dn>0){await drawPhase(idx,dn);}else log('先攻の最初のターンはドローなし。','sys');
   if(G.over)return;
@@ -1224,7 +1241,7 @@ async function startGame(auto,opts){
     }
     for(const i of [ME,1-ME])await drawPhase(i,6);
     G.first=rnd()<0.5?0:1;
-    log('先攻は'+sname(G.first)+'。','sys');render();await wait(700);
+    log('先攻は'+sname(G.first)+'。','sys');logUnity();render();await wait(700);
     let cur=G.first;
     while(!G.over){await turn(cur);cur=1-cur;}
   }catch(e){if(!(e instanceof Abort)){console.error(e);log('エラー:'+e.message,'sys');render();}}
@@ -1253,7 +1270,8 @@ function cpuSweep(idx){
   return foeC.length>=2&&gain>=SWEEP_DIFF;
 }
 /* ---------- abilities ---------- */
-const abNext=i=>Math.max(G.p[i].abUsed+ABIL[G.p[i].ab].cd,ABIL[G.p[i].ab].start||0);
+const abCd=i=>Math.max(1,ABIL[G.p[i].ab].cd-(G.p[i].unity==='k'?2:0));
+const abNext=i=>Math.max(G.p[i].abUsed+abCd(i),ABIL[G.p[i].ab].start||0);
 const abReady=i=>!!G.p[i].ab&&G.turn>=abNext(i);
 function abCan(i){
   const P=G.p[i],F=G.p[1-i];
@@ -1409,10 +1427,11 @@ function synergy(idx,ch,c,t,e){
   const side=TSIDE[t],k=EKIND[e];let s=0;
   if(senseWarn(c,t,e)&&!(k==='bounce'&&side==='f'))return -99;
   if(k==='bounce'&&side==='f'&&t!=='allyone')return -99;
-  if(k==='harm'){s+=3;if(t==='enemies')s+=foeN;}
-  if(k==='help'){s+=(t==='friends'||t==='others')?2+myN:3;}
-  if(k==='att')s+=2+(t==='friends'||t==='others'?myN:0);
-  if(k==='trig')s+=1+(t==='friends'||t==='others'?myN:0);
+  if(k==='harm'){s+=3;if(t==='enemies'||t==='tagfoe')s+=foeN;}
+  const wf=t==='friends'||t==='others'||t==='tagself'||t==='tagally';
+  if(k==='help'){s+=wf?2+myN:3;}
+  if(k==='att')s+=2+(wf?myN:0);
+  if(k==='trig')s+=1+(wf?myN:0);
   if(k==='bounce')s+=foeN?3:-2;
   if(t==='all')s-=12;
   if(e==='heal'&&(c==='enter'||c==='attacks'))s-=1;
@@ -1558,7 +1577,7 @@ function abilHTML(i){
   const A=ABIL[P.ab],hideUse=(i!==ME&&!G.auto&&P.ab==='trap'&&P.trapHide),ready=hideUse||abReady(i);
   const st=ready?'使用可':'ターン'+abNext(i)+'以降に再使用';
   const btn=(i===ME&&!G.auto&&G.phase==='main')?'<button class="btn" data-act="ability"'+(canAct()&&ready&&abCan(i)?'':' disabled')+'>使う</button>':'';
-  return '<div class="abil '+(ready?'ready':'')+'" title="'+A.desc+'(使用後'+A.cd+'ターンで再使用)"><i>能力</i><b>'+A.name+'</b><span>'+st+'</span>'+btn+'</div>';
+  return '<div class="abil '+(ready?'ready':'')+'" title="'+A.desc+'(使用後'+abCd(i)+'ターンで再使用)"><i>能力</i><b>'+A.name+'</b><span>'+st+'</span>'+btn+'</div>';
 }
 function statusHTML(i){
   const P=G.p[i],foe=i!==ME,used=fieldCost(i);
@@ -1567,7 +1586,7 @@ function statusHTML(i){
     +'<div class="who">'+sname(i)+'</div>'
     +'<div class="life '+(P.life<=5?'low':'')+' '+(tg?'targetable':'')+' '+fxClass('P'+i)+'" data-act="player" data-id="'+i+'" data-key="P'+i+'" style="'+fxStyle('P'+i)+'"'+(tg?' role="button" tabindex="0"':'')+'><i>LIFE</i><b>'+Math.max(P.life,0)+'</b></div>'
     +'<div class="cost-meter"><span>場のコスト <b>'+used+'</b> / '+CAP+'</span><div class="track"><i style="width:'+Math.min(100,used/CAP*100)+'%"></i></div></div>'
-    +abilHTML(i)+sweepHTML(i)+'<div class="chips"><span>手札 <b>'+P.hand.length+'</b></span><span>キャラ山 <b>'+P.cdeck.length+'</b></span><span>スキル山 <b>'+P.sdeck.length+'</b></span><span>墓地 キャラ<b>'+P.cgrave.length+'</b> / スキル<b>'+P.sgrave.length+'</b></span></div>'
+    +abilHTML(i)+sweepHTML(i)+'<div class="chips">'+(P.unity?'<span class="unity t-'+P.unity+'" title="'+UNITY_TXT[P.unity]+'">✨'+TAGNAME[P.unity]+'統一</span>':'')+'<span>手札 <b>'+P.hand.length+'</b></span><span>キャラ山 <b>'+P.cdeck.length+'</b></span><span>スキル山 <b>'+P.sdeck.length+'</b></span><span>墓地 キャラ<b>'+P.cgrave.length+'</b> / スキル<b>'+P.sgrave.length+'</b></span></div>'
     +'</section>';
 }
 function midHTML(){
@@ -1978,6 +1997,9 @@ function edSideHTML(){
   const d=ED.d,errs=validateDeck(d).concat(ownErr(d)),ds=allDecks();
   let h='<label class="dlab">デッキ名<input id="dName" maxlength="16" placeholder="例:毒デッキ" value="'+d.name.replace(/"/g,'&quot;')+'"></label>';
   h+='<div class="dcount"><span>キャラ <b>'+cnt(d.chars)+'</b>/'+DECK_C+'</span><span>スキル <b>'+cnt(d.skills)+'</b>/'+DECK_S+'</span><span>条件 '+typeCnt(d,'cond')+'・対象 '+typeCnt(d,'targ')+'・効果 '+typeCnt(d,'eff')+'</span></div>';
+  {const ut=unityTag(d.chars),cn={};Object.entries(d.chars).forEach(([k,c])=>{const t=CHAR_BY[k]&&CHAR_BY[k].tag;if(t)cn[t]=(cn[t]||0)+c;});
+   const best=Object.entries(cn).sort((a,b)=>b[1]-a[1])[0];
+   h+='<div class="unitybar '+(ut?'on':'')+'">'+(ut?'✨ <b>'+TAGNAME[ut]+'統一</b>:'+UNITY_TXT[ut]:'属性統一:同じ属性のキャラを'+UNITY_MIN+'枚以上入れると恩恵'+(best?'(いま最多は'+TAGNAME[best[0]]+' '+best[1]+'枚)':''))+'</div>';}
   h+='<div class="derr '+(errs.length?'bad':'ok')+'">'+(errs.length?errs.slice(0,3).join('<br>'):'このデッキで遊べます')+'</div>';
   h+='<h3>能力(1つ選ぶ)</h3><div class="dabs">'+AB_KEYS.map(k=>'<button class="dab '+(d.ab===k?'on':'')+'" data-d="ab" data-id="'+k+'" title="'+ABIL[k].desc+'"><b>'+ABIL[k].name+'</b><span>再使用'+ABIL[k].cd+'</span></button>').join('')+'</div>';
   h+='<div class="dabdesc">'+(ABIL[d.ab]?ABIL[d.ab].desc:'')+'</div>';
