@@ -386,7 +386,7 @@ body.fx-lite .unit.fx-lunge{animation:none}
 </div>
 <div class="fxlayer" id="fx"></div>
 
-<div class="overlay solid" id="title" hidden><div class="titlebox"><h1 class="ttl">組み立て<span>TCG</span></h1><p class="tsub">キャラに「条件・対象・効果」を組み付けて戦うカードゲーム</p><div class="tbtns"><button class="tbtn" id="tDeck"><b>デッキ構築</b><span>カードを選んで、能力といっしょに保存する</span></button><button class="tbtn" id="tCpu"><b>CPU戦</b><span>作ったデッキで、CPUと対戦する</span></button><button class="tbtn" id="tGacha"><b>ガチャ</b><span>カードパックを開ける(準備中)</span></button><button class="tbtn" id="tPvp"><b>対人戦</b><span>ルームコードで友達と対戦(オンライン版のみ)</span></button></div><div class="tmini"><button class="btn" id="tWatch">CPU同士を観戦</button><button class="btn" id="tRules">ルール</button><button class="btn" id="tAcct" hidden>アカウント</button></div><p class="tmsg" id="titleMsg"></p></div></div>
+<div class="overlay solid" id="title" hidden><div class="titlebox"><h1 class="ttl">組み立て<span>TCG</span></h1><p class="tsub">キャラに「条件・対象・効果」を組み付けて戦うカードゲーム</p><div class="tbtns"><button class="tbtn" id="tDeck"><b>デッキ構築</b><span>カードを選んで、能力といっしょに保存する</span></button><button class="tbtn" id="tCpu"><b>CPU戦</b><span>作ったデッキで、CPUと対戦する</span></button><button class="tbtn" id="tGacha"><b>ガチャ</b><span>カードパックを開ける</span></button><button class="tbtn" id="tPvp"><b>対人戦</b><span>ルームコードで友達と対戦(オンライン版のみ)</span></button></div><div class="tmini"><button class="btn" id="tWatch">CPU同士を観戦</button><button class="btn" id="tRules">ルール</button><button class="btn" id="tAcct" hidden>アカウント</button></div><p class="tmsg" id="titleMsg"></p></div></div>
 <div class="overlay solid" id="builder" hidden><div class="dsheet"><div class="dhead"><h2>デッキ構築</h2><button class="btn" id="dBack">タイトルへ</button></div><div class="dbody"><section class="dcat" id="dCat"></section><aside class="dside" id="dSide"></aside></div></div></div>
 <div class="overlay solid" id="gacha" hidden><div id="gachaBox"></div></div>
 <div class="overlay" id="lobby" hidden><div class="sheet" role="dialog"><h2>対人戦</h2><div id="lbMenu"><label class="lbl">名前<input id="lbName" maxlength="16" value="プレイヤー"></label><div class="btns"><button class="btn primary" id="lbCreate">ルームを作る</button></div><label class="lbl">ルームコードで参加<input id="lbInput" maxlength="6" placeholder="ABCDE" autocapitalize="characters"></label><div class="btns"><button class="btn" id="lbJoin">参加する</button></div></div><div id="lbWait" hidden><p>このコードを相手に伝えてください。</p><p class="lbcode" id="lbCode"></p><p>相手の参加を待っています…</p></div><p class="tmsg" id="lbMsg"></p><div class="btns"><button class="btn" id="lbBack">戻る</button></div></div></div>
@@ -485,7 +485,7 @@ const DESC={
     poison:'対象は自分のターン開始時に1ダメージを受ける(合計'+POISON_TURNS+'回)。',freeze:'対象は、持ち主の次のターンに基本攻撃できない(持ち主のターン中に受けたときは、そのターンの残りの基本攻撃ができない)。',
     atkdown:'対象のATKを永続で-1する(0まで)。',silence:'対象のスキルが、持ち主の次のターンの終わりまで発動しなくなる。',
     grow:'対象のATKを永続で+1する(元のATK+2まで)。',trigger:'対象のスキルを条件を無視して発動させる(この効果は不発)。',
-    bounce:'対象を手札に戻す。敵に使うとスキルは墓地へ、キャラだけ手札に戻る。「敵が場に出たとき」と組み合わせて対象が「敵の全員」のときは、出てきた敵1体だけが戻る。',
+    bounce:'対象を手札に戻す。敵に使うとスキルは墓地へ、キャラだけ手札に戻る。「敵が場に出たとき」と組み合わせたときは、この効果は同じターン中に同じカードにつき1回まで。',
     cure:'対象の毒・凍結・沈黙をすべて治す(何もなければ不発)。',
     swapatk:'このカードと対象のATKを、永続で入れ替える(自分を対象にしたときは不発)。',fortify:'対象の最大HPだけを+2する(現在のHPは増えない。例:HP4/4が4/6になる。永続で、元のHP+4まで)。「HPが半分以下になったとき」は、HPが減ったときだけ判定する。',execute:'対象のHPが2以下なら、墓地に送る(ダメージではないので装甲・シールド・耐久は無視)。HPが3以上なら不発。'}
 };
@@ -528,13 +528,13 @@ const ROWS=[
   ['thorn','棘皮の古竜',6,3,8,{eff:'ping'},{counter:1,armor:1}],
   ['valkyrie','戦乙女',6,4,6,{targ:'self'},{double:1}],
   ['sentinel','不落の砦',5,3,4,{cond:'attacked',targ:'self',eff:'shield'},{guard:1}],
-  ['plaguelord','黒死の将',5,2,4,{cond:'enter',targ:'enemies',eff:'poison'},{armor:1}],
+  ['plaguelord','黒死の将',5,3,5,{cond:'enter',targ:'enemies',eff:'poison'},{armor:1}],
   ['lance','一閃の槍帝',4,6,5,{targ:'foeone'},{pierce:1}],
-  ['warking','不屈の戦王',3,7,5,{targ:'all'},{adapt:1}],
+  ['warking','不屈の戦王',3,7,7,{targ:'all'},{adapt:1}],
   ['swift','韋駄天',3,3,4,{cond:'enter'},{haste:1}],
-  ['wardgod','無類の護神',5,2,10,{eff:'heal'},{endure:1}],
+  ['wardgod','無類の護神',5,2,10,{cond:'myturn',targ:'weakally',eff:'shield'},{endure:1}],
   ['fool','愚者の城',4,4,7,{cond:'attacked',eff:'silence'},{armor:5,decay:1}],
-  ['undead','アンデッドモンスター',5,5,3,{targ:'self'},{undead:1}],
+  ['undead','アンデッドモンスター',5,3,3,{targ:'self'},{undead:1}],
   ['veteran','古参兵',4,4,6,null],['charger','突撃兵',4,6,4,null],['elite','精兵',5,4,8,null],
   ['paladin','墓守',4,4,5,{cond:'allygrave'}],['trainer','猟兵',4,4,5,{cond:'foegrave'}],['mercenary','傭兵',4,4,5,{cond:'wounded'}],
   ['glacier','番兵',3,4,5,{cond:'grave'}],['scribe','書記',4,4,5,{cond:'effected'}],
@@ -934,6 +934,8 @@ async function runEffect(u,targ,eff){
   const ctx={me,eff,atk:atkOf(u)};
   const plr=()=>({player:foe});
   if(eff==='shield'&&u.shieldTurn===G.turn){log(un(u)+'のシールドは、このターンはもう張れない。','sys');render();await wait(250);return;}
+  const bLim=eff==='bounce'&&u.slots.cond.key==='foeenter';
+  if(bLim&&u.bounceTurn===G.turn){log(un(u)+'の手札に戻す効果は、このターンはもう使えない。','sys');render();await wait(250);return;}
   let targets=[];
   if(targ==='self'){if(u.alive)targets=[{unit:u}];}
   else if(targ==='friends')targets=P.field.map(unit=>({unit}));
@@ -941,8 +943,7 @@ async function runEffect(u,targ,eff){
   else if(targ==='tagally'){if(P.field.length){const c1=await choose(me,P.field.map(unit=>({unit})),text,ctx);const tg=c1.unit.char.tag;targets=P.field.filter(x=>x.char.tag===tg).map(unit=>({unit}));}}
   else if(targ==='tagfoe'){const o=F.field.map(unit=>({unit}));if(dmgEff&&!o.length)o.push(plr());if(o.length){const c1=await choose(me,o,text,ctx);if(c1.unit){const tg=c1.unit.char.tag;targets=F.field.filter(x=>x.char.tag===tg).map(unit=>({unit}));}else targets=[c1];}}
   else if(targ==='others')targets=P.field.filter(x=>x!==u).map(unit=>({unit}));
-  else if(targ==='enemies'){targets=F.field.map(unit=>({unit}));if(dmgEff&&!targets.length)targets=[plr()];
-    if(eff==='bounce'&&u.slots.cond.key==='foeenter'&&targets.length){const sj=(u.trigSubj&&u.trigSubj.alive&&F.field.includes(u.trigSubj))?u.trigSubj:F.field.reduce((m,x)=>x.order>m.order?x:m);targets=[{unit:sj}];}}
+  else if(targ==='enemies'){targets=F.field.map(unit=>({unit}));if(dmgEff&&!targets.length)targets=[plr()];}
   else if(targ==='all'){targets=P.field.concat(F.field).map(unit=>({unit}));if(dmgEff&&!F.field.length)targets.push(plr());}
   else if(targ==='weakally'){if(P.field.length)targets=[{unit:P.field.reduce((m,x)=>x.hp<m.hp?x:m)}];}
   else if(targ==='lowfoe'){if(F.field.length)targets=[{unit:F.field.reduce((m,x)=>x.hp<m.hp?x:m)}];else if(dmgEff)targets=[plr()];}
@@ -965,6 +966,7 @@ async function runEffect(u,targ,eff){
   }
   if(!targets.length){log('対象がいないので不発。','sys');render();await wait(300);return;}
   if(eff==='shield')u.shieldTurn=G.turn;
+  if(bLim)u.bounceTurn=G.turn;
   const unitsOf=()=>targets.filter(t=>t.unit&&t.unit.alive).map(t=>t.unit);
   if(eff==='attack'){
     if(u.alive)emit('attacks',u);
@@ -1425,6 +1427,12 @@ function senseWarn(c,t,e){
 function synergy(idx,ch,c,t,e){
   const foeN=G.p[1-idx].field.length,myN=G.p[idx].field.length;
   const side=TSIDE[t],k=EKIND[e];let s=0;
+  if(e==='heal'){const uf=G.p[1-idx].field.filter(u=>u.char.kw&&u.char.kw.undead);
+    if(uf.length){
+      if(t==='foeone'||t==='select')return 6+(c==='myturn'?2:0);
+      if(t==='lowfoe'&&uf.includes(G.p[1-idx].field.reduce((m,x)=>x.hp<m.hp?x:m)))return 6+(c==='myturn'?2:0);
+      if(t==='topatk'&&uf.includes(G.p[1-idx].field.reduce((m,x)=>atkOf(x)>atkOf(m)?x:m)))return 6+(c==='myturn'?2:0);
+    }}
   if(senseWarn(c,t,e)&&!(k==='bounce'&&side==='f'))return -99;
   if(k==='bounce'&&side==='f'&&t!=='allyone')return -99;
   if(k==='harm'){s+=3;if(t==='enemies'||t==='tagfoe')s+=foeN;}
@@ -1483,7 +1491,7 @@ function cpuPick(opts,ctx){
         case 'attack':case 'ping':s=fr?-100:((t.hp<=(ctx.atk||1)?30:0)+A*2+t.char.cost-t.hp*0.2);break;
         case 'makeattack':s=fr?A*2:-100;break;
         case 'atkup':case 'grow':s=fr?A+(repeat?3:0):-100;break;
-        case 'heal':s=fr?((t.maxHp-t.hp)>0?(t.maxHp-t.hp)*3+ucost(t)*0.3:-30):-100;break;
+        case 'heal':s=fr?((t.maxHp-t.hp)>0?(t.maxHp-t.hp)*3+ucost(t)*0.3:-30):((t.char.kw&&t.char.kw.undead)?(t.hp<=HEAL?ucost(t)*3+A*2+40:HEAL*3+ucost(t)*0.5+A):-100);break;
         case 'shield':s=fr?(t.shield?-40:A+ucost(t)):-100;break;
         case 'poison':s=fr?-100:(t.poison>0?-5:t.hp*2+ucost(t));break;
         case 'freeze':s=fr?-100:(t.frozenTurn>=G.turn?-40:A*3+ucost(t)*0.3);break;
@@ -1543,7 +1551,7 @@ function plate(t,key,fixed){
 function kwTags(c){
   return Object.keys(c.kw||{}).map(k=>'<span class="tag kw" title="'+KWD[k]+'">'+kwName(k,c.kw[k])+'</span>').join('');
 }
-const rare=c=>Object.keys(c.kw||{}).length?3:(c.cost>=4?2:1);
+const R2KW=['sentinel'];const rare=c=>R2KW.includes(c.key)?2:Object.keys(c.kw||{}).length?3:(c.cost>=4?2:1);
 function unitHTML(u,side){
   const key='u'+u.uid,foe=side===1;
   const targetable=(UI.prompt&&UI.prompt.keys.has(key))||(UI.mode==='attack'&&foe&&!UI.prompt&&basicPool(FOE()).includes(u));
@@ -2069,15 +2077,15 @@ const RVAL={1:1,2:3,3:10};
 const PACKS=[
  {id:'p1',name:'第1弾 槍帝降臨',art:['槍帝','降臨'],feature:'lance',r3:['warlord','valkyrie','ironclad','thorn'],r2:['archmage','dragoon','giant','sniper','assassin','bombmaker','venomblade','trainer','glacier','tide','charger'],featW:1.2,live:true,open:true,
   blurb:'貫く槍が、守りを砕く。攻撃性能の高いカードが多め。'},
- {id:'p2',name:'第2弾 不落の城塞',art:['城塞','不落'],feature:'wardgod',r3:['bastion','sentinel','ironclad','thorn'],r2:['general','giant','elite','priest','captain','night','veteran','paladin','mercenary','glacier','scribe','curse'],featW:1.2,live:true,open:true,
+ {id:'p2',name:'第2弾 不落の城塞',art:['城塞','不落'],feature:'wardgod',r3:['bastion','ironclad','thorn'],r2:['general','giant','elite','priest','captain','night','veteran','paladin','mercenary','glacier','scribe','curse','sentinel'],featW:1.2,live:true,open:true,
   blurb:'倒れない護神が、盤面を支える。守りと回復のカードが多め。'},
  {id:'p3',name:'第3弾 疾風迅雷',art:['迅雷','疾風'],feature:'swift',r3:['lance','warlord','valkyrie','plaguelord'],r2:['dragoon','archmage','charger','assassin','sniper','bombmaker','venomblade','trainer','drummer','tide','mistwitch','mercenary'],featW:1.2,live:true,open:true,
   blurb:'出た瞬間に駆け抜ける。速攻と攻撃のカードが多め。'},
- {id:'p4',name:'第4弾 朽ちる契約',art:['契約','朽ちる'],feature:'fool',r3:['plaguelord','thorn','warlord','sentinel'],r2:['paladin','trainer','glacier','scribe','mistwitch','bombmaker','curse','dragoon','assassin','veteran','tide','mercenary'],featW:1.2,live:false,open:false,
+ {id:'p4',name:'第4弾 朽ちる契約',art:['契約','朽ちる'],feature:'fool',r3:['plaguelord','thorn','warlord'],r2:['paladin','trainer','glacier','scribe','mistwitch','bombmaker','curse','dragoon','assassin','veteran','tide','mercenary','sentinel'],featW:1.2,live:false,open:false,
   blurb:'朽ちゆく城が、攻撃者を黙らせる。墓地と呪いのカードが多め。【仮案】'},
  {id:'p5',name:'第5弾 死者の行進',art:['死者','行進'],feature:'undead',r3:['plaguelord','valkyrie','bastion','ironclad'],r2:['paladin','trainer','glacier','priest','captain','mercenary','curse','scribe','night','elite','drummer','sniper'],featW:1.2,live:false,open:false,
   blurb:'墓から起き上がる者たち。墓地のカードが多め。【仮案】'},
- {id:'p6',name:'第6弾 適応の森',art:['適応','の森'],feature:'warking',r3:['lance','thorn','sentinel','valkyrie'],r2:['mistwitch','curse','tide','scribe','glacier','venomblade','priest','giant','general','elite','drummer','archmage'],featW:1.2,live:false,open:false,
+ {id:'p6',name:'第6弾 適応の森',art:['適応','の森'],feature:'warking',r3:['lance','thorn','valkyrie'],r2:['mistwitch','curse','tide','scribe','glacier','venomblade','priest','giant','general','elite','drummer','archmage','sentinel'],featW:1.2,live:false,open:false,
   blurb:'どんな状態異常も効かない王。状態異常と全体効果のカードが多め。【仮案】'}
 ];
 const packLive=p=>p.live||!!window.__OFFLINE__, packOpen=p=>p.open||!!window.__OFFLINE__;
