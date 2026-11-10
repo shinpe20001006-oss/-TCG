@@ -302,6 +302,65 @@ h1 span{color:var(--eff)}
   .pop{animation:fade 1s forwards}
   @keyframes fade{from{opacity:1}to{opacity:0}}
 }
+/* ---- 演出 ---- */
+.ctag{display:inline-block;font-size:10px;font-weight:900;line-height:1;padding:2px 5px;border-radius:5px;border:1px solid currentColor;margin-left:4px;vertical-align:middle;white-space:nowrap}
+.ctag.t-w{color:#B3361B}.ctag.t-m{color:#7A3FC4}.ctag.t-b{color:#2F7D32}.ctag.t-k{color:#2F6F8F}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ctag.t-w{color:#FF8A6E}:root:not([data-theme="light"]) .ctag.t-m{color:#C9A0FF}:root:not([data-theme="light"]) .ctag.t-b{color:#8FDB94}:root:not([data-theme="light"]) .ctag.t-k{color:#8FD0EE}}
+:root[data-theme="dark"] .ctag.t-w{color:#FF8A6E}:root[data-theme="dark"] .ctag.t-m{color:#C9A0FF}:root[data-theme="dark"] .ctag.t-b{color:#8FDB94}:root[data-theme="dark"] .ctag.t-k{color:#8FD0EE}
+.tagf{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0}
+.tagf button{font:inherit;font-size:12px;font-weight:900;padding:4px 10px;border-radius:999px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+.tagf button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.vx{position:fixed;pointer-events:none;--sp:1}
+.vx:not(.ghost)>*{position:absolute;pointer-events:none}
+.vx.ghost>*{margin:0!important;width:100%!important;height:100%!important;box-sizing:border-box;animation:none!important}
+.vx.ring i{left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:4px solid var(--vc,#fff);animation:vring calc(.55s*var(--sp)) ease-out forwards}
+.vx.ring i+i{animation-delay:calc(.1s*var(--sp));opacity:0}
+@keyframes vring{0%{transform:scale(.3);opacity:.95}100%{transform:scale(3.6);opacity:0;border-width:1px}}
+.vx.burst b{left:50%;top:50%;width:6px;height:18px;margin:-9px 0 0 -3px;border-radius:3px;background:var(--vc,#fff);transform:rotate(var(--a)) translateY(0);animation:vburst calc(.5s*var(--sp)) ease-out forwards}
+@keyframes vburst{0%{transform:rotate(var(--a)) translateY(0) scaleY(.4);opacity:1}100%{transform:rotate(var(--a)) translateY(calc(var(--d,40px)*-1)) scaleY(1);opacity:0}}
+.vx.rise b{bottom:6%;width:var(--s,10px);height:var(--s,10px);border-radius:50%;background:var(--vc);left:var(--x);opacity:0;animation:vrise calc(.9s*var(--sp)) ease-out var(--dl,0s) forwards;box-shadow:0 0 8px var(--vc)}
+@keyframes vrise{0%{transform:translateY(0) scale(.6);opacity:0}20%{opacity:.95}100%{transform:translateY(-70px) scale(1.1);opacity:0}}
+.vx.glow{border-radius:12px;box-shadow:0 0 0 0 var(--vc),inset 0 0 22px var(--vc);background:color-mix(in srgb,var(--vc) 22%,transparent);animation:vglow calc(.7s*var(--sp)) ease-out forwards}
+@keyframes vglow{0%{opacity:0;transform:scale(.92)}25%{opacity:1}100%{opacity:0;transform:scale(1.08)}}
+.vx.ice{border-radius:12px;background:linear-gradient(135deg,rgba(190,235,255,.85),rgba(120,200,255,.35));border:3px solid #BFE8FF;animation:vice calc(.9s*var(--sp)) ease-out forwards}
+.vx.ice b{left:var(--x);top:var(--y);width:0;height:0;border:7px solid transparent;border-bottom:16px solid #EAF8FF;transform:rotate(var(--a));filter:drop-shadow(0 0 3px #7CC8F0)}
+@keyframes vice{0%{opacity:0;transform:scale(1.15)}30%{opacity:1;transform:scale(1)}100%{opacity:0}}
+.vx.chain{border-radius:12px;background:repeating-linear-gradient(135deg,rgba(60,60,70,.55) 0 6px,transparent 6px 14px);border:3px dashed #8A8F99;animation:vglow calc(.9s*var(--sp)) ease-out forwards}
+.vx.shield{border-radius:50%;border:4px solid #6CB6FF;box-shadow:0 0 16px #6CB6FF,inset 0 0 16px rgba(108,182,255,.6);animation:vshield calc(.7s*var(--sp)) ease-out forwards}
+@keyframes vshield{0%{opacity:0;transform:scale(.4)}35%{opacity:1;transform:scale(1.05)}100%{opacity:0;transform:scale(1.2)}}
+.vx.flame b{bottom:0;left:var(--x);width:14px;height:26px;border-radius:50% 50% 40% 40%;background:linear-gradient(#FFD34D,#FF5A1F);opacity:0;animation:vflame calc(.7s*var(--sp)) ease-out var(--dl,0s) forwards;filter:blur(.5px)}
+@keyframes vflame{0%{opacity:0;transform:translateY(8px) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translateY(-34px) scale(1.2,1.5)}}
+.vx.down b{top:0;left:var(--x);width:0;height:0;border:8px solid transparent;border-top:14px solid #8B1A1A;opacity:0;animation:vdown calc(.7s*var(--sp)) ease-in var(--dl,0s) forwards}
+@keyframes vdown{0%{opacity:0;transform:translateY(-10px)}30%{opacity:1}100%{opacity:0;transform:translateY(40px)}}
+.vx.summon i{left:50%;bottom:-6px;width:130%;height:34px;margin-left:-65%;border-radius:50%;border:3px dashed var(--eff);box-shadow:0 0 14px var(--eff);animation:vsummon calc(.8s*var(--sp)) ease-out forwards}
+.vx.summon i+i{width:90%;margin-left:-45%;height:22px;bottom:-1px;animation-direction:reverse}
+@keyframes vsummon{0%{opacity:0;transform:scale(.3) rotate(0)}30%{opacity:1}100%{opacity:0;transform:scale(1.15) rotate(90deg)}}
+.vx.ghost{margin:0;animation-fill-mode:forwards}
+.vx.ghost.bnc{animation:vbounce calc(.6s*var(--sp)) ease-in forwards}
+@keyframes vbounce{0%{opacity:.95;transform:none}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.15)}}
+.vx.ghost.ash{animation:vash calc(.8s*var(--sp)) ease-out forwards}
+@keyframes vash{0%{opacity:.95;filter:none;transform:none}40%{filter:grayscale(1) brightness(1.3);opacity:.8}100%{opacity:0;filter:grayscale(1) blur(3px);transform:translateY(18px) scale(.9)}}
+.vx.beam{height:5px;margin-top:-2px;transform-origin:0 50%;border-radius:3px;background:linear-gradient(90deg,transparent,var(--vc));box-shadow:0 0 8px var(--vc);animation:vbeam calc(.45s*var(--sp)) ease-out forwards}
+@keyframes vbeam{0%{transform:rotate(var(--r)) scaleX(0);opacity:1}60%{transform:rotate(var(--r)) scaleX(1);opacity:1}100%{transform:rotate(var(--r)) scaleX(1);opacity:0}}
+.vx.orb{width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:radial-gradient(#fff,var(--vc));box-shadow:0 0 12px var(--vc);animation:vorb calc(.4s*var(--sp)) ease-in forwards}
+@keyframes vorb{0%{transform:translate(0,0)}100%{transform:translate(var(--dx),var(--dy))}}
+.shake{animation:vshake calc(.35s*var(--shk,1)) linear}
+@keyframes vshake{0%,100%{transform:none}20%{transform:translate(-5px,2px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-3px,-2px)}80%{transform:translate(3px,2px)}}
+/* 状態の見た目(つけっぱなし) */
+.unit.st-shield::before{content:"";position:absolute;inset:-5px;border-radius:16px;border:2px solid #6CB6FF;box-shadow:0 0 10px #6CB6FF,inset 0 0 8px rgba(108,182,255,.5);pointer-events:none;animation:vpulse 1.8s ease-in-out infinite}
+.unit.st-frozen::after{content:"";position:absolute;inset:0;border-radius:12px;background:linear-gradient(135deg,rgba(190,235,255,.45),rgba(120,200,255,.12) 55%,rgba(190,235,255,.35));border:2px solid #9ED8FF;box-shadow:inset 0 0 14px rgba(160,220,255,.7);pointer-events:none}
+.unit.st-silence:not(.st-frozen)::after{content:"";position:absolute;inset:0;border-radius:12px;background:repeating-linear-gradient(135deg,rgba(70,75,85,.35) 0 5px,transparent 5px 12px);border:2px dashed #8A8F99;pointer-events:none}
+.unit.st-poison:not(.st-frozen):not(.st-silence)::after{content:"";position:absolute;inset:0;border-radius:12px;background:radial-gradient(circle at 20% 100%,rgba(150,70,210,.45),transparent 40%),radial-gradient(circle at 75% 100%,rgba(150,70,210,.4),transparent 38%);box-shadow:inset 0 -8px 14px rgba(150,70,210,.35);pointer-events:none;animation:vpulse 1.4s ease-in-out infinite}
+@keyframes vpulse{50%{opacity:.55}}
+.chainbanner.c4{font-size:clamp(44px,12vw,96px);color:#F2A900}
+.chainbanner.c6{font-size:clamp(54px,14vw,120px);color:#E0243C}
+body.fx-lite .unit.st-shield::before,body.fx-lite .unit.st-frozen::after,body.fx-lite .unit.st-silence::after,body.fx-lite .unit.st-poison::after{display:none}
+@media (prefers-reduced-motion:reduce){.vx{display:none}.shake{animation:none}}
+.unit.fx-lunge{animation:ulunge calc(.43s*var(--sp,1)) ease-in-out both;z-index:30;position:relative}
+@keyframes ulunge{0%{transform:none}42%{transform:translate(var(--dx),var(--dy)) scale(1.06)}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.unit.fx-lunge{animation:none}}
+body.fx-lite .unit.fx-lunge{animation:none}
+
 </style>
 
 <div class="app">
@@ -309,7 +368,7 @@ h1 span{color:var(--eff)}
     <h1>組み立て<span>TCG</span></h1>
     <div class="turnchip" id="turnchip"></div>
     <div class="topbtns">
-      <button class="btn" id="btnSpeed">速度:ふつう</button>
+      <button class="btn" id="btnSpeed">速度:ふつう</button><button class="btn" id="btnFx">演出:通常</button>
       <button class="btn" id="btnWatch">CPU同士を観戦</button>
       <button class="btn" id="btnRules">ルール</button>
       <button class="btn" id="btnNew">タイトルへ</button>
@@ -322,7 +381,7 @@ h1 span{color:var(--eff)}
 </div>
 <div class="fxlayer" id="fx"></div>
 
-<div class="overlay solid" id="title" hidden><div class="titlebox"><h1 class="ttl">組み立て<span>TCG</span></h1><p class="tsub">キャラに「条件・対象・効果」を組み付けて戦うカードゲーム</p><div class="tbtns"><button class="tbtn" id="tDeck"><b>デッキ構築</b><span>カードを選んで、能力といっしょに保存する</span></button><button class="tbtn" id="tCpu"><b>CPU戦</b><span>作ったデッキで、CPUと対戦する</span></button><button class="tbtn" id="tGacha"><b>ガチャ</b><span>カードパックを開ける</span></button><button class="tbtn" id="tPvp"><b>対人戦</b><span>ルームコードで友達と対戦(オンライン版のみ)</span></button></div><div class="tmini"><button class="btn" id="tWatch">CPU同士を観戦</button><button class="btn" id="tRules">ルール</button><button class="btn" id="tAcct" hidden>アカウント</button></div><p class="tmsg" id="titleMsg"></p></div></div>
+<div class="overlay solid" id="title" hidden><div class="titlebox"><h1 class="ttl">組み立て<span>TCG</span></h1><p class="tsub">キャラに「条件・対象・効果」を組み付けて戦うカードゲーム</p><div class="tbtns"><button class="tbtn" id="tDeck"><b>デッキ構築</b><span>カードを選んで、能力といっしょに保存する</span></button><button class="tbtn" id="tCpu"><b>CPU戦</b><span>作ったデッキで、CPUと対戦する</span></button><button class="tbtn" id="tGacha"><b>ガチャ</b><span>カードパックを開ける(準備中)</span></button><button class="tbtn" id="tPvp"><b>対人戦</b><span>ルームコードで友達と対戦(オンライン版のみ)</span></button></div><div class="tmini"><button class="btn" id="tWatch">CPU同士を観戦</button><button class="btn" id="tRules">ルール</button><button class="btn" id="tAcct" hidden>アカウント</button></div><p class="tmsg" id="titleMsg"></p></div></div>
 <div class="overlay solid" id="builder" hidden><div class="dsheet"><div class="dhead"><h2>デッキ構築</h2><button class="btn" id="dBack">タイトルへ</button></div><div class="dbody"><section class="dcat" id="dCat"></section><aside class="dside" id="dSide"></aside></div></div></div>
 <div class="overlay solid" id="gacha" hidden><div id="gachaBox"></div></div>
 <div class="overlay" id="lobby" hidden><div class="sheet" role="dialog"><h2>対人戦</h2><div id="lbMenu"><label class="lbl">名前<input id="lbName" maxlength="16" value="プレイヤー"></label><div class="btns"><button class="btn primary" id="lbCreate">ルームを作る</button></div><label class="lbl">ルームコードで参加<input id="lbInput" maxlength="6" placeholder="ABCDE" autocapitalize="characters"></label><div class="btns"><button class="btn" id="lbJoin">参加する</button></div></div><div id="lbWait" hidden><p>このコードを相手に伝えてください。</p><p class="lbcode" id="lbCode"></p><p>相手の参加を待っています…</p></div><p class="tmsg" id="lbMsg"></p><div class="btns"><button class="btn" id="lbBack">戻る</button></div></div></div>
@@ -381,7 +440,7 @@ const TYPES=['cond','targ','eff'];
 const TLABEL={cond:'条件',targ:'対象',eff:'効果'};
 const COND={
   attacked:{name:'攻撃されたとき',inc:1}, attacks:{name:'攻撃したとき',inc:1}, grave:{name:'自分が墓地に送られたとき',inc:2},
-  wounded:{name:'HPが半分以下になったとき',inc:1},
+  wounded:{name:'HPが半分以下になったとき',inc:1}, ailed:{name:'状態異常になったとき',inc:1},
   enter:{name:'場に出たとき',inc:2}, effected:{name:'効果を受けたとき',inc:1}, allygrave:{name:'味方が墓地に送られたとき',inc:1},
   allyenter:{name:'味方が場に出たとき',inc:1}, foeenter:{name:'敵が場に出たとき',inc:2}, foegrave:{name:'敵が墓地に送られたとき',inc:1},
   myturn:{name:'自身のターンのとき',inc:3}, foeturn:{name:'相手のターンのとき',inc:3},
@@ -399,12 +458,13 @@ const EFF={
   makeattack:{name:'攻撃させる',inc:3}, heal:{name:'HPを'+HEAL+'回復する',inc:1}, shield:{name:'シールドを張る',inc:2},
   poison:{name:'毒を与える',inc:1}, freeze:{name:'凍結させる',inc:1}, atkdown:{name:'ATKを-1する',inc:1},
   silence:{name:'沈黙させる',inc:1}, grow:{name:'ATKを鍛える(永続+1)',inc:2}, trigger:{name:'スキルを発動させる',inc:1}, bounce:{name:'手札に戻す',inc:3},
-  swapatk:{name:'ATKを入れ替える',inc:2}, fortify:{name:'最大HPを+2する',inc:1}, execute:{name:'HP2以下なら倒す',inc:3}
+  swapatk:{name:'ATKを入れ替える',inc:2}, fortify:{name:'最大HPを+2する',inc:1}, execute:{name:'HP2以下なら倒す',inc:3}, cure:{name:'状態異常を治す',inc:2}
 };
 const SK={cond:COND,targ:TARG,eff:EFF};
 const DESC={
   cond:{attacked:'攻撃を受けて、HPが残ったとき。',attacks:'このカードが攻撃したとき(同じカードで1ターンに1回まで)。',grave:'このカードが墓地に送られたとき。',
-    wounded:'ダメージでHPが最大の半分以下になったとき(1体につき1回だけ)。',
+    wounded:'ダメージでHPが最大の半分以下に下がったとき。回復して半分より上に戻れば、もう一度発動できる(半分以下のまま続けて受けても発動しない)。',
+    ailed:'毒・凍結を受けたとき(効果が実際に当たったときだけ。適応では発動しない)。沈黙を受けた場合は、同時にスキルが封じられるので発動しない。',
     enter:'このユニットが場に出た直後。',effected:'他のカードの効果の対象になったとき(基本攻撃と自分のスキルは除く)。',
     allygrave:'自分以外の味方が墓地に送られたとき(プレイヤーが「墓地に送る」で直接送った場合は発動しない)。',allyenter:'自分以外の味方が場に出たとき。',foeenter:'敵が場に出たとき。',foegrave:'敵が墓地に送られたとき。',
     myturn:'自分のターン開始時。',foeturn:'相手のターン開始時。',
@@ -420,11 +480,12 @@ const DESC={
     poison:'対象は自分のターン開始時に1ダメージを受ける(合計'+POISON_TURNS+'回)。',freeze:'対象は、持ち主の次のターンに基本攻撃できない。',
     atkdown:'対象のATKを永続で-1する(0まで)。',silence:'対象のスキルが、持ち主の次のターンの終わりまで発動しなくなる。',
     grow:'対象のATKを永続で+1する(元のATK+2まで)。',trigger:'対象のスキルを条件を無視して発動させる(この効果は不発)。',
-    bounce:'対象を手札に戻す。敵に使うとスキルは墓地へ、キャラだけ手札に戻る。',
+    bounce:'対象を手札に戻す。敵に使うとスキルは墓地へ、キャラだけ手札に戻る。「敵が場に出たとき」と組み合わせて対象が「敵の全員」のときは、出てきた敵1体だけが戻る。',
+    cure:'対象の毒・凍結・沈黙をすべて治す(何もなければ不発)。',
     swapatk:'このカードと対象のATKを、永続で入れ替える(自分を対象にしたときは不発)。',fortify:'対象の最大HPだけを+2する(現在のHPは増えない。例:HP4/4が4/6になる。永続で、元のHP+4まで)。「HPが半分以下になったとき」は、HPが減ったときだけ判定する。',execute:'対象のHPが2以下なら、墓地に送る(ダメージではないので装甲・シールド・耐久は無視)。HPが3以上なら不発。'}
 };
 const TSIDE={lowfoe:'e',foetwo:'e',topally:'f',self:'f',allyone:'f',weakally:'f',others:'f',friends:'f',foeone:'e',topatk:'e',enemies:'e',select:'m',all:'m'};
-const EKIND={ping:'harm',attack:'harm',poison:'harm',freeze:'harm',silence:'harm',atkdown:'harm',atkup:'help',grow:'help',heal:'help',shield:'help',makeattack:'att',trigger:'trig',bounce:'bounce',swapatk:'harm',fortify:'help',execute:'harm'};
+const EKIND={ping:'harm',attack:'harm',poison:'harm',freeze:'harm',silence:'harm',atkdown:'harm',atkup:'help',grow:'help',heal:'help',shield:'help',makeattack:'att',trigger:'trig',bounce:'bounce',swapatk:'harm',fortify:'help',execute:'harm',cure:'help'};
 const ABIL={
   fortress:{name:'籠城の構え',cd:4,desc:'次の相手のターン、自分のライフへの直接攻撃を無効にする。'},
   reaper:{name:'死神の鎌',cd:12,start:8,desc:'敵のカード1枚を選んで墓地に送る。ターン8になるまでは使えない。'},
@@ -438,7 +499,7 @@ const ABIL={
 const AB_KEYS=Object.keys(ABIL);
 const REPEAT=new Set(['myturn','foeturn','foeweak']), WIDE=new Set(['friends','enemies','all','others','foetwo']);
 let SURV=SURCHARGE;
-const sur=(c,t,e)=>((REPEAT.has(c)&&WIDE.has(t))?SURV:0)+((e==='bounce'&&WIDE.has(t))?3:0);
+const sur=(c,t,e)=>((REPEAT.has(c)&&WIDE.has(t))?SURV:0)+((e==='bounce'&&WIDE.has(t))?5:0);
 const ROWS=[
   ['apprentice','見習い剣士',1,2,4,null],['scout','斥候',1,3,3,null],['shield','盾持ち',2,3,5,null],['archer','弓兵',2,3,4,null],
   ['heavy','重装兵',3,3,6,null],['mage','魔導士',3,4,5,null],['dragoon','竜騎士',4,5,5,null],['archmage','大魔導',4,6,5,null],
@@ -478,14 +539,23 @@ const ROWS=[
 const KWD={pierce:'貫通:このカードの攻撃(基本攻撃・「攻撃する」の効果)は、相手の装甲とシールドを無視する。シールドは破壊され、ダメージは通る。能力「追い討ち」には効かない。',guard:'守護:このカードがいる間、相手の基本攻撃はこのカード(守護を持つカード)にしか向けられない。',armor:'装甲:攻撃で受けるダメージが減る(最低0)。毒・1ダメージ・直接ダメージには効かない。',counter:'反撃:基本攻撃を受けて生き残ったとき、攻撃してきたカードにATK分のダメージを返す。',double:'連撃:1ターンに基本攻撃を2回できる。',adapt:'適応:毒・凍結・沈黙・手札に戻る効果を受けない。',haste:'速攻:場に出たターンから基本攻撃ができる。',endure:'耐久:死ぬダメージを受けても、HP1で耐える。1回のみ。',decay:'自壊:毎ターンの終わり(自分のターンも相手のターンも)に、自身が1ダメージを受ける。',undead:'死者:このカードへの回復とダメージが反転する(ダメージで回復、回復でダメージ)。回復は最大HPまで。'};
 const kwName=(k,v)=>({guard:'守護',armor:'装甲'+v,counter:'反撃',double:'連撃',pierce:'貫通',adapt:'適応',haste:'速攻',endure:'耐久',decay:'自壊',undead:'死者'})[k];
 const CHARS=ROWS.map(([key,name,b,atk,hp,fix,kw])=>({key,name,b,cost:b,atk,hp,hpBase:hp,fix,kw:kw||{}}));
+const TAGNAME={w:'戦士',m:'魔術',b:'獣',k:'機械'};
+const TAGMAP={apprentice:'w',heavy:'w',general:'w',knight:'w',wounded:'w',counter:'w',maiden:'w',captain:'w',warlord:'w',valkyrie:'w',lance:'w',warking:'w',veteran:'w',elite:'w',paladin:'w',mercenary:'w',
+ mage:'m',archmage:'m',medic:'m',weaken:'m',mourner:'m',priest:'m',witch:'m',frost:'m',sealer:'m',mistwitch:'m',wardgod:'m',fool:'m',undead:'m',scribe:'m',curse:'m',tide:'m',
+ scout:'b',dragoon:'b',giant:'b',watch:'b',herald:'b',needle:'b',signal:'b',berserk:'b',avenger:'b',snake:'b',night:'b',thorn:'b',swift:'b',charger:'b',trainer:'b',venomblade:'b',
+ shield:'k',archer:'k',bomber:'k',guardian:'k',sniper:'k',slinger:'k',smith:'k',assassin:'k',drummer:'k',bombmaker:'k',bastion:'k',ironclad:'k',sentinel:'k',plaguelord:'k',glacier:'k',ambush:'k'};
+const RENAME={medic:'治癒師',weaken:'呪詛師',scribe:'魔導書記',scout:'迅狼',dragoon:'若竜',giant:'大熊',watch:'番犬',herald:'伝令鳥',needle:'針鼠',signal:'遠吠えの狼',berserk:'狂獣',avenger:'手負いの猪',snake:'毒蛇',night:'夜梟',charger:'猛牛',trainer:'猟犬',venomblade:'毒蜘蛛',
+ shield:'盾機兵',archer:'連弩機',bomber:'自爆機',guardian:'守護機',sniper:'狙撃砲台',slinger:'投石機',smith:'鍛造機',assassin:'暗殺機',drummer:'戦鼓機',bombmaker:'爆弾機',plaguelord:'黒死の毒機',glacier:'番兵機',ambush:'伏せ砲台'};
+CHARS.forEach(c=>{c.tag=TAGMAP[c.key];if(RENAME[c.key])c.name=RENAME[c.key];});
+const tagBadge=c=>c.tag?'<span class="ctag t-'+c.tag+'" title="タグ:'+TAGNAME[c.tag]+'">'+TAGNAME[c.tag]+'</span>':'';
 function recost(){CHARS.forEach(c=>{let cost=c.b;if(c.fix)TYPES.forEach(t=>{if(c.fix[t])cost+=Math.max(0,SK[t][c.fix[t]].inc-1);});c.cost=cost;});}
 recost();
 const isComplete=ch=>!!(ch.fix&&ch.fix.cond&&ch.fix.targ&&ch.fix.eff);
 const cardCost=ch=>ch.cost+(isComplete(ch)?sur(ch.fix.cond,ch.fix.targ,ch.fix.eff):0);
 const SKILL_DECK=[
   ['cond','attacked',2],['cond','attacks',2],['cond','grave',2],['cond','wounded',2],['cond','enter',2],['cond','effected',1],['cond','allygrave',1],
-  ['cond','allyenter',1],['cond','foeenter',1],['cond','foegrave',1],['cond','myturn',1],['cond','foeturn',1],['cond','foeattacks',1],['cond','foeweak',1],['cond','abil',1],
-  ['targ','lowfoe',1],['targ','topally',1],['targ','foetwo',1],['eff','swapatk',1],['eff','fortify',1],['eff','execute',1],
+  ['cond','allyenter',1],['cond','foeenter',1],['cond','foegrave',1],['cond','myturn',1],['cond','foeturn',1],['cond','foeattacks',1],['cond','foeweak',1],['cond','abil',1],['cond','ailed',1],
+  ['targ','lowfoe',1],['targ','topally',1],['targ','foetwo',1],['eff','swapatk',1],['eff','fortify',1],['eff','execute',1],['eff','cure',1],
   ['targ','self',2],['targ','allyone',2],['targ','foeone',2],['targ','select',2],['targ','topatk',1],['targ','weakally',1],
   ['targ','others',1],['targ','friends',1],['targ','enemies',1],['targ','all',1],
   ['eff','ping',2],['eff','attack',3],['eff','atkup',2],['eff','makeattack',1],['eff','heal',2],['eff','shield',2],['eff','poison',1],
@@ -551,7 +621,7 @@ const wait=ms=>{const rid=G.runId;if(HEADLESS||speed===0)return rid!==G.runId?Pr
 const nextTurnOf=owner=>G.cur===owner?G.turn+2:G.turn+1;
 
 /* ---------- setup ---------- */
-function newPlayer(){return{life:LIFE,hand:[],cdeck:[],sdeck:[],cgrave:[],sgrave:[],field:[],ab:null,abUsed:-99,abRevealed:false,fortressTurn:-99,trapTurn:-99,swept:false};}
+function newPlayer(){return{life:LIFE,hand:[],cdeck:[],sdeck:[],cgrave:[],sgrave:[],field:[],ab:null,abUsed:-99,abRevealed:false,fortressTurn:-99,trapTurn:-99,trapHide:false,swept:false};}
 let BUNDLE=0.7;const BUNDLE_SET=v=>{BUNDLE=v;};
 function arrangeSkills(cards){
   const by={cond:[],targ:[],eff:[]};shuffle(cards.slice()).forEach(c=>by[c.type].push(c));
@@ -600,19 +670,88 @@ function log(msg,cls){if(typeof window!=='undefined'&&window.__logspy)window.__l
 function popup(key,text,cls){
   if(HEADLESS)return;
   const el=document.querySelector('[data-key="'+key+'"]');if(!el)return;
+  if(fxOn())fxFromPopup(key,text,cls);
   const r=el.getBoundingClientRect(),s=document.createElement('div');
   s.className='pop '+cls;s.textContent=text;
   s.style.left=(r.left+r.width/2)+'px';s.style.top=(r.top+r.height*0.4)+'px';
   $('fx').appendChild(s);setTimeout(()=>s.remove(),1100);
 }
-function flash(key,cls,dur){UI.flash[key]={cls,t0:performance.now(),dur};}
+
+/* ---------- 演出(エフェクトのみ・音なし。「演出:簡易」では出さない) ---------- */
+let FXMODE=1;try{if(localStorage.getItem('kumitate-tcg-fx')==='0')FXMODE=0;}catch(e){}
+const fxOn=()=>!HEADLESS&&FXMODE===1&&typeof document!=='undefined'&&!!$('fx');
+const elRect=key=>{const el=document.querySelector('[data-key="'+key+'"]');return el?{el,r:el.getBoundingClientRect()}:null;};
+function vxMake(cls,r,extra,life){
+  const e=document.createElement('div');e.className='vx '+cls;
+  e.style.cssText='left:'+r.left+'px;top:'+r.top+'px;width:'+r.width+'px;height:'+r.height+'px;--sp:'+speed+';'+(extra||'');
+  $('fx').appendChild(e);setTimeout(()=>e.remove(),(life||1000)*Math.max(speed,0.35)+200);return e;
+}
+const vxRand=(n,f)=>{let h='';for(let i=0;i<n;i++)h+=f(i);return h;};
+function vxShake(){const b=$('board');if(!b)return;b.style.setProperty('--shk',speed);b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),400);}
+function vxGhost(key,kind,dx,dy){
+  const q=elRect(key);if(!q)return;
+  const w=vxMake('ghost '+kind,q.r,'--dx:'+Math.round(dx||0)+'px;--dy:'+Math.round(dy||0)+'px;',800);
+  const c=q.el.cloneNode(true);
+  [c].concat([...c.querySelectorAll('*')]).forEach(x=>{x.removeAttribute('data-key');x.removeAttribute('data-act');x.removeAttribute('id');});
+  c.classList.remove('targetable','sel','ready');w.appendChild(c);
+}
+function vfx(key,kind,arg){
+  if(!fxOn())return;const q=elRect(key);if(!q)return;const r=q.r;
+  if(kind==='hit'){const big=arg>=4,e=vxMake('ring burst',r,'--vc:#FF5A3C;');e.innerHTML='<i></i><i></i>'+vxRand(big?12:8,i=>'<b style="--a:'+(i*(360/(big?12:8)))+'deg;--d:'+(big?58:40)+'px"></b>');if(arg>=5)vxShake();}
+  else if(kind==='clang'){const e=vxMake('ring burst',r,'--vc:#BFC8D0;');e.innerHTML='<i></i>'+vxRand(6,i=>'<b style="--a:'+(i*60)+'deg;--d:30px"></b>');}
+  else if(kind==='shieldbreak'){const e=vxMake('ring burst',r,'--vc:#6CB6FF;');e.innerHTML='<i></i><i></i>'+vxRand(10,i=>'<b style="--a:'+(i*36)+'deg;--d:46px"></b>');}
+  else if(kind==='poison'||kind==='heal'){const col=kind==='poison'?'#A24BD8':'#3FD16B';vxMake('rise',r,'--vc:'+col+';',1100).innerHTML=vxRand(8,i=>'<b style="--x:'+(8+Math.random()*80).toFixed(0)+'%;--s:'+(6+Math.random()*8).toFixed(0)+'px;--dl:'+(Math.random()*0.35).toFixed(2)+'s"></b>');}
+  else if(kind==='ice'){vxMake('ice',r,'',1000).innerHTML=vxRand(7,i=>'<b style="--x:'+(6+Math.random()*80).toFixed(0)+'%;--y:'+(6+Math.random()*70).toFixed(0)+'%;--a:'+(Math.random()*360).toFixed(0)+'deg"></b>');}
+  else if(kind==='chain'){vxMake('chain',r,'',1000);}
+  else if(kind==='shield'){vxMake('shield',r,'',800);}
+  else if(kind==='up'){vxMake('flame',r,'',800).innerHTML=vxRand(7,i=>'<b style="--x:'+(6+i*13)+'%;--dl:'+(Math.random()*0.25).toFixed(2)+'s"></b>');}
+  else if(kind==='down'){vxMake('down',r,'',800).innerHTML=vxRand(5,i=>'<b style="--x:'+(8+i*18)+'%;--dl:'+(Math.random()*0.25).toFixed(2)+'s"></b>');}
+  else if(kind==='summon'){vxMake('summon',r,'--eff:var(--eff);',900).innerHTML='<i></i><i></i>';}
+}
+function vxLine(k1,k2,cls,col){
+  if(!fxOn())return;const a=elRect(k1),b=elRect(k2);if(!a||!b)return;
+  const x1=a.r.left+a.r.width/2,y1=a.r.top+a.r.height/2,x2=b.r.left+b.r.width/2,y2=b.r.top+b.r.height/2;
+  const e=document.createElement('div'),dx=x2-x1,dy=y2-y1;
+  e.className='vx '+cls;e.style.cssText='left:'+x1+'px;top:'+y1+'px;--sp:'+speed+';--vc:'+col+';'+(cls==='beam'?'width:'+Math.hypot(dx,dy)+'px;--r:'+Math.atan2(dy,dx)+'rad;':'--dx:'+dx+'px;--dy:'+dy+'px;');
+  $('fx').appendChild(e);setTimeout(()=>e.remove(),700*Math.max(speed,0.35)+200);
+}
+function vfxAttack(src,t,mode){
+  if(!fxOn()||!src||src.uid===undefined)return;
+  const from='u'+src.uid,to=t.unit?'u'+t.unit.uid:'P'+t.player;
+  if(mode==='ping'){vxLine(from,to,'orb','#FFD34D');return;}
+  const a=elRect(from),b=elRect(to);if(!a||!b)return;
+  const dx=(b.r.left+b.r.width/2-a.r.left-a.r.width/2)*0.7,dy=(b.r.top+b.r.height/2-a.r.top-a.r.height/2)*0.7;
+  flash(from,'lunge',Math.round(430*Math.max(speed,0.35)),'--dx:'+Math.round(dx)+'px;--dy:'+Math.round(dy)+'px;--sp:'+speed+';');
+}
+function fxFromPopup(key,text,cls){
+  let m;
+  if(cls==='dmg'){
+    if((m=/^-(\d+)$/.exec(text)))vfx(key,'hit',+m[1]);
+    else if(text==='毒'||text==='毒 -1')vfx(key,'poison');
+    else if(text==='凍結')vfx(key,'ice');
+    else if(text==='沈黙')vfx(key,'chain');
+    else if(text==='ATK-1')vfx(key,'down');
+    else if(text==='自壊 -1'||text==='破壊'||text==='処刑'||text==='罠!'||text==='死神')vfx(key,'hit',5);
+  }else if(cls==='buff'){
+    if(/^\+\d/.test(text)||text==='治療'||/^最大HP/.test(text)||text==='上限')vfx(key,'heal');
+    else if(text==='盾')vfx(key,'shield');
+    else if(/^ATK\+/.test(text))vfx(key,'up');
+  }else if(cls==='info'){
+    if(text==='防いだ')vfx(key,'shieldbreak');
+    else if(text==='装甲')vfx(key,'clang');
+    else if(text==='無効'||text==='籠城')vfx(key,'shield');
+  }
+}
+function flash(key,cls,dur,vars){UI.flash[key]={cls,t0:performance.now(),dur,vars:vars||''};}
 function fxClass(key){const f=UI.flash[key];if(!f)return '';if(performance.now()-f.t0>=f.dur){delete UI.flash[key];return '';}return 'fx-'+f.cls;}
-function fxStyle(key){const f=UI.flash[key];if(!f)return '';return 'animation-delay:-'+Math.round(performance.now()-f.t0)+'ms;';}
+function fxStyle(key){const f=UI.flash[key];if(!f)return '';return 'animation-delay:-'+Math.round(performance.now()-f.t0)+'ms;'+(f.vars||'');}
 function hint(text){UI.hint=text;render();clearTimeout(hintT);hintT=setTimeout(()=>{if(UI){UI.hint='';render();}},2400);}
 
 /* ---------- engine ---------- */
 const byTurn=(a,b)=>((a.owner===G.cur?0:1)-(b.owner===G.cur?0:1))||(a.order-b.order);
-function qpush(u,ev){if(u.alive&&!silenced(u)&&u.slots.cond.key===ev)queue.push({unit:u,event:ev});}
+function qpush(u,ev,subj){if(u.alive&&!silenced(u)&&u.slots.cond.key===ev)queue.push({unit:u,event:ev,subj});}
+function woundReset(u){if(u.hp*2>u.maxHp)u.woundedDone=false;}
+function woundChk(u){if(u.hp*2<=u.maxHp){if(!u.woundedDone){u.woundedDone=true;emit('wounded',u);}}else u.woundedDone=false;}
 function emit(ev,u,direct){
   if(ev==='attacks'){
     if(u.alive&&!silenced(u)&&u.slots.cond.key==='attacks'&&u.condAtkTurn!==G.turn){u.condAtkTurn=G.turn;queue.push({unit:u,event:ev});}
@@ -626,7 +765,7 @@ function emit(ev,u,direct){
 function emitEnter(u){
   emit('enter',u);
   G.p[u.owner].field.filter(v=>v!==u).sort(byTurn).forEach(v=>qpush(v,'allyenter'));
-  G.p[1-u.owner].field.slice().sort(byTurn).forEach(v=>qpush(v,'foeenter'));
+  G.p[1-u.owner].field.slice().sort(byTurn).forEach(v=>qpush(v,'foeenter',u));
 }
 function emitTurnStart(idx){
   G.p[idx].field.slice().sort((a,b)=>a.order-b.order).forEach(u=>qpush(u,'myturn'));
@@ -640,26 +779,26 @@ async function decayTick(idx){
     log(un(u)+'が自壊で1ダメージ(HP'+Math.max(u.hp,0)+'/'+u.maxHp+')',sideOf(u));
     render();await wait(420);
     if(u.hp<=0)sendToGrave(u,'自壊した');
-    else if(!u.woundedDone&&u.hp*2<=u.maxHp){u.woundedDone=true;emit('wounded',u);}
+    else woundChk(u);
   }
 }
 async function poisonTick(idx){
   for(const u of G.p[idx].field.slice()){
     if(!u.alive||u.poison<=0)continue;
     u.poison--;
-    if(u.char.kw&&u.char.kw.undead){u.hp=Math.min(u.maxHp,u.hp+1);popup('u'+u.uid,'毒 +1','buff');log(un(u)+'は死者なので毒で1回復した(HP'+u.hp+'/'+u.maxHp+')',sideOf(u));render();await wait(420);continue;}
+    if(u.char.kw&&u.char.kw.undead){u.hp=Math.min(u.maxHp,u.hp+1);woundReset(u);popup('u'+u.uid,'毒 +1','buff');log(un(u)+'は死者なので毒で1回復した(HP'+u.hp+'/'+u.maxHp+')',sideOf(u));render();await wait(420);continue;}
     u.hp-=1;popup('u'+u.uid,'毒 -1','dmg');flash('u'+u.uid,'hit',450);
     log(un(u)+'が毒で1ダメージ(HP'+Math.max(u.hp,0)+'/'+u.maxHp+')',sideOf(u));
     if(u.hp<=0&&u.char.kw&&u.char.kw.endure&&!u.endureUsed){u.endureUsed=true;u.hp=1;popup('u'+u.uid,'耐久','info');log(un(u)+'は耐久でHP1で耐えた。',sideOf(u));}
     render();await wait(420);
     if(u.hp<=0)sendToGrave(u,'毒で倒れた');
-    else if(!u.woundedDone&&u.hp*2<=u.maxHp){u.woundedDone=true;emit('wounded',u);}
+    else woundChk(u);
   }
 }
 function showChain(n){
   if(HEADLESS||typeof document==='undefined')return;
   if(n>=3)log('🔗 '+n+'連鎖!','skill');
-  const el=document.createElement('div');el.className='chainbanner';el.textContent=n+'連鎖!';
+  const el=document.createElement('div');el.className='chainbanner'+(n>=6?' c6':n>=4?' c4':'');el.textContent=n+'連鎖!';
   $('fx').appendChild(el);setTimeout(()=>el.remove(),1200);
 }
 async function drain(){
@@ -670,6 +809,7 @@ async function drain(){
     if(silenced(u)){log(un(u)+'は沈黙していてスキルが発動しない。','sys');continue;}
     chain.add(u);
     if(chain.size>=2)showChain(chain.size);
+    u.trigSubj=it.subj||null;
     await resolveSkill(u,it.event);
   }
 }
@@ -680,6 +820,7 @@ async function act(fn){
 }
 function removeFromField(u){u.alive=false;G.p[u.owner].field=G.p[u.owner].field.filter(x=>x!==u);if(UI.selUnit===u)UI.selUnit=null;}
 function sendToGrave(u,why,direct){
+  if(fxOn())vxGhost('u'+u.uid,'ash');
   const P=G.p[u.owner];removeFromField(u);
   if(u.playRec&&G.turn===u.summonedTurn+1&&u.atkTurn<0)u.playRec.diedFirst=true;
   P.cgrave.push(u.char);u.char.costDown=0;
@@ -688,6 +829,7 @@ function sendToGrave(u,why,direct){
   emit('grave',u,direct);
 }
 function returnToHand(u,skillsToGrave){
+  if(fxOn())vxGhost('u'+u.uid,'bnc',0,(u.owner===ME?1:-1)*window.innerHeight*0.5);
   const P=G.p[u.owner];removeFromField(u);
   P.hand.push(u.char);u.char.costDown=0;
   TYPES.forEach(t=>{const s=u.slots[t];if(!s.fixed&&s.card)(skillsToGrave?P.sgrave:P.hand).push(s.card);});
@@ -701,6 +843,7 @@ function choose(chooser,opts,text,ctx,cancel){
   return new Promise(res=>{UI.prompt={opts,keys:new Set(opts.map(keyOf)),text,res:r=>{netSend(chooser,{t:'pick',k:kk(r)});res(r);},cancel:!!cancel};UI.selUnit=null;UI.mode=null;render();});
 }
 async function hit(src,t,dmg,mode,np){
+  vfxAttack(src,t,mode);
   const isAtk=mode!=='ping'&&mode!=='counter';
   const pierce=!np&&isAtk&&!!(src&&src.char&&src.char.kw&&src.char.kw.pierce);
   if(t.player!==undefined){
@@ -760,7 +903,7 @@ async function hit(src,t,dmg,mode,np){
   else{
     if(isAtk)emit('attacked',v);
     if(mode!=='basic'&&mode!=='counter'&&src!==v)emit('effected',v);
-    if(!v.woundedDone&&v.hp*2<=v.maxHp){v.woundedDone=true;emit('wounded',v);}
+    woundChk(v);
     await counterBack();
   }
   render();
@@ -783,7 +926,8 @@ async function runEffect(u,targ,eff){
   if(targ==='self'){if(u.alive)targets=[{unit:u}];}
   else if(targ==='friends')targets=P.field.map(unit=>({unit}));
   else if(targ==='others')targets=P.field.filter(x=>x!==u).map(unit=>({unit}));
-  else if(targ==='enemies'){targets=F.field.map(unit=>({unit}));if(dmgEff&&!targets.length)targets=[plr()];}
+  else if(targ==='enemies'){targets=F.field.map(unit=>({unit}));if(dmgEff&&!targets.length)targets=[plr()];
+    if(eff==='bounce'&&u.slots.cond.key==='foeenter'&&targets.length){const sj=(u.trigSubj&&u.trigSubj.alive&&F.field.includes(u.trigSubj))?u.trigSubj:F.field.reduce((m,x)=>x.order>m.order?x:m);targets=[{unit:sj}];}}
   else if(targ==='all'){targets=P.field.concat(F.field).map(unit=>({unit}));if(dmgEff&&!F.field.length)targets.push(plr());}
   else if(targ==='weakally'){if(P.field.length)targets=[{unit:P.field.reduce((m,x)=>x.hp<m.hp?x:m)}];}
   else if(targ==='lowfoe'){if(F.field.length)targets=[{unit:F.field.reduce((m,x)=>x.hp<m.hp?x:m)}];else if(dmgEff)targets=[plr()];}
@@ -839,7 +983,7 @@ async function runEffect(u,targ,eff){
       if(v.slots.eff.key==='trigger'){log(un(v)+'のスキルは発動させられない。','sys');continue;}
       if(silenced(v)){log(un(v)+'は沈黙している。','sys');continue;}
       if(chain.has(v)){log(un(v)+'は連鎖中にすでに発動している。','sys');continue;}
-      chain.add(v);
+      chain.add(v);v.trigSubj=null;
       await resolveSkill(v,'forced');
     }
   }else{
@@ -847,24 +991,25 @@ async function runEffect(u,targ,eff){
       if(!v.alive)continue;
       let pop=null,cls='buff',msg='';
       if(v.char.kw&&v.char.kw.adapt&&(eff==='poison'||eff==='freeze'||eff==='silence'||eff==='bounce')){popup('u'+v.uid,'適応','info');log(un(v)+'は適応で効果を受けない。',sideOf(v));render();await wait(380);continue;}
-      if(eff==='heal'&&v.char.kw&&v.char.kw.undead){const dd=HEAL;v.hp-=dd;popup('u'+v.uid,'-'+dd,'dmg');flash('u'+v.uid,'hit',450);log(un(v)+'は死者なので回復がダメージになった(HP'+Math.max(v.hp,0)+'/'+v.maxHp+')',sideOf(v));render();await wait(450);if(v.hp<=0)sendToGrave(v,'回復で倒れた');else{if(v!==u)emit('effected',v);if(!v.woundedDone&&v.hp*2<=v.maxHp){v.woundedDone=true;emit('wounded',v);}}continue;}
+      if(eff==='heal'&&v.char.kw&&v.char.kw.undead){const dd=HEAL;v.hp-=dd;popup('u'+v.uid,'-'+dd,'dmg');flash('u'+v.uid,'hit',450);log(un(v)+'は死者なので回復がダメージになった(HP'+Math.max(v.hp,0)+'/'+v.maxHp+')',sideOf(v));render();await wait(450);if(v.hp<=0)sendToGrave(v,'回復で倒れた');else{if(v!==u)emit('effected',v);woundChk(v);}continue;}
       if(eff==='atkup'){if(v.tmpTurn!==G.turn){v.tmpTurn=G.turn;v.tmpAtk=0;}v.tmpAtk++;pop='ATK+1';msg=un(v)+'のATKがこのターン'+atkOf(v)+'になった。';}
       else if(eff==='grow'){if(v.atk<Math.min(ATKMAX,v.char.atk+2))v.atk++;pop='ATK+1';msg=un(v)+'のATKが'+v.atk+'になった(永続)。';}
       else if(eff==='atkdown'){v.atk=Math.max(0,v.atk-1);pop='ATK-1';cls='dmg';msg=un(v)+'のATKが'+v.atk+'になった(永続)。';}
-      else if(eff==='heal'){const h=Math.min(HEAL,v.maxHp-v.hp);v.hp+=h;pop='+'+h;msg=un(v)+'のHPが'+h+'回復した(HP'+v.hp+'/'+v.maxHp+')。';}
+      else if(eff==='heal'){const h=Math.min(HEAL,v.maxHp-v.hp);v.hp+=h;woundReset(v);pop='+'+h;msg=un(v)+'のHPが'+h+'回復した(HP'+v.hp+'/'+v.maxHp+')。';}
       else if(eff==='shield'){v.shield=true;pop='盾';msg=un(v)+'にシールドが張られた。';}
-      else if(eff==='poison'){v.poison=POISON_TURNS;pop='毒';cls='dmg';msg=un(v)+'が毒を受けた。';}
-      else if(eff==='freeze'){v.frozenTurn=nextTurnOf(v.owner);pop='凍結';cls='dmg';msg=un(v)+'は次のターン攻撃できない。';}
+      else if(eff==='poison'){v.poison=POISON_TURNS;pop='毒';cls='dmg';msg=un(v)+'が毒を受けた。';emit('ailed',v);}
+      else if(eff==='freeze'){v.frozenTurn=nextTurnOf(v.owner);pop='凍結';cls='dmg';msg=un(v)+'は次のターン攻撃できない。';emit('ailed',v);}
       else if(eff==='swapatk'){
         if(v===u){pop='不発';cls='info';msg='自分とは入れ替えられない。';}
         else{const t0=u.atk;u.atk=v.atk;v.atk=t0;pop='ATK入替';cls='info';popup('u'+u.uid,'ATK'+u.atk,'info');msg=un(u)+'と'+un(v)+'のATKが入れ替わった('+un(u)+'ATK'+u.atk+' / '+un(v)+'ATK'+v.atk+')。';}
       }
-      else if(eff==='fortify'){const g=Math.max(0,Math.min(2,v.char.hp+4-v.maxHp));v.maxHp+=g;pop=g?'最大HP+'+g:'上限';msg=un(v)+'の最大HPが'+v.maxHp+'になった(HP'+v.hp+'/'+v.maxHp+')。';}
+      else if(eff==='fortify'){const g=Math.max(0,Math.min(2,v.char.hp+4-v.maxHp));v.maxHp+=g;woundReset(v);pop=g?'最大HP+'+g:'上限';msg=un(v)+'の最大HPが'+v.maxHp+'になった(HP'+v.hp+'/'+v.maxHp+')。';}
       else if(eff==='execute'){
         if(v.hp<=2){log(un(u)+'の処刑:'+un(v)+'を倒した。',sideOf(v));popup('u'+v.uid,'処刑','dmg');flash('u'+v.uid,'hit',450);render();await wait(450);sendToGrave(v,'処刑された');render();await wait(300);continue;}
         pop='不発';cls='info';msg=un(v)+'はHPが3以上なので処刑できない。';
       }
-      else if(eff==='silence'){v.silenceTurn=nextTurnOf(v.owner);pop='沈黙';cls='dmg';msg=un(v)+'のスキルが封じられた。';}
+      else if(eff==='silence'){v.silenceTurn=nextTurnOf(v.owner);pop='沈黙';cls='dmg';msg=un(v)+'のスキルが封じられた。';emit('ailed',v);}
+      else if(eff==='cure'){const had=(v.poison>0)||(v.frozenTurn>=G.turn)||silenced(v);if(had){v.poison=0;v.frozenTurn=-99;v.silenceTurn=-99;pop='治療';msg=un(v)+'の状態異常が治った。';}else{pop='不発';cls='info';msg=un(v)+'は状態異常ではない。';}}
       else if(eff==='bounce'){returnToHand(v,v.owner!==u.owner);render();await wait(500);continue;}
       popup('u'+v.uid,pop,cls);log(msg,sideOf(v));
       if(v!==u)emit('effected',v);
@@ -998,10 +1143,10 @@ async function playBody(idx,ch,picks){
   const u=makeUnit(idx,ch,picks);ch.costDown=0;P.field.push(u);
   u.playRec={o:idx,ch:ch.key,c:u.slots.cond.key,t:u.slots.targ.key,e:u.slots.eff.key,cost:ucost(u),turn:G.turn};G.plays.push(u.playRec);
   log(sname(idx)+'が「'+ch.name+'」を出した(コスト'+ucost(u)+'):'+readSkill(u.slots.cond.key,u.slots.targ.key,u.slots.eff.key),sideOf(u));
-  flash('u'+u.uid,'enter',400);render();await wait(520);
+  flash('u'+u.uid,'enter',400);render();vfx('u'+u.uid,'summon');await wait(520);
   const O=G.p[1-idx];
   if(O.trapTurn===G.turn){
-    O.trapTurn=-99;O.abRevealed=true;G.abUses.trapHit=(G.abUses.trapHit||0)+1;
+    O.trapTurn=-99;O.trapHide=false;O.abRevealed=true;G.abUses.trapHit=(G.abUses.trapHit||0)+1;
     log('🪤 '+sname(1-idx)+'の「巧妙な罠」が発動!',idx===ME?'foe':'me');popup('u'+u.uid,'罠!','dmg');render();await wait(600);
     sendToGrave(u,'罠にかかって墓地に送られた');return;
   }
@@ -1136,7 +1281,7 @@ function openPick(title,sub,items,cancel){
 function cardMini(c){
   if(c.kind==='char'){
     const fx=TYPES.filter(t=>c.fix&&c.fix[t]).map(t=>TLABEL[t]+':'+SK[t][c.fix[t]].name).join(' / ')||'固定なし';
-    return '<b>'+c.name+'</b><span>コスト'+cardCost(c)+'  ATK'+c.atk+' / HP'+c.hp+'</span><small>'+fx+'</small>';
+    return '<b>'+c.name+(c.tag?'【'+TAGNAME[c.tag]+'】':'')+'</b><span>コスト'+cardCost(c)+'  ATK'+c.atk+' / HP'+c.hp+'</span><small>'+fx+'</small>';
   }
   const i=SK[c.type][c.key];
   return '<b>'+i.name+'</b><span>'+TLABEL[c.type]+'スキル  +'+i.inc+'</span><small>'+DESC[c.type][c.key]+'</small>';
@@ -1223,7 +1368,7 @@ async function abilityBody(idx){
     use();announce();render();await wait(400);
     await hit(src,{unit:t.unit},atk,'basic',true);
   }else if(k==='trap'){
-    use();P.trapTurn=G.turn+1;
+    use();P.trapTurn=G.turn+1;P.trapHide=true;
     if(named)log('🪤 巧妙な罠を仕掛けた(相手には知らされない)。','me');
     render();await wait(300);
   }
@@ -1271,6 +1416,7 @@ function synergy(idx,ch,c,t,e){
   if(k==='bounce')s+=foeN?3:-2;
   if(t==='all')s-=12;
   if(e==='heal'&&(c==='enter'||c==='attacks'))s-=1;
+  if(e==='cure'&&c!=='ailed'&&c!=='myturn'&&c!=='foeturn')s-=3;
   if(e==='atkup'&&(c==='enter'||c==='grave'||c==='wounded'||c==='foeturn'))s-=4;
   if(e==='atkup'&&c==='myturn')s+=2;
   if(c==='myturn')s+=2;
@@ -1332,6 +1478,7 @@ function cpuPick(opts,ctx){
         case 'fortify':s=fr?((t.maxHp<t.char.hp+4)?ucost(t)*0.3+(t.hp<t.maxHp?4:1):-20):-100;break;
         case 'execute':s=fr?-100:(t.hp<=2?ucost(t)*3+A*2+10:-60);break;
         case 'discount':s=fr?ucost(t):-100;break;
+        case 'cure':s=fr?((t.poison>0||t.frozenTurn>=G.turn||silenced(t))?ucost(t)*0.5+8:-30):-100;break;
         default:s=0;
       }
     }
@@ -1382,7 +1529,7 @@ function unitHTML(u,side){
   const key='u'+u.uid,foe=side===1;
   const targetable=(UI.prompt&&UI.prompt.keys.has(key))||(UI.mode==='attack'&&foe&&!UI.prompt&&basicPool(FOE()).includes(u));
   const ready=!foe&&G.phase==='main'&&canBasicAttack(u);
-  const cls=['unit',foe?'foe':'mine',UI.selUnit===u?'sel':'',targetable?'targetable':'',ready?'ready':'',fxClass(key)].join(' ');
+  const cls=['unit',foe?'foe':'mine',UI.selUnit===u?'sel':'',targetable?'targetable':'',ready?'ready':'',fxClass(key),u.shield?'st-shield':'',u.poison>0?'st-poison':'',G.turn<=u.frozenTurn?'st-frozen':'',silenced(u)?'st-silence':''].join(' ');
   const tags=[],A=atkOf(u);
   tags.push(kwTags(u.char));
   if(u.shield)tags.push('<span class="tag st">盾</span>');
@@ -1393,7 +1540,7 @@ function unitHTML(u,side){
   else if(u.atkTurn===G.turn&&!ready)tags.push('<span class="tag">攻撃済み</span>');
   else if(ready)tags.push('<span class="tag go">攻撃できる</span>');
   return '<div class="'+cls+'" data-act="unit" data-id="'+u.uid+'" data-side="'+side+'" data-key="'+key+'" role="button" tabindex="0" style="'+fxStyle(key)+'">'
-    +'<div class="u-head"><span class="cost">'+ucost(u)+'</span><span class="u-name">'+u.char.name+'</span></div>'
+    +'<div class="u-head"><span class="cost">'+ucost(u)+'</span><span class="u-name">'+u.char.name+'</span>'+tagBadge(u.char)+'</div>'
     +'<div class="u-stats"><span class="'+(A>u.char.atk?'buffed':(A<u.char.atk?'debuffed':''))+'"><i>ATK</i>'+A+'</span><span><i>HP</i>'+Math.max(u.hp,0)+'<small>/'+u.maxHp+'</small></span></div>'
     +'<div class="hpbar"><span style="width:'+Math.max(0,u.hp/u.maxHp*100)+'%"></span></div>'
     +TYPES.map(t=>plate(t,u.slots[t].key,u.slots[t].fixed)).join('')
@@ -1408,7 +1555,7 @@ function abilHTML(i){
   const P=G.p[i];
   if(!P.ab)return '';
   if(!(i===ME||G.auto||P.abRevealed))return '<div class="abil hidden"><i>能力</i><b>???</b></div>';
-  const A=ABIL[P.ab],ready=abReady(i);
+  const A=ABIL[P.ab],hideUse=(i!==ME&&!G.auto&&P.ab==='trap'&&P.trapHide),ready=hideUse||abReady(i);
   const st=ready?'使用可':'ターン'+abNext(i)+'以降に再使用';
   const btn=(i===ME&&!G.auto&&G.phase==='main')?'<button class="btn" data-act="ability"'+(canAct()&&ready&&abCan(i)?'':' disabled')+'>使う</button>':'';
   return '<div class="abil '+(ready?'ready':'')+'" title="'+A.desc+'(使用後'+A.cd+'ターンで再使用)"><i>能力</i><b>'+A.name+'</b><span>'+st+'</span>'+btn+'</div>';
@@ -1505,7 +1652,7 @@ function drawHTML(){
 function charCardHTML(c,click){
   const tg=!!(UI.prompt&&UI.prompt.keys.has('h'+c.uid));
   return '<div class="hcard '+(UI.selChar===c?'sel':'')+' '+(click?'click':'')+' '+(tg?'targetable':'')+'" data-act="hand" data-id="'+c.uid+'"'+(click||tg?' role="button" tabindex="0"':'')+'>'
-    +'<div class="u-head"><span class="cost">'+Math.max(0,cardCost(c)-3*(c.costDown||0))+'</span><span class="u-name">'+c.name+'</span></div>'
+    +'<div class="u-head"><span class="cost">'+Math.max(0,cardCost(c)-3*(c.costDown||0))+'</span><span class="u-name">'+c.name+'</span>'+tagBadge(c)+'</div>'
     +'<div class="u-stats"><span><i>ATK</i>'+c.atk+'</span><span><i>HP</i>'+c.hp+'</span></div>'
     +(Object.keys(c.kw||{}).length?'<div class="u-state">'+kwTags(c)+'</div>':'')
     +TYPES.map(t=>c.fix&&c.fix[t]?plate(t,c.fix[t],true):'<div class="plate free '+t+'"><b>'+TLABEL[t]+'</b><span>〈自由〉</span></div>').join('')+'</div>';
@@ -1629,6 +1776,9 @@ $('btnNew').addEventListener('click',()=>{showTitle();});
 $('btnWatch').addEventListener('click',()=>{if(G&&G.auto)playWith(LAST.deck||PRESETS[0],false);else playWith(null,true);});
 $('btnAgain').addEventListener('click',()=>{if(G&&G.net){showTitle();return;}playWith(LAST.deck||PRESETS[0],!!(G&&G.auto));});
 $('btnLook').addEventListener('click',()=>{$('result').hidden=true;});
+const fxLabel=()=>{$('btnFx').textContent='演出:'+(FXMODE===1?'通常':'簡易');document.body.classList.toggle('fx-lite',FXMODE!==1);};
+fxLabel();
+$('btnFx').addEventListener('click',()=>{FXMODE=FXMODE===1?0:1;try{localStorage.setItem('kumitate-tcg-fx',String(FXMODE));}catch(e){}fxLabel();});
 $('btnSpeed').addEventListener('click',()=>{
   speed=speed===1?0.35:1;
   $('btnSpeed').textContent='速度:'+(speed===1?'ふつう':'はやい');
@@ -1791,7 +1941,7 @@ async function chooseDeck(){
   return i<0?null:ds[i];
 }
 /* デッキ構築画面 */
-const ED={d:null,tab:'char',msg:'',editing:null,onlyOwn:false};
+const ED={d:null,tab:'char',msg:'',editing:null,onlyOwn:false,tagF:''};
 function edOpen(){
   if(!ED.d){ED.d=cloneDeck(PRESETS[0]);ED.d.name='';ED.editing=null;}
   $('title').hidden=true;$('builder').hidden=false;edRender();
@@ -1802,12 +1952,13 @@ function fixText(c){
 }
 function edCatalogHTML(){
   const d=ED.d,tabs=[['char','キャラ'],['cond','条件'],['targ','対象'],['eff','効果']];
-  let h='<div class="dtabs">'+tabs.map(([k,n])=>'<button class="dtab '+(ED.tab===k?'on':'')+'" data-d="tab" data-id="'+k+'">'+n+(k==='char'?' '+cnt(d.chars)+'/'+DECK_C:' '+typeCnt(d,k))+'</button>').join('')+'</div>'+(ED.tab==='char'?'<div class="dmsg" style="margin:4px 0">レア3: '+bigCnt(d.chars)+' / '+BIG_MAX+'枚まで</div>':'')+(OWN()?'<div class="dtoggle"><button class="btn'+(ED.onlyOwn?' primary':'')+'" data-d="own">'+(ED.onlyOwn?'持っているカードだけ表示中':'持っているカードだけ表示')+'</button></div>':'')+'<div class="dgrid">';
+  let h='<div class="dtabs">'+tabs.map(([k,n])=>'<button class="dtab '+(ED.tab===k?'on':'')+'" data-d="tab" data-id="'+k+'">'+n+(k==='char'?' '+cnt(d.chars)+'/'+DECK_C:' '+typeCnt(d,k))+'</button>').join('')+'</div>'+(ED.tab==='char'?'<div class="tagf">'+[['','すべて']].concat(Object.entries(TAGNAME)).map(([k,n])=>'<button class="'+(ED.tagF===k?'on':'')+'" data-d="tagf" data-id="'+k+'">'+n+'</button>').join('')+'</div><div class="dmsg" style="margin:4px 0">レア3: '+bigCnt(d.chars)+' / '+BIG_MAX+'枚まで</div>':'')+(OWN()?'<div class="dtoggle"><button class="btn'+(ED.onlyOwn?' primary':'')+'" data-d="own">'+(ED.onlyOwn?'持っているカードだけ表示中':'持っているカードだけ表示')+'</button></div>':'')+'<div class="dgrid">';
   if(ED.tab==='char'){
     CHARS.slice().sort((a,b)=>a.cost-b.cost||a.name.localeCompare(b.name,'ja')).forEach(c=>{
       const n=d.chars[c.key]||0,mx=capC(c),full=cnt(d.chars)>=DECK_C,ow=OWN(),have=ow?(ow.chars[c.key]||0):null;
       if(ED.onlyOwn&&ow&&!have&&!n)return;
-      h+='<div class="dcard '+(n?'has':'')+(ow&&!have?' none':'')+'"><div class="dc-main"><b>'+c.name+'</b><span class="dc-cost">'+cardCost(c)+'</span></div>'
+      if(ED.tagF&&c.tag!==ED.tagF)return;
+      h+='<div class="dcard '+(n?'has':'')+(ow&&!have?' none':'')+'"><div class="dc-main"><b>'+c.name+tagBadge(c)+'</b><span class="dc-cost">'+cardCost(c)+'</span></div>'
         +'<div class="dc-sub">ATK '+c.atk+' / HP '+c.hp+(isBig(c)?' ・レア3':'')+'</div>'+(ow?'<span class="own'+(have?'':' zero')+'">'+(have?'所持 '+have+'枚':'未所持')+'</span>':'')
         +'<div class="dc-fix">'+fixText(c)+'</div>'+(Object.keys(c.kw||{}).length?'<div class="u-state">'+kwTags(c)+'</div>':'')
         +'<div class="dc-ctl"><button data-d="dec" data-id="c:'+c.key+'"'+(n?'':' disabled')+'>−</button><span>'+n+'</span><button data-d="inc" data-id="c:'+c.key+'"'+(n>=mx||full||(isBig(c)&&bigCnt(d.chars)>=BIG_MAX)?' disabled':'')+'>＋</button></div></div>';
@@ -1864,6 +2015,7 @@ function edClick(e){
     if(n===0)delete o[key];else o[key]=n;
   }
   else if(a==='own')ED.onlyOwn=!ED.onlyOwn;
+  else if(a==='tagf')ED.tagF=id;
   else if(a==='ab')d.ab=id;
   else if(a==='save')edSave();
   else if(a==='fill'){ED.d=randomDeck(d,true);ED.d.name=d.name;ED.msg='空きをおまかせで埋めました。';}
