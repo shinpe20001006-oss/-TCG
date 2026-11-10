@@ -136,6 +136,7 @@
   "cond.attacks": 3,
   "cond.grave": 3,
   "cond.wounded": 3,
+  "cond.ailed": 3,
   "cond.enter": 3,
   "cond.effected": 3,
   "cond.allygrave": 3,
@@ -175,7 +176,8 @@
   "eff.bounce": 3,
   "eff.swapatk": 3,
   "eff.fortify": 3,
-  "eff.execute": 3
+  "eff.execute": 3,
+  "eff.cure": 3
  },
  "abilities": [
   "fortress",
