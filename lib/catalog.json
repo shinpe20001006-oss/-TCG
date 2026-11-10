@@ -45,7 +45,7 @@
   "warlord": 1,
   "thorn": 1,
   "valkyrie": 1,
-  "sentinel": 1,
+  "sentinel": 2,
   "plaguelord": 1,
   "lance": 1,
   "warking": 1,
@@ -111,7 +111,7 @@
   "warlord": 3,
   "thorn": 3,
   "valkyrie": 3,
-  "sentinel": 3,
+  "sentinel": 2,
   "plaguelord": 3,
   "lance": 3,
   "warking": 3,
@@ -282,7 +282,6 @@
    "feature": "wardgod",
    "r3": [
     "bastion",
-    "sentinel",
     "ironclad",
     "thorn"
    ],
@@ -298,7 +297,8 @@
     "mercenary",
     "glacier",
     "scribe",
-    "curse"
+    "curse",
+    "sentinel"
    ],
    "featW": 1.2,
    "live": true,
@@ -349,8 +349,7 @@
    "r3": [
     "plaguelord",
     "thorn",
-    "warlord",
-    "sentinel"
+    "warlord"
    ],
    "r2": [
     "paladin",
@@ -364,7 +363,8 @@
     "assassin",
     "veteran",
     "tide",
-    "mercenary"
+    "mercenary",
+    "sentinel"
    ],
    "featW": 1.2,
    "live": false,
@@ -415,7 +415,6 @@
    "r3": [
     "lance",
     "thorn",
-    "sentinel",
     "valkyrie"
    ],
    "r2": [
@@ -430,7 +429,8 @@
     "general",
     "elite",
     "drummer",
-    "archmage"
+    "archmage",
+    "sentinel"
    ],
    "featW": 1.2,
    "live": false,
