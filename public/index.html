@@ -366,6 +366,7 @@ body.fx-lite .unit.fx-lunge{animation:none}
 .unitybar{font-size:12px;border:1.5px dashed var(--line);border-radius:10px;padding:6px 10px;margin:6px 0;color:var(--muted,#667)}
 .unitybar.on{border-style:solid;border-color:#E0A800;background:color-mix(in srgb,#E0A800 14%,transparent);color:var(--ink)}
 
+.stt{width:100%;border-collapse:collapse;font-size:13px;margin:4px 0 8px}.stt th,.stt td{padding:4px 6px;border-bottom:1px solid rgba(128,128,128,.3);text-align:right}.stt th:first-child,.stt td:first-child{text-align:left}.stsum{font-size:15px;margin:4px 0}#stats .sheet{max-height:86vh;overflow:auto}#stats h3{font-size:13px;margin:10px 0 2px;opacity:.8}.stnote,.stnone{font-size:12px;opacity:.7}
 </style>
 
 <div class="app">
@@ -386,10 +387,11 @@ body.fx-lite .unit.fx-lunge{animation:none}
 </div>
 <div class="fxlayer" id="fx"></div>
 
-<div class="overlay solid" id="title" hidden><div class="titlebox"><h1 class="ttl">組み立て<span>TCG</span></h1><p class="tsub">キャラに「条件・対象・効果」を組み付けて戦うカードゲーム</p><div class="tbtns"><button class="tbtn" id="tDeck"><b>デッキ構築</b><span>カードを選んで、能力といっしょに保存する</span></button><button class="tbtn" id="tCpu"><b>CPU戦</b><span>作ったデッキで、CPUと対戦する</span></button><button class="tbtn" id="tGacha"><b>ガチャ</b><span>カードパックを開ける</span></button><button class="tbtn" id="tPvp"><b>対人戦</b><span>ルームコードで友達と対戦(オンライン版のみ)</span></button></div><div class="tmini"><button class="btn" id="tWatch">CPU同士を観戦</button><button class="btn" id="tRules">ルール</button><button class="btn" id="tAcct" hidden>アカウント</button></div><p class="tmsg" id="titleMsg"></p></div></div>
+<div class="overlay solid" id="title" hidden><div class="titlebox"><h1 class="ttl">組み立て<span>TCG</span></h1><p class="tsub">キャラに「条件・対象・効果」を組み付けて戦うカードゲーム</p><div class="tbtns"><button class="tbtn" id="tDeck"><b>デッキ構築</b><span>カードを選んで、能力といっしょに保存する</span></button><button class="tbtn" id="tCpu"><b>CPU戦</b><span>作ったデッキで、CPUと対戦する</span></button><button class="tbtn" id="tGacha"><b>ガチャ</b><span>カードパックを開ける</span></button><button class="tbtn" id="tPvp"><b>対人戦</b><span>ルームコードで友達と対戦(オンライン版のみ)</span></button></div><div class="tmini"><button class="btn" id="tWatch">CPU同士を観戦</button><button class="btn" id="tStats">戦績</button><button class="btn" id="tRules">ルール</button><button class="btn" id="tAcct" hidden>アカウント</button></div><p class="tmsg" id="titleMsg"></p></div></div>
 <div class="overlay solid" id="builder" hidden><div class="dsheet"><div class="dhead"><h2>デッキ構築</h2><button class="btn" id="dBack">タイトルへ</button></div><div class="dbody"><section class="dcat" id="dCat"></section><aside class="dside" id="dSide"></aside></div></div></div>
 <div class="overlay solid" id="gacha" hidden><div id="gachaBox"></div></div>
 <div class="overlay" id="lobby" hidden><div class="sheet" role="dialog"><h2>対人戦</h2><div id="lbMenu"><label class="lbl">名前<input id="lbName" maxlength="16" value="プレイヤー"></label><div class="btns"><button class="btn primary" id="lbCreate">ルームを作る</button></div><label class="lbl">ルームコードで参加<input id="lbInput" maxlength="6" placeholder="ABCDE" autocapitalize="characters"></label><div class="btns"><button class="btn" id="lbJoin">参加する</button></div></div><div id="lbWait" hidden><p>このコードを相手に伝えてください。</p><p class="lbcode" id="lbCode"></p><p>相手の参加を待っています…</p></div><p class="tmsg" id="lbMsg"></p><div class="btns"><button class="btn" id="lbBack">戻る</button></div></div></div>
+<div class="overlay" id="stats" hidden><div class="sheet" role="dialog"><h2>戦績</h2><div id="stBody"></div><div class="btns"><button class="btn" id="stReset">記録を消す</button><button class="btn primary" id="stClose">閉じる</button></div></div></div>
 <div class="overlay" id="acct" hidden><div class="sheet" role="dialog"><h2>アカウント</h2><p id="acInfo"></p><p class="lbcode" id="acCode" style="font-size:26px"></p><label class="lbl">引き継ぎコードを入力<input id="acInput" maxlength="14" placeholder="XXXX-XXXX-XXXX" autocapitalize="characters"></label><div class="btns"><button class="btn" id="acRecover">引き継ぐ</button><button class="btn" id="acRegen">コードを再発行</button><button class="btn primary" id="acClose">閉じる</button></div><p class="tmsg" id="acMsg" style="color:var(--muted)"></p></div></div>
 <div class="overlay" id="rules" hidden>
   <div class="sheet" role="dialog" aria-label="ルール">
@@ -1067,6 +1069,7 @@ function checkOver(){
     $('resultText').textContent=G.over==='draw'?'両者のライフが同時に0になりました。':(G.over==='win'?'相手のライフを0にしました。ターン'+G.turn+'で決着。':'ライフが0になりました。別の組み立てで再挑戦しましょう。');
   }
   log('ゲーム終了:'+$('resultTitle').textContent,'turn');
+  if(!G.auto&&!G.bot)stRecord(G.over,G.net?'pvp':'cpu'+(G.lv==null?1:G.lv),G.myDeck);
   if(!G.auto&&!G.bot&&ACC.on&&G.over!=='draw')rewardReport(G.net?'pvp':'cpu',G.over,G.net?PV.match:'');
   render();
   setTimeout(()=>{if(G&&G.over)$('result').hidden=false;},700);
@@ -1227,7 +1230,7 @@ async function turn(idx){
 }
 async function startGame(auto,opts){
   opts=opts||{};const dk=opts.decks||[];
-  init(auto,opts.decks,opts);if(!HEADLESS){$('result').hidden=true;$('pick').hidden=true;$('title').hidden=true;$('builder').hidden=true;}render();
+  init(auto,opts.decks,opts);G.lv=opts.lv;G.myDeck=dk[ME]||null;if(!HEADLESS){$('result').hidden=true;$('pick').hidden=true;$('title').hidden=true;$('builder').hidden=true;}render();
   try{
     log('ゲーム開始。ライフ'+LIFE+'、場のコスト上限'+CAP+'。','sys');
     if(G.net){G.p[0].ab=dk[0].ab;G.p[1].ab=dk[1].ab;}
@@ -1955,11 +1958,48 @@ function randomDeck(base,limit){
   return d;
 }
 const deckSummary=d=>'キャラ'+cnt(d.chars)+'/'+DECK_C+' スキル'+cnt(d.skills)+'/'+DECK_S+' ・能力:'+(ABIL[d.ab]?ABIL[d.ab].name:'未選択');
+/* CPUの「つよい」用デッキ(自己対戦の探索で選ばれた構築) */
+const STRONG=[{"name":"自由構築型","ab":"reaper","chars":{"herald":2,"tide":2,"bombmaker":2,"ironclad":1,"plaguelord":1,"swift":1,"archer":1,"apprentice":1,"mage":3,"knight":1,"drummer":2,"watch":1,"undead":1,"general":1},"skills":{"targ.all":3,"eff.shield":1,"eff.swapatk":1,"cond.allyenter":2,"targ.enemies":2,"cond.enter":2,"eff.fortify":1,"targ.topatk":2,"eff.attack":1,"eff.trigger":1,"targ.tagfoe":1,"targ.lowfoe":1,"cond.foeenter":1,"targ.self":2,"cond.allygrave":3,"eff.bounce":2,"targ.allyone":1,"targ.others":1,"eff.grow":1,"eff.atkup":1}},{"name":"獣型","ab":"reaper","chars":{"charger":1,"venomblade":2,"giant":1,"dragoon":1,"night":1,"swift":1,"warking":1,"priest":1,"herald":2,"snake":1,"archer":2,"avenger":1,"sealer":1,"scout":1,"signal":1,"counter":1,"thorn":1},"skills":{"targ.all":3,"eff.makeattack":3,"cond.foeenter":2,"targ.enemies":3,"eff.bounce":2,"eff.silence":1,"cond.enter":3,"targ.allyone":2,"targ.foetwo":1,"targ.topally":1,"eff.atkup":1,"targ.select":2,"eff.shield":2,"eff.ping":1,"cond.myturn":1,"cond.foeturn":1,"targ.foeone":1}},{"name":"機械型","ab":"reaper","chars":{"sentinel":1,"tide":1,"undead":1,"glacier":1,"sniper":2,"assassin":2,"dragoon":1,"bomber":2,"thorn":1,"general":1,"bombmaker":1,"slinger":1,"ambush":1,"swift":1,"bastion":1,"elite":1,"archmage":1},"skills":{"targ.tagfoe":1,"targ.topatk":3,"eff.attack":2,"eff.bounce":2,"cond.foeenter":1,"targ.enemies":1,"targ.lowfoe":2,"eff.atkup":1,"cond.grave":1,"cond.myturn":1,"cond.abil":2,"eff.silence":2,"eff.grow":2,"targ.select":3,"cond.ailed":1,"cond.allyenter":2,"targ.topally":1,"targ.allyone":1,"eff.trigger":1}},{"name":"戦士型","ab":"trap","chars":{"maiden":1,"heavy":1,"general":2,"elite":1,"plaguelord":1,"mercenary":1,"valkyrie":1,"dragoon":2,"captain":1,"apprentice":2,"knight":1,"priest":1,"tide":1,"counter":1,"veteran":2,"wounded":1},"skills":{"eff.makeattack":2,"cond.foeattacks":2,"targ.enemies":3,"eff.execute":1,"targ.all":1,"eff.bounce":2,"cond.wounded":1,"targ.tagfoe":1,"cond.foegrave":1,"cond.foeturn":1,"targ.lowfoe":2,"eff.silence":2,"targ.foetwo":1,"cond.myturn":1,"cond.attacked":1,"targ.tagself":1,"cond.grave":1,"targ.foeone":1,"eff.atkdown":2,"cond.allygrave":1,"targ.friends":1,"targ.weakally":1}}];
+let LV=1;try{const q=+localStorage.getItem('kumitate-tcg-lv');if(q>=0&&q<=2)LV=q;}catch(e){}
+const LVNAME=['かんたん','ふつう','つよい'];
+function cpuDeck(lv){
+  if(lv===0)return randomDeck();
+  const s=STRONG[Math.floor(Math.random()*STRONG.length)];
+  const d=cloneDeck(s);d.name='CPUデッキ';
+  if(lv===2)return d;
+  const drop=(o,k)=>{for(let i=0;i<k;i++){const ks=Object.keys(o);if(!ks.length)break;const q=ks[Math.floor(Math.random()*ks.length)];o[q]--;if(!o[q])delete o[q];}};
+  drop(d.chars,7);drop(d.skills,10);
+  return randomDeck(d,true);
+}
+/* 戦績(この端末のブラウザに保存) */
+const ST_KEY='kumitate-tcg-stats';
+function stLoad(){try{const s=JSON.parse(localStorage.getItem(ST_KEY));if(s&&s.v===1)return s;}catch(e){}return{v:1,tot:{g:0,w:0,d:0},by:{},decks:{},chars:{}};}
+function stSave(s){try{localStorage.setItem(ST_KEY,JSON.stringify(s));}catch(e){}}
+function stRecord(res,kind,deck){
+  const s=stLoad(),w=res==='win'?1:0,dr=res==='draw'?1:0;
+  const add=(o,k)=>{const x=o[k]||(o[k]={g:0,w:0,d:0});x.g++;x.w+=w;x.d+=dr;};
+  s.tot.g++;s.tot.w+=w;s.tot.d+=dr;add(s.by,kind);
+  if(deck){add(s.decks,deck.name||'(名前なし)');Object.keys(deck.chars||{}).forEach(k=>{if(deck.chars[k]>0)add(s.chars,k);});}
+  stSave(s);
+}
+const pct=(x)=>(x.g-x.d)>0?Math.round(x.w/(x.g-x.d)*100)+'%':'-';
+function stShow(){
+  const s=stLoad(),by=s.by,row=(n,x)=>'<tr><td>'+n+'</td><td>'+x.g+'</td><td>'+x.w+'</td><td>'+pct(x)+'</td></tr>';
+  const kinds=[['cpu0','CPU戦(かんたん)'],['cpu1','CPU戦(ふつう)'],['cpu2','CPU戦(つよい)'],['pvp','対人戦']];
+  let h='<p class="stsum">通算 <b>'+s.tot.g+'</b> 戦 <b>'+s.tot.w+'</b> 勝('+pct(s.tot)+')</p>';
+  h+='<h3>対戦相手別</h3><table class="stt"><tr><th></th><th>試合</th><th>勝ち</th><th>勝率</th></tr>'+kinds.filter(k=>by[k[0]]).map(k=>row(k[1],by[k[0]])).join('')+'</table>';
+  const dk=Object.entries(s.decks).sort((a,b)=>b[1].g-a[1].g);
+  h+='<h3>デッキ別</h3>'+(dk.length?'<table class="stt"><tr><th></th><th>試合</th><th>勝ち</th><th>勝率</th></tr>'+dk.map(([n,x])=>row(n.replace(/</g,'&lt;'),x)).join('')+'</table>':'<p class="stnone">まだ記録がありません。</p>');
+  const ch=Object.entries(s.chars).filter(([k])=>CHAR_BY[k]).sort((a,b)=>b[1].g-a[1].g).slice(0,12);
+  h+='<h3>よく使うキャラ(上位12)</h3>'+(ch.length?'<table class="stt"><tr><th></th><th>試合</th><th>勝ち</th><th>勝率</th></tr>'+ch.map(([k,x])=>row(CHAR_BY[k].name,x)).join('')+'</table>':'<p class="stnone">まだ記録がありません。</p>');
+  h+='<p class="stnote">デッキ入りのキャラごとの勝率です(引いたかどうかは問いません)。引き分けは勝率に含めません。</p>';
+  $('stBody').innerHTML=h;$('stats').hidden=false;
+}
 let LAST={deck:null,auto:false};
 function playWith(deck,auto){
   LAST={deck:deck||LAST.deck,auto:!!auto};
   const mine=auto?randomDeck():(deck||LAST.deck||PRESETS[0]);
-  return run(startGame(!!auto,{decks:[mine,randomDeck()]}));
+  return run(startGame(!!auto,{decks:[mine,auto?randomDeck():cpuDeck(LV)],lv:LV}));
 }
 async function chooseDeck(){
   const ds=allDecks();
@@ -2344,7 +2384,15 @@ function initMenus(){
   $('dCat').parentNode.addEventListener('click',edClick);
   $('dSide').addEventListener('input',e=>{if(e.target.id==='dName'){ED.d.name=e.target.value;}});
   $('tDeck').addEventListener('click',()=>edOpen());
-  $('tCpu').addEventListener('click',async()=>{const d=await chooseDeck();if(d)playWith(d,false);});
+  $('tCpu').addEventListener('click',async()=>{const d=await chooseDeck();if(!d)return;
+    const i=await openPick('CPUの強さ','相手のデッキの強さを選びます。前回:'+LVNAME[LV],[
+      {html:'<b>かんたん</b><span>ランダムに組んだデッキ</span><small>はじめてでも勝ちやすい</small>'},
+      {html:'<b>ふつう</b><span>強いデッキに、ランダムなカードを混ぜたもの</span><small>ふつうに歯ごたえがある</small>'},
+      {html:'<b>つよい</b><span>自己対戦で選び抜かれた強いデッキ</span><small>組み合わせをよく考えないと勝てません</small>'}],true);
+    if(i<0)return;LV=i;try{localStorage.setItem('kumitate-tcg-lv',String(i));}catch(e){}
+    playWith(d,false);});
+  $('tStats').addEventListener('click',stShow);$('stClose').addEventListener('click',()=>{$('stats').hidden=true;});
+  $('stReset').addEventListener('click',()=>{if(confirm('戦績の記録をすべて消します。よろしいですか?')){stSave({v:1,tot:{g:0,w:0,d:0},by:{},decks:{},chars:{}});stShow();}});
   $('tWatch').addEventListener('click',()=>playWith(null,true));
   $('tRules').addEventListener('click',()=>{$('rules').hidden=false;});
   $('dBack').addEventListener('click',showTitle);
@@ -2364,7 +2412,7 @@ async function sim(n,opt){
   }finally{HEADLESS=sv.HEADLESS;CPURANDOM=sv.CPURANDOM;LIFE=sv.LIFE;HPMULT=sv.HPMULT;speed=sv.speed;}
   return out;
 }
-window.__tcg={bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover,rewardReport},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({maxCopies,KWD,ABIL,AB_KEYS,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
+window.__tcg={st:{stRecord,stLoad,stShow,cpuDeck,STRONG,setLV:v=>{LV=v;}},bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover,rewardReport},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({maxCopies,KWD,ABIL,AB_KEYS,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
   tune:m=>{Object.keys(m).forEach(k=>{if(k==='sur'){SURV=m[k];return;}const [ty,key]=k.split('.');if(ty==='ab'){if(key.endsWith('_s'))ABIL[key.slice(0,-2)].start=m[k];else ABIL[key].cd=m[k];return;}SK[ty][key].inc=m[k];});recost();},
   cfg:o=>{if(o.cap!==undefined)CAP=o.cap;if(o.firstdraw!==undefined)FIRSTDRAW=o.firstdraw;if(o.hp!==undefined)HPMULT=o.hp;if(o.life!==undefined)LIFE=o.life;if(o.handmax!==undefined)HANDMAX=o.handmax;if(o.atkq!==undefined)ATKQ=o.atkq;if(o.ctr!==undefined)CTR=o.ctr;if(o.untg!==undefined)UNTG=o.untg;if(o.autosw!==undefined)AUTOSW=o.autosw;if(o.catch!==undefined)CATCH=o.catch;if(o.catchn!==undefined)CATCHN=o.catchn;if(o.grace!==undefined)GRACE=o.grace;if(o.haste!==undefined)HASTE=o.haste;if(o.sweep){const w=o.sweep;if(w.on!==undefined)SWEEP_ON=w.on;if(w.t!==undefined)SWEEP_T=w.t;if(w.life!==undefined)SWEEP_LIFE=w.life;if(w.diff!==undefined)SWEEP_DIFF=w.diff;}}};
 if(typeof document!=='undefined'&&$('board')){initMenus();showTitle();accInit().then(()=>{if(!ACC.on&&!GA.on)gaInit();});}
