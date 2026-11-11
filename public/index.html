@@ -1968,7 +1968,7 @@ function cpuDeck(lv){
   const d=cloneDeck(s);d.name='CPUデッキ';
   if(lv===2)return d;
   const drop=(o,k)=>{for(let i=0;i<k;i++){const ks=Object.keys(o);if(!ks.length)break;const q=ks[Math.floor(Math.random()*ks.length)];o[q]--;if(!o[q])delete o[q];}};
-  drop(d.chars,7);drop(d.skills,10);
+  drop(d.chars,16);drop(d.skills,24);
   return randomDeck(d,true);
 }
 /* 戦績(この端末のブラウザに保存) */
@@ -2387,7 +2387,7 @@ function initMenus(){
   $('tCpu').addEventListener('click',async()=>{const d=await chooseDeck();if(!d)return;
     const i=await openPick('CPUの強さ','相手のデッキの強さを選びます。前回:'+LVNAME[LV],[
       {html:'<b>かんたん</b><span>ランダムに組んだデッキ</span><small>はじめてでも勝ちやすい</small>'},
-      {html:'<b>ふつう</b><span>強いデッキに、ランダムなカードを混ぜたもの</span><small>ふつうに歯ごたえがある</small>'},
+      {html:'<b>ふつう</b><span>強いデッキを少しだけ取り入れた、ほぼランダムなデッキ</span><small>かんたんより少し強い</small>'},
       {html:'<b>つよい</b><span>自己対戦で選び抜かれた強いデッキ</span><small>組み合わせをよく考えないと勝てません</small>'}],true);
     if(i<0)return;LV=i;try{localStorage.setItem('kumitate-tcg-lv',String(i));}catch(e){}
     playWith(d,false);});
