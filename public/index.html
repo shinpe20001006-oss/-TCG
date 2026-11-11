@@ -367,6 +367,9 @@ body.fx-lite .unit.fx-lunge{animation:none}
 .unitybar.on{border-style:solid;border-color:#E0A800;background:color-mix(in srgb,#E0A800 14%,transparent);color:var(--ink)}
 
 .stt{width:100%;border-collapse:collapse;font-size:13px;margin:4px 0 8px}.stt th,.stt td{padding:4px 6px;border-bottom:1px solid rgba(128,128,128,.3);text-align:right}.stt th:first-child,.stt td:first-child{text-align:left}.stsum{font-size:15px;margin:4px 0}#stats .sheet{max-height:86vh;overflow:auto}#stats h3{font-size:13px;margin:10px 0 2px;opacity:.8}.stnote,.stnone{font-size:12px;opacity:.7}
+@keyframes movedGlow{0%{box-shadow:0 0 0 0 rgba(255,200,60,.9)}60%{box-shadow:0 0 0 10px rgba(255,200,60,0)}100%{box-shadow:0 0 0 0 rgba(255,200,60,0)}}
+.unit.fx-moved{animation:movedGlow 1s ease-out 1;outline:2px solid rgba(255,190,40,.85);outline-offset:1px}.unit.mine{touch-action:pan-y}.unit.dragging{z-index:60;opacity:.92;cursor:grabbing;transition:none!important;box-shadow:0 10px 24px rgba(0,0,0,.35)}body.fx-lite .unit.fx-moved{animation:none}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#e5322d;box-shadow:0 0 0 2px var(--bg,#fff);margin-left:6px;vertical-align:middle}#tNews{position:absolute;top:12px;right:12px;z-index:5}#tNews .dot{position:absolute;top:-3px;right:-3px;margin:0}#news .sheet{max-height:86vh;overflow:auto}.nitem{border-bottom:1px solid rgba(128,128,128,.3)}.nhead{display:flex;width:100%;gap:8px;align-items:center;text-align:left;background:none;border:0;padding:10px 2px;font:inherit;color:inherit;cursor:pointer}.nhead .ndate{font-size:12px;opacity:.65;white-space:nowrap}.nbody{white-space:pre-wrap;font-size:14px;line-height:1.7;padding:0 2px 10px}.ngrant{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:0 2px 12px;font-size:13px}.nnone{opacity:.7}
 </style>
 
 <div class="app">
@@ -387,11 +390,12 @@ body.fx-lite .unit.fx-lunge{animation:none}
 </div>
 <div class="fxlayer" id="fx"></div>
 
-<div class="overlay solid" id="title" hidden><div class="titlebox"><h1 class="ttl">組み立て<span>TCG</span></h1><p class="tsub">キャラに「条件・対象・効果」を組み付けて戦うカードゲーム</p><div class="tbtns"><button class="tbtn" id="tDeck"><b>デッキ構築</b><span>カードを選んで、能力といっしょに保存する</span></button><button class="tbtn" id="tCpu"><b>CPU戦</b><span>作ったデッキで、CPUと対戦する</span></button><button class="tbtn" id="tGacha"><b>ガチャ</b><span>カードパックを開ける</span></button><button class="tbtn" id="tPvp"><b>対人戦</b><span>ルームコードで友達と対戦(オンライン版のみ)</span></button></div><div class="tmini"><button class="btn" id="tWatch">CPU同士を観戦</button><button class="btn" id="tStats">戦績</button><button class="btn" id="tRules">ルール</button><button class="btn" id="tAcct" hidden>アカウント</button></div><p class="tmsg" id="titleMsg"></p></div></div>
+<div class="overlay solid" id="title" hidden><button class="btn" id="tNews">お知らせ<i class="dot" id="tNewsDot" hidden></i></button><div class="titlebox"><h1 class="ttl">組み立て<span>TCG</span></h1><p class="tsub">キャラに「条件・対象・効果」を組み付けて戦うカードゲーム</p><div class="tbtns"><button class="tbtn" id="tDeck"><b>デッキ構築</b><span>カードを選んで、能力といっしょに保存する</span></button><button class="tbtn" id="tCpu"><b>CPU戦</b><span>作ったデッキで、CPUと対戦する</span></button><button class="tbtn" id="tGacha"><b>ガチャ</b><span>カードパックを開ける</span></button><button class="tbtn" id="tPvp"><b>対人戦</b><span>ルームコードで友達と対戦(オンライン版のみ)</span></button></div><div class="tmini"><button class="btn" id="tWatch">CPU同士を観戦</button><button class="btn" id="tStats">戦績</button><button class="btn" id="tRules">ルール</button><button class="btn" id="tAcct" hidden>アカウント</button></div><p class="tmsg" id="titleMsg"></p></div></div>
 <div class="overlay solid" id="builder" hidden><div class="dsheet"><div class="dhead"><h2>デッキ構築</h2><button class="btn" id="dBack">タイトルへ</button></div><div class="dbody"><section class="dcat" id="dCat"></section><aside class="dside" id="dSide"></aside></div></div></div>
 <div class="overlay solid" id="gacha" hidden><div id="gachaBox"></div></div>
 <div class="overlay" id="lobby" hidden><div class="sheet" role="dialog"><h2>対人戦</h2><div id="lbMenu"><label class="lbl">名前<input id="lbName" maxlength="16" value="プレイヤー"></label><div class="btns"><button class="btn primary" id="lbCreate">ルームを作る</button></div><label class="lbl">ルームコードで参加<input id="lbInput" maxlength="6" placeholder="ABCDE" autocapitalize="characters"></label><div class="btns"><button class="btn" id="lbJoin">参加する</button></div></div><div id="lbWait" hidden><p>このコードを相手に伝えてください。</p><p class="lbcode" id="lbCode"></p><p>相手の参加を待っています…</p></div><p class="tmsg" id="lbMsg"></p><div class="btns"><button class="btn" id="lbBack">戻る</button></div></div></div>
 <div class="overlay" id="stats" hidden><div class="sheet" role="dialog"><h2>戦績</h2><div id="stBody"></div><div class="btns"><button class="btn" id="stReset">記録を消す</button><button class="btn primary" id="stClose">閉じる</button></div></div></div>
+<div class="overlay" id="news" hidden><div class="sheet" role="dialog"><h2>お知らせ</h2><div id="newsBody"></div><div class="btns"><button class="btn primary" id="newsClose">閉じる</button></div></div></div>
 <div class="overlay" id="acct" hidden><div class="sheet" role="dialog"><h2>アカウント</h2><p id="acInfo"></p><p class="lbcode" id="acCode" style="font-size:26px"></p><label class="lbl">引き継ぎコードを入力<input id="acInput" maxlength="14" placeholder="XXXX-XXXX-XXXX" autocapitalize="characters"></label><div class="btns"><button class="btn" id="acRecover">引き継ぐ</button><button class="btn" id="acRegen">コードを再発行</button><button class="btn primary" id="acClose">閉じる</button></div><p class="tmsg" id="acMsg" style="color:var(--muted)"></p></div></div>
 <div class="overlay" id="rules" hidden>
   <div class="sheet" role="dialog" aria-label="ルール">
@@ -498,7 +502,7 @@ const ABIL={
   reaper:{name:'死神の鎌',cd:12,start:8,desc:'敵のカード1枚を選んで墓地に送る。ターン8になるまでは使えない。'},
   foresight:{name:'予知の眼',cd:16,desc:'キャラ山札かスキル山札を選び、上から8枚を見て1枚を手札に加える。その山札はシャッフルされる。'},
   revive:{name:'蘇生の魔術',cd:6,desc:'キャラ墓地からランダムで1枚を手札に加える。'},
-  discount:{name:'経費削減',cd:3,desc:'自分の場のユニット1体か、手札のキャラ1枚のコストを-3する。'},
+  discount:{name:'経費削減',cd:5,desc:'自分の場のユニット1体か、手札のキャラ1枚のコストを-3する。'},
   cleanse:{name:'聖なる癒し',cd:2,desc:'味方全員の沈黙・凍結・毒を解除する。'},
   pursuit:{name:'追い討ち',cd:14,desc:'敵のカード1枚を選び、自分の場で最も高いATKで攻撃する。'},
   trap:{name:'巧妙な罠',cd:18,desc:'次の相手のターン、相手が最初に召喚したカードを即座に墓地に送る。使ったことは相手に知らされない。'}
@@ -762,7 +766,8 @@ function fxStyle(key){const f=UI.flash[key];if(!f)return '';return 'animation-de
 function hint(text){UI.hint=text;render();clearTimeout(hintT);hintT=setTimeout(()=>{if(UI){UI.hint='';render();}},2400);}
 
 /* ---------- engine ---------- */
-const byTurn=(a,b)=>((a.owner===G.cur?0:1)-(b.owner===G.cur?0:1))||(a.order-b.order);
+const posOf=u=>G.p[u.owner].field.indexOf(u);
+const byTurn=(a,b)=>((a.owner===G.cur?0:1)-(b.owner===G.cur?0:1))||(posOf(a)-posOf(b));
 function qpush(u,ev,subj){if(u.alive&&!silenced(u)&&u.slots.cond.key===ev)queue.push({unit:u,event:ev,subj});}
 function woundReset(u){if(u.hp*2>u.maxHp)u.woundedDone=false;}
 function woundChk(u){if(u.hp*2<=u.maxHp){if(!u.woundedDone){u.woundedDone=true;emit('wounded',u);}}else u.woundedDone=false;}
@@ -782,9 +787,9 @@ function emitEnter(u){
   G.p[1-u.owner].field.slice().sort(byTurn).forEach(v=>qpush(v,'foeenter',u));
 }
 function emitTurnStart(idx){
-  G.p[idx].field.slice().sort((a,b)=>a.order-b.order).forEach(u=>qpush(u,'myturn'));
-  G.p[1-idx].field.slice().sort((a,b)=>a.order-b.order).forEach(u=>qpush(u,'foeturn'));
-  if(G.p[1-idx].field.length>G.p[idx].field.length)G.p[idx].field.slice().sort((a,b)=>a.order-b.order).forEach(u=>qpush(u,'foeweak'));
+  G.p[idx].field.slice().forEach(u=>qpush(u,'myturn'));
+  G.p[1-idx].field.slice().forEach(u=>qpush(u,'foeturn'));
+  if(G.p[1-idx].field.length>G.p[idx].field.length)G.p[idx].field.slice().forEach(u=>qpush(u,'foeweak'));
 }
 async function decayTick(idx){
   for(const u of G.p[idx].field.slice()){
@@ -1141,9 +1146,17 @@ function perform(idx,m){
     return basicAttackBody(u,tg);
   }
   if(m.t==='sac'){const u=findUnit(m.u);if(!u){netDesync('sac');throw new Abort();}return (async()=>{sendToGrave(u,'自ら墓地に送られた',true);})();}
+  if(m.t==='move'){const u=findUnit(m.u);if(!u||u.owner!==idx||!(m.to>=0)){netDesync('move');throw new Abort();}return (async()=>{moveUnit(u,m.to);})();}
   if(m.t==='ability')return abilityBody(idx);
   if(m.t==='sweep')return sweepBody(idx);
   netDesync('act '+m.t);throw new Abort();
+}
+function moveUnit(u,to){
+  const f=G.p[u.owner].field,from=f.indexOf(u);to=Math.max(0,Math.min(f.length-1,to));
+  if(from<0||from===to)return;
+  f.splice(from,1);f.splice(to,0,u);
+  UI.flip=true;flash('u'+u.uid,'moved',1000);
+  log(un(u)+'を左から'+(to+1)+'番目へ移動した。',sideOf(u));
 }
 function doAct(idx,m){netSend(idx,m);return act(()=>perform(idx,m));}
 const playMsg=(ch,picks)=>{const p={};TYPES.forEach(t=>{if(picks[t])p[t]=picks[t].uid;});return{t:'play',ch:ch.uid,picks:p};};
@@ -1629,7 +1642,7 @@ function unitBarHTML(){
   else if(u.atkTurn===G.turn)why='このターンはもう攻撃しました。';
   else if(frozen(u))why='凍結しているので、このターンは攻撃できません。';
   return '<div class="unitbar"><div class="sentence"><b>'+u.char.name+'</b>　'+readSkill(u.slots.cond.key,u.slots.targ.key,u.slots.eff.key)+'</div>'
-    +'<div class="btns"><button class="btn" data-act="attack"'+(atkOk?'':' disabled')+'>攻撃する</button><button class="btn" data-act="sac"'+(can?'':' disabled')+'>墓地に送る</button></div>'
+    +'<div class="btns"><button class="btn" data-act="attack"'+(atkOk?'':' disabled')+'>攻撃する</button><button class="btn" data-act="sac"'+(can?'':' disabled')+'>墓地に送る</button>'+(()=>{const f=G.p[ME].field,i=f.indexOf(u);return '<button class="btn" data-act="mvl"'+(can&&i>0?'':' disabled')+'>◀ 左へ</button><button class="btn" data-act="mvr"'+(can&&i>=0&&i<f.length-1?'':' disabled')+'>右へ ▶</button>';})()+'</div>'
     +(why?'<p class="why">'+why+'</p>':'')+'</div>';
 }
 function builderInfo(){
@@ -1709,7 +1722,12 @@ function render(){
   TYPES.forEach(t=>{if(UI.picks[t]&&!G.p[ME].hand.includes(UI.picks[t]))delete UI.picks[t];});
   $('turnchip').innerHTML=G.turn?('<b>ターン '+G.turn+'</b> ・ '+sname(G.cur)+'の番'):'準備中';
   $('btnWatch').textContent=G.auto?'自分で遊ぶ':'CPU同士を観戦';
+  const _old={};if(UI.flip&&!HEADLESS)$('board').querySelectorAll('[data-act="unit"]').forEach(e=>{_old[e.dataset.key]=e.getBoundingClientRect();});
   $('board').innerHTML=statusHTML(FOE())+fieldsHTML()+unitBarHTML()+statusHTML(ME)+drawHTML()+builderHTML()+handHTML();
+  if(UI.flip){UI.flip=false;
+    $('board').querySelectorAll('[data-act="unit"]').forEach(e=>{const o=_old[e.dataset.key];if(!o||!e.animate)return;const n=e.getBoundingClientRect(),dx=o.left-n.left,dy=o.top-n.top;
+      if(Math.abs(dx)<2&&Math.abs(dy)<2)return;
+      e.animate([{transform:'translate('+dx+'px,'+dy+'px)',zIndex:5},{transform:'translate(0,0)',zIndex:5}],{duration:(document.body.classList.contains('fx-lite')?220:420),easing:'cubic-bezier(.2,.8,.2,1)'});});}
   const ol=$('log'),near=ol.scrollHeight-ol.scrollTop-ol.clientHeight<50;
   ol.innerHTML=logs.map(l=>'<li class="'+l.cls+'">'+l.msg+'</li>').join('');
   if(near)ol.scrollTop=ol.scrollHeight;
@@ -1787,6 +1805,13 @@ $('board').addEventListener('click',e=>{
     UI.selUnit=null;UI.selChar=null;UI.picks={};UI.mode=null;
     run(doAct(ME,{t:'ability'}));
   }
+  else if(a==='mvl'||a==='mvr'){
+    if(!canAct())return;
+    const u=UI.selUnit;if(!u||!u.alive)return;
+    const i=G.p[ME].field.indexOf(u),to=a==='mvl'?i-1:i+1;
+    if(to<0||to>=G.p[ME].field.length)return;
+    run(doAct(ME,{t:'move',u:u.uid,to}));
+  }
   else if(a==='sac'){
     if(!canAct())return;
     const u=UI.selUnit;if(!u||!u.alive)return;
@@ -1797,6 +1822,34 @@ $('board').addEventListener('click',e=>{
     const r=UI.endRes;UI.endRes=null;UI.selUnit=null;UI.selChar=null;UI.picks={};UI.mode=null;G.phase='wait';netSend(ME,{t:'end'});render();if(r)r();
   }
 });
+(function(){
+  let D=null;
+  const board=$('board');
+  board.addEventListener('pointerdown',e=>{
+    const el=e.target.closest('.unit.mine');if(!el||e.button>0||!G||!canAct()||UI.prompt||UI.mode)return;
+    D={el,uid:+el.dataset.id,x:e.clientX,y:e.clientY,on:false,id:e.pointerId};
+  });
+  board.addEventListener('pointermove',e=>{
+    if(!D||e.pointerId!==D.id)return;
+    const dx=e.clientX-D.x,dy=e.clientY-D.y;
+    if(!D.on){if(Math.hypot(dx,dy)<10)return;D.on=true;D.el.classList.add('dragging');try{D.el.setPointerCapture(e.pointerId);}catch(_){}}
+    D.el.style.transform='translate('+dx+'px,'+dy+'px)';
+  });
+  const end=e=>{
+    if(!D||e.pointerId!==D.id)return;
+    const d=D;D=null;
+    if(!d.on)return;
+    d.el.classList.remove('dragging');d.el.style.transform='';
+    UI.noClick=Date.now()+300;
+    const u=G&&G.p[ME].field.find(x=>x.uid===d.uid);if(!u||!canAct()){render();return;}
+    const others=[...board.querySelectorAll('.unit.mine')].filter(x=>x!==d.el);
+    let to=0;others.forEach(x=>{const r=x.getBoundingClientRect();if(e.clientX>r.left+r.width/2)to++;});
+    const from=G.p[ME].field.indexOf(u);
+    if(to!==from)run(doAct(ME,{t:'move',u:u.uid,to}));else render();
+  };
+  board.addEventListener('pointerup',end);board.addEventListener('pointercancel',end);
+  board.addEventListener('click',e=>{if(UI.noClick&&Date.now()<UI.noClick){e.stopPropagation();e.preventDefault();}},true);
+})();
 $('board').addEventListener('keydown',e=>{
   if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-act]')&&e.target.tagName!=='BUTTON'){e.preventDefault();e.target.click();}
 });
@@ -1866,6 +1919,57 @@ function loadDecks(){
 }
 function storeLocal(a){memDecks=a;try{localStorage.setItem(LS_KEY,JSON.stringify(a));}catch(e){storageOk=false;}}
 function storeDecks(a){storeLocal(a);accPush(a);}
+/* ---------- お知らせ(オンライン: サーバー、オフライン: 同梱の一覧。配布の受け取りはオンラインのみ) ---------- */
+const NEWS_BUILTIN=[{"id": "2026-11-12-update", "date": "2026-11-12", "title": "アップデート(11/12)", "body": "・場のユニットを、自分のターン中に左右へ並べ替えられるようになりました(ドラッグ、または「◀左へ」「右へ▶」ボタン)。\n・スキルが同時に発動するときは、同じ側では場の左のユニットから順に発動します(「HP最小」などの同点も左優先)。\n・能力「経費削減」の再使用ターンを3から5に増やしました。\n・このお知らせ機能を追加しました。"}, {"id": "2026-11-11-update", "date": "2026-11-11", "title": "アップデート(11/11)", "body": "・CPU戦に「かんたん/ふつう/つよい」の強さ選択を追加しました。\n・タイトル画面に「戦績」を追加しました(デッキ別・キャラ別の勝率など)。\n・レア3の調整: 無類の護神の固定スキルを変更、不屈の戦王のHPを7に、黒死の毒機を3/5に、アンデッドモンスターのATKを3に変更しました。"}];
+const NK='kumitate-tcg-news-read';
+const NEWSD={items:[]};
+const nEsc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function nLocalRead(){try{return JSON.parse(localStorage.getItem(NK))||{};}catch(e){return{};}}
+function nDot(){
+  const el=document.getElementById('tNewsDot');if(!el)return;
+  el.hidden=!NEWSD.items.some(i=>!i.read||(i.grant&&!i.claimed&&!i.offline));
+}
+async function newsLoad(){
+  if(typeof document==='undefined'||HEADLESS)return;
+  if(ACC.on){try{NEWSD.items=(await api('/api/news')).items||[];}catch(e){NEWSD.items=[];}}
+  else{const r=nLocalRead();NEWSD.items=NEWS_BUILTIN.map(n=>({...n,read:!!r[n.id],claimed:false,offline:true}));}
+  nDot();
+}
+async function nMarkRead(it){
+  if(it.read)return;it.read=true;
+  if(ACC.on){try{await api('/api/news/read','POST',{id:it.id});}catch(e){}}
+  else{const r=nLocalRead();r[it.id]=1;try{localStorage.setItem(NK,JSON.stringify(r));}catch(e){}}
+  nDot();
+}
+function nGrantText(g){
+  const a=[];if(g.energy)a.push('エナジー +'+g.energy);
+  Object.entries(g.chars||{}).forEach(([k,n])=>{if(CHAR_BY[k])a.push('キャラ「'+CHAR_BY[k].name+'」×'+n);});
+  Object.entries(g.skills||{}).forEach(([id,n])=>{const [t,k]=id.split('.');const m=t==='cond'?COND:t==='targ'?TARG:EFF;if(m&&m[k])a.push((t==='cond'?'条件':t==='targ'?'対象':'効果')+'スキル「'+m[k].name+'」×'+n);});
+  return a.join(' / ');
+}
+function newsShow(){
+  const box=$('newsBody');
+  const draw=()=>{
+    box.innerHTML=NEWSD.items.length?NEWSD.items.map((it,i)=>{
+      const open=!!it._open,flag=!it.read||(it.grant&&!it.claimed&&!it.offline);
+      let h='<div class="nitem'+(open?' open':'')+'"><button class="nhead" data-i="'+i+'"><span class="ndate">'+nEsc(it.date)+'</span><b>'+nEsc(it.title)+'</b>'+(flag?'<i class="dot"></i>':'')+'</button>';
+      if(open){h+='<div class="nbody">'+nEsc(it.body)+'</div>';
+        if(it.grant){h+='<div class="ngrant"><span>配布:'+nEsc(nGrantText(it.grant))+'</span>'+(it.offline?'<small>(受け取りはオンライン版のアカウントでできます)</small>':it.claimed?'<small>受け取り済み</small>':'<button class="btn primary" data-claim="'+i+'">受け取る</button>')+'</div>';}
+      }
+      return h+'</div>';}).join(''):'<p class="nnone">お知らせはありません。</p>';
+  };
+  draw();$('news').hidden=false;
+  box.onclick=async e=>{
+    const hb=e.target.closest('[data-i]'),cb=e.target.closest('[data-claim]');
+    if(cb){const it=NEWSD.items[+cb.dataset.claim];cb.disabled=true;
+      try{await api('/api/news/claim','POST',{id:it.id});it.claimed=true;it.read=true;
+        try{ACC.owned=await api('/api/inventory');}catch(x){}
+        try{gaSyncSrv(await api('/api/gacha'));}catch(x){}
+      }catch(x){alert(x.message);if(/受け取り済み/.test(x.message))it.claimed=true;}
+      nDot();draw();return;}
+    if(hb){const it=NEWSD.items[+hb.dataset.i];it._open=!it._open;if(it._open)await nMarkRead(it);draw();}
+  };
+}
 /* ---------- account (オンライン版のみ。サーバーが無いときは端末内保存のまま) ---------- */
 const ACC={on:false,token:null,player:null,owned:null,synced:{},err:''};
 const AK='kumitate.auth.v1';
@@ -2107,7 +2211,7 @@ function edClick(e){
 function showTitle(){
   if(G)G.runId++;
   pvLeave();$('lobby').hidden=true;
-  $('builder').hidden=true;$('result').hidden=true;$('pick').hidden=true;$('rules').hidden=true;$('titleMsg').textContent='';$('title').hidden=false;
+  $('builder').hidden=true;$('result').hidden=true;$('pick').hidden=true;$('rules').hidden=true;$('titleMsg').textContent='';$('title').hidden=false;newsLoad();
 }
 /* ---------- ガチャ(この端末内に保存する版。サーバー判定版は後日) ---------- */
 const GK='kumitate.gacha.v1',E_MS=10*60*1000,E_CAP=300,E_START=100,PACK_COST=50,PITY_N=100;
@@ -2391,6 +2495,7 @@ function initMenus(){
       {html:'<b>つよい</b><span>自己対戦で選び抜かれた強いデッキ</span><small>組み合わせをよく考えないと勝てません</small>'}],true);
     if(i<0)return;LV=i;try{localStorage.setItem('kumitate-tcg-lv',String(i));}catch(e){}
     playWith(d,false);});
+  $('tNews').addEventListener('click',()=>{newsShow();});$('newsClose').addEventListener('click',()=>{$('news').hidden=true;});
   $('tStats').addEventListener('click',stShow);$('stClose').addEventListener('click',()=>{$('stats').hidden=true;});
   $('stReset').addEventListener('click',()=>{if(confirm('戦績の記録をすべて消します。よろしいですか?')){stSave({v:1,tot:{g:0,w:0,d:0},by:{},decks:{},chars:{}});stShow();}});
   $('tWatch').addEventListener('click',()=>playWith(null,true));
@@ -2412,10 +2517,10 @@ async function sim(n,opt){
   }finally{HEADLESS=sv.HEADLESS;CPURANDOM=sv.CPURANDOM;LIFE=sv.LIFE;HPMULT=sv.HPMULT;speed=sv.speed;}
   return out;
 }
-window.__tcg={st:{stRecord,stLoad,stShow,cpuDeck,STRONG,setLV:v=>{LV=v;}},bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover,rewardReport},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({maxCopies,KWD,ABIL,AB_KEYS,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
+window.__tcg={news:{newsLoad,NEWSD,nDot,nGrantText,NEWS_BUILTIN},ord:{byTurn,posOf,moveUnit,setG:g=>{G=g;if(!UI)UI={flash:{}};},qpush,drainQ:()=>queue.map(q=>q.unit.name)},st:{stRecord,stLoad,stShow,cpuDeck,STRONG,setLV:v=>{LV=v;}},bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover,rewardReport},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({maxCopies,KWD,ABIL,AB_KEYS,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
   tune:m=>{Object.keys(m).forEach(k=>{if(k==='sur'){SURV=m[k];return;}const [ty,key]=k.split('.');if(ty==='ab'){if(key.endsWith('_s'))ABIL[key.slice(0,-2)].start=m[k];else ABIL[key].cd=m[k];return;}SK[ty][key].inc=m[k];});recost();},
   cfg:o=>{if(o.cap!==undefined)CAP=o.cap;if(o.firstdraw!==undefined)FIRSTDRAW=o.firstdraw;if(o.hp!==undefined)HPMULT=o.hp;if(o.life!==undefined)LIFE=o.life;if(o.handmax!==undefined)HANDMAX=o.handmax;if(o.atkq!==undefined)ATKQ=o.atkq;if(o.ctr!==undefined)CTR=o.ctr;if(o.untg!==undefined)UNTG=o.untg;if(o.autosw!==undefined)AUTOSW=o.autosw;if(o.catch!==undefined)CATCH=o.catch;if(o.catchn!==undefined)CATCHN=o.catchn;if(o.grace!==undefined)GRACE=o.grace;if(o.haste!==undefined)HASTE=o.haste;if(o.sweep){const w=o.sweep;if(w.on!==undefined)SWEEP_ON=w.on;if(w.t!==undefined)SWEEP_T=w.t;if(w.life!==undefined)SWEEP_LIFE=w.life;if(w.diff!==undefined)SWEEP_DIFF=w.diff;}}};
-if(typeof document!=='undefined'&&$('board')){initMenus();showTitle();accInit().then(()=>{if(!ACC.on&&!GA.on)gaInit();});}
+if(typeof document!=='undefined'&&$('board')){initMenus();showTitle();accInit().then(()=>{if(!ACC.on&&!GA.on)gaInit();newsLoad();});}
 })();
 
 </script>
