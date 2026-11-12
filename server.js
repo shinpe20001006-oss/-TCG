@@ -10,7 +10,7 @@ async function start(port, dbUrl) {
   const st = await store.open(dbUrl);
   const app = express();
   app.set('trust proxy', 1);
-  app.use('/api', router(st));
+  app.use('/api', router(st, c => { const r = rooms.rooms.get(String(c)); return !!r && !r.b; }));
   app.use(express.static(path.join(__dirname, 'public'), { maxAge: 0 }));
   const server = http.createServer(app);
   const wss = rooms.attach(server);
