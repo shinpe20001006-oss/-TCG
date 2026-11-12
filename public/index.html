@@ -370,7 +370,7 @@ body.fx-lite .unit.fx-lunge{animation:none}
 @keyframes movedGlow{0%{box-shadow:0 0 0 0 rgba(255,200,60,.9)}60%{box-shadow:0 0 0 10px rgba(255,200,60,0)}100%{box-shadow:0 0 0 0 rgba(255,200,60,0)}}
 .unit.fx-moved{animation:movedGlow 1s ease-out 1;outline:2px solid rgba(255,190,40,.85);outline-offset:1px}.unit.mine{touch-action:pan-y}.unit.dragging{z-index:60;opacity:.92;cursor:grabbing;transition:none!important;box-shadow:0 10px 24px rgba(0,0,0,.35)}body.fx-lite .unit.fx-moved{animation:none}
 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#e5322d;box-shadow:0 0 0 2px var(--bg,#fff);margin-left:6px;vertical-align:middle}#tNews{position:absolute;top:12px;right:12px;z-index:5}#tNews .dot{position:absolute;top:-3px;right:-3px;margin:0}#news .sheet{max-height:86vh;overflow:auto}.nitem{border-bottom:1px solid rgba(128,128,128,.3)}.nhead{display:flex;width:100%;gap:8px;align-items:center;text-align:left;background:none;border:0;padding:10px 2px;font:inherit;color:inherit;cursor:pointer}.nhead .ndate{font-size:12px;opacity:.65;white-space:nowrap}.nbody{white-space:pre-wrap;font-size:14px;line-height:1.7;padding:0 2px 10px}.ngrant{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:0 2px 12px;font-size:13px}.nnone{opacity:.7}
-.fr-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(128,128,128,.3)}.fr-row b{flex:1;word-break:break-all}.fr-row .btn{font-size:12px;padding:4px 10px}.fr-h{font-size:13px;margin:10px 0 2px;color:var(--muted)}.nsec{font-size:12px;color:var(--muted);margin:8px 0 2px}.nfr{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(128,128,128,.3)}.nfr span{flex:1}.nfr .btn{font-size:12px;padding:4px 10px}.nfr .end{color:var(--muted);font-size:12px}</style>
+.fr-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(128,128,128,.3)}.fr-row b{flex:1;word-break:break-all}.fr-row .btn{font-size:12px;padding:4px 10px}.fr-h{font-size:13px;margin:10px 0 2px;color:var(--muted)}.nsec{font-size:12px;color:var(--muted);margin:8px 0 2px}.nfr{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(128,128,128,.3)}.nfr span{flex:1}.nfr .btn{font-size:12px;padding:4px 10px}.nfr .end{color:var(--muted);font-size:12px}.stars{letter-spacing:1px;font-size:12px;color:#9aa3ad}.stars.r2{color:#4a8fd8}.stars.r3{color:#e0a100}.gvbtn{font-size:11px;padding:2px 8px;margin-left:6px}.gv-h{font-size:13px;margin:8px 0 2px}.gvi{position:relative;cursor:default}.gvn{position:absolute;right:10px;top:8px;font-style:normal;font-weight:700}</style>
 
 <div class="app">
   <header class="top">
@@ -432,6 +432,7 @@ body.fx-lite .unit.fx-lunge{animation:none}
     <div class="btns"><button class="btn primary" id="btnRulesClose">閉じる</button></div>
   </div>
 </div>
+<div class="overlay" id="gv" hidden><div class="sheet" role="dialog"><h2>自分の墓地</h2><div class="picklist" id="gvBody"></div><div class="btns"><button class="btn primary" id="gvClose">閉じる</button></div></div></div>
 <div class="overlay" id="pick" hidden><div class="sheet" role="dialog"><h2 id="pickTitle"></h2><p id="pickSub"></p><div class="picklist" id="pickList"></div><div class="btns"><button class="btn" id="pickCancel" hidden>やめる</button></div></div></div>
 <div class="overlay" id="result" hidden>
   <div class="sheet result">
@@ -1053,11 +1054,11 @@ async function rewardReport(kind,res,match){
       say(r.gained?' ／ エナジー +'+r.gained+' を獲得':' ／ 今日のCPU戦の報酬は上限に達しています');
       return;
     }
-    for(let i=0;i<14;i++){
+    for(let i=0;i<40;i++){
       const r=await api('/api/reward/pvp','POST',{match,result:res});
       if(r.status==='granted'||r.status==='capped'){if(r.state)gaSyncSrv(r.state);say(r.gained?' ／ エナジー +'+r.gained+' を獲得':' ／ 今日の対人戦の報酬は上限に達しています');return;}
       if(r.status==='rejected')return;
-      await new Promise(ok=>setTimeout(ok,2500));
+      await new Promise(ok=>setTimeout(ok,3000));
     }
   }catch(e){}
 }
@@ -1314,6 +1315,13 @@ function openPick(title,sub,items,cancel){
     box.onclick=e=>{const b=e.target.closest('.pickitem');if(b&&!b.disabled)done(+b.dataset.i);};
     $('pickCancel').onclick=()=>done(-1);
   });
+}
+function graveView(){
+  if(!G)return;const P=G.p[ME];
+  const grp=arr=>{const m=new Map();arr.slice().reverse().forEach(c=>{const k=c.kind==='char'?'c:'+c.key:c.type+'.'+c.key;if(m.has(k))m.get(k).n++;else m.set(k,{c,n:1});});return[...m.values()];};
+  const sec=(t,l)=>'<h3 class="gv-h">'+t+'('+l.reduce((a,x)=>a+x.n,0)+'枚)</h3>'+(l.length?l.map(x=>'<div class="pickitem gvi">'+cardMini(x.c)+(x.n>1?'<em class="gvn">×'+x.n+'</em>':'')+'</div>').join(''):'<p class="nnone">なし</p>');
+  $('gvBody').innerHTML=sec('キャラ',grp(P.cgrave))+sec('スキル',grp(P.sgrave));
+  $('gv').hidden=false;
 }
 function cardMini(c){
   if(c.kind==='char'){
@@ -1611,7 +1619,7 @@ function statusHTML(i){
     +'<div class="who">'+sname(i)+'</div>'
     +'<div class="life '+(P.life<=5?'low':'')+' '+(tg?'targetable':'')+' '+fxClass('P'+i)+'" data-act="player" data-id="'+i+'" data-key="P'+i+'" style="'+fxStyle('P'+i)+'"'+(tg?' role="button" tabindex="0"':'')+'><i>LIFE</i><b>'+Math.max(P.life,0)+'</b></div>'
     +'<div class="cost-meter"><span>場のコスト <b>'+used+'</b> / '+CAP+'</span><div class="track"><i style="width:'+Math.min(100,used/CAP*100)+'%"></i></div></div>'
-    +abilHTML(i)+sweepHTML(i)+'<div class="chips">'+(P.unity?'<span class="unity t-'+P.unity+'" title="'+UNITY_TXT[P.unity]+'">✨'+TAGNAME[P.unity]+'統一</span>':'')+'<span>手札 <b>'+P.hand.length+'</b></span><span>キャラ山 <b>'+P.cdeck.length+'</b></span><span>スキル山 <b>'+P.sdeck.length+'</b></span><span>墓地 キャラ<b>'+P.cgrave.length+'</b> / スキル<b>'+P.sgrave.length+'</b></span></div>'
+    +abilHTML(i)+sweepHTML(i)+'<div class="chips">'+(P.unity?'<span class="unity t-'+P.unity+'" title="'+UNITY_TXT[P.unity]+'">✨'+TAGNAME[P.unity]+'統一</span>':'')+'<span>手札 <b>'+P.hand.length+'</b></span><span>キャラ山 <b>'+P.cdeck.length+'</b></span><span>スキル山 <b>'+P.sdeck.length+'</b></span><span>墓地 キャラ<b>'+P.cgrave.length+'</b> / スキル<b>'+P.sgrave.length+'</b></span>'+(i===ME&&!G.auto?'<button class="btn gvbtn" data-act="grave">墓地を見る</button>':'')+'</div>'
     +'</section>';
 }
 function midHTML(){
@@ -1777,6 +1785,7 @@ $('board').addEventListener('click',e=>{
   const a=el.dataset.act,id=+el.dataset.id;
   if(a==='unit')onUnit(id,+el.dataset.side);
   else if(a==='player'){if(UI.prompt)resolvePrompt('P'+id);}
+  else if(a==='grave')graveView();
   else if(a==='hand')onHand(id);
   else if(a==='draw')humanDrawClick(el.dataset.t);
   else if(a==='drawauto')humanDrawAuto();
@@ -1881,7 +1890,7 @@ const CHAR_BY=Object.fromEntries(CHARS.map(c=>[c.key,c]));
 const isBig=c=>rare(c)===3;
 const maxCopies=c=>isBig(c)?1:(rare(c)===2?2:3);
 const cnt=o=>Object.values(o).reduce((a,b)=>a+b,0);
-const BIG_MAX=4,bigCnt=o=>Object.entries(o).reduce((a,[k,n])=>a+(CHAR_BY[k]&&isBig(CHAR_BY[k])?n:0),0);
+const BIG_MAX=3,bigCnt=o=>Object.entries(o).reduce((a,[k,n])=>a+(CHAR_BY[k]&&isBig(CHAR_BY[k])?n:0),0);
 const typeCnt=(d,t)=>Object.entries(d.skills).filter(([id])=>id.indexOf(t+'.')===0).reduce((a,[,n])=>a+n,0);
 const cloneDeck=d=>({name:d.name,chars:Object.assign({},d.chars),skills:Object.assign({},d.skills),ab:d.ab});
 function validateDeck(d){
@@ -1921,7 +1930,7 @@ function loadDecks(){
 function storeLocal(a){memDecks=a;try{localStorage.setItem(LS_KEY,JSON.stringify(a));}catch(e){storageOk=false;}}
 function storeDecks(a){storeLocal(a);accPush(a);}
 /* ---------- お知らせ(オンライン: サーバー、オフライン: 同梱の一覧。配布の受け取りはオンラインのみ) ---------- */
-const NEWS_BUILTIN=[{"id": "2026-11-12-update", "date": "2026-11-12", "title": "アップデート(11/12)", "body": "・場のユニットを、自分のターン中に左右へ並べ替えられるようになりました(ドラッグ、または「◀左へ」「右へ▶」ボタン)。\n・スキルが同時に発動するときは、同じ側では場の左のユニットから順に発動します(「HP最小」などの同点も左優先)。\n・能力「経費削減」の再使用ターンを3から5に増やしました。\n・このお知らせ機能を追加しました。"}, {"id": "2026-11-11-update", "date": "2026-11-11", "title": "アップデート(11/11)", "body": "・CPU戦に「かんたん/ふつう/つよい」の強さ選択を追加しました。\n・タイトル画面に「戦績」を追加しました(デッキ別・キャラ別の勝率など)。\n・レア3の調整: 無類の護神の固定スキルを変更、不屈の戦王のHPを7に、黒死の毒機を3/5に、アンデッドモンスターのATKを3に変更しました。"}];
+const NEWS_BUILTIN=[{"id": "2026-11-12-update2", "date": "2026-11-12", "title": "アップデート(11/12 その2)", "body": "・フレンド機能を追加しました(オンライン版)。タイトルの「フレンド」からフレンドコードで申請でき、承認されるとフレンドになります。対人戦のルームコード画面の「フレンドに転送」で、フレンドに対戦を申し込めます。\n・プレイヤー名はアカウント画面で設定する形に変更しました(対人戦の画面では入力しません)。\n・対人戦・CPU戦に「墓地を見る」ボタンを追加しました。\n・対人戦の終了後、ルームに参加した側がエナジーをもらえない不具合を修正しました。\n・デッキに入れられるレア3を4枚から3枚までに変更しました(CPU「つよい」のデッキも調整)。\n・デッキ構築画面で、キャラをレア順(1→3)に並べ、全キャラにレア度を★で表示するようにしました。\n・「手札に戻す」の制限を「同一ターン中に同一カードにつき1回まで」に変更しました。"}, {"id": "2026-11-12-update", "date": "2026-11-12", "title": "アップデート(11/12)", "body": "・場のユニットを、自分のターン中に左右へ並べ替えられるようになりました(ドラッグ、または「◀左へ」「右へ▶」ボタン)。\n・スキルが同時に発動するときは、同じ側では場の左のユニットから順に発動します(「HP最小」などの同点も左優先)。\n・能力「経費削減」の再使用ターンを3から5に増やしました。\n・このお知らせ機能を追加しました。"}, {"id": "2026-11-11-update", "date": "2026-11-11", "title": "アップデート(11/11)", "body": "・CPU戦に「かんたん/ふつう/つよい」の強さ選択を追加しました。\n・タイトル画面に「戦績」を追加しました(デッキ別・キャラ別の勝率など)。\n・レア3の調整: 無類の護神の固定スキルを変更、不屈の戦王のHPを7に、黒死の毒機を3/5に、アンデッドモンスターのATKを3に変更しました。"}];
 const NK='kumitate-tcg-news-read';
 const NEWSD={items:[],inbox:{requests:[],invites:[]}};
 const nEsc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -2126,7 +2135,7 @@ function randomDeck(base,limit){
 }
 const deckSummary=d=>'キャラ'+cnt(d.chars)+'/'+DECK_C+' スキル'+cnt(d.skills)+'/'+DECK_S+' ・能力:'+(ABIL[d.ab]?ABIL[d.ab].name:'未選択');
 /* CPUの「つよい」用デッキ(自己対戦の探索で選ばれた構築) */
-const STRONG=[{"name":"自由構築型","ab":"reaper","chars":{"herald":2,"tide":2,"bombmaker":2,"ironclad":1,"plaguelord":1,"swift":1,"archer":1,"apprentice":1,"mage":3,"knight":1,"drummer":2,"watch":1,"undead":1,"general":1},"skills":{"targ.all":3,"eff.shield":1,"eff.swapatk":1,"cond.allyenter":2,"targ.enemies":2,"cond.enter":2,"eff.fortify":1,"targ.topatk":2,"eff.attack":1,"eff.trigger":1,"targ.tagfoe":1,"targ.lowfoe":1,"cond.foeenter":1,"targ.self":2,"cond.allygrave":3,"eff.bounce":2,"targ.allyone":1,"targ.others":1,"eff.grow":1,"eff.atkup":1}},{"name":"獣型","ab":"reaper","chars":{"charger":1,"venomblade":2,"giant":1,"dragoon":1,"night":1,"swift":1,"warking":1,"priest":1,"herald":2,"snake":1,"archer":2,"avenger":1,"sealer":1,"scout":1,"signal":1,"counter":1,"thorn":1},"skills":{"targ.all":3,"eff.makeattack":3,"cond.foeenter":2,"targ.enemies":3,"eff.bounce":2,"eff.silence":1,"cond.enter":3,"targ.allyone":2,"targ.foetwo":1,"targ.topally":1,"eff.atkup":1,"targ.select":2,"eff.shield":2,"eff.ping":1,"cond.myturn":1,"cond.foeturn":1,"targ.foeone":1}},{"name":"機械型","ab":"reaper","chars":{"sentinel":1,"tide":1,"undead":1,"glacier":1,"sniper":2,"assassin":2,"dragoon":1,"bomber":2,"thorn":1,"general":1,"bombmaker":1,"slinger":1,"ambush":1,"swift":1,"bastion":1,"elite":1,"archmage":1},"skills":{"targ.tagfoe":1,"targ.topatk":3,"eff.attack":2,"eff.bounce":2,"cond.foeenter":1,"targ.enemies":1,"targ.lowfoe":2,"eff.atkup":1,"cond.grave":1,"cond.myturn":1,"cond.abil":2,"eff.silence":2,"eff.grow":2,"targ.select":3,"cond.ailed":1,"cond.allyenter":2,"targ.topally":1,"targ.allyone":1,"eff.trigger":1}},{"name":"戦士型","ab":"trap","chars":{"maiden":1,"heavy":1,"general":2,"elite":1,"plaguelord":1,"mercenary":1,"valkyrie":1,"dragoon":2,"captain":1,"apprentice":2,"knight":1,"priest":1,"tide":1,"counter":1,"veteran":2,"wounded":1},"skills":{"eff.makeattack":2,"cond.foeattacks":2,"targ.enemies":3,"eff.execute":1,"targ.all":1,"eff.bounce":2,"cond.wounded":1,"targ.tagfoe":1,"cond.foegrave":1,"cond.foeturn":1,"targ.lowfoe":2,"eff.silence":2,"targ.foetwo":1,"cond.myturn":1,"cond.attacked":1,"targ.tagself":1,"cond.grave":1,"targ.foeone":1,"eff.atkdown":2,"cond.allygrave":1,"targ.friends":1,"targ.weakally":1}}];
+const STRONG=[{"name":"自由構築型","ab":"reaper","chars":{"herald":3,"tide":2,"bombmaker":2,"ironclad":1,"plaguelord":1,"swift":1,"archer":1,"apprentice":1,"mage":3,"knight":1,"drummer":2,"watch":1,"general":1},"skills":{"targ.all":3,"eff.shield":1,"eff.swapatk":1,"cond.allyenter":2,"targ.enemies":2,"cond.enter":2,"eff.fortify":1,"targ.topatk":2,"eff.attack":1,"eff.trigger":1,"targ.tagfoe":1,"targ.lowfoe":1,"cond.foeenter":1,"targ.self":2,"cond.allygrave":3,"eff.bounce":2,"targ.allyone":1,"targ.others":1,"eff.grow":1,"eff.atkup":1}},{"name":"獣型","ab":"reaper","chars":{"charger":1,"venomblade":2,"giant":1,"dragoon":1,"night":1,"swift":1,"warking":1,"priest":1,"herald":2,"snake":1,"archer":2,"avenger":1,"sealer":1,"scout":1,"signal":1,"counter":1,"thorn":1},"skills":{"targ.all":3,"eff.makeattack":3,"cond.foeenter":2,"targ.enemies":3,"eff.bounce":2,"eff.silence":1,"cond.enter":3,"targ.allyone":2,"targ.foetwo":1,"targ.topally":1,"eff.atkup":1,"targ.select":2,"eff.shield":2,"eff.ping":1,"cond.myturn":1,"cond.foeturn":1,"targ.foeone":1}},{"name":"機械型","ab":"reaper","chars":{"sentinel":2,"tide":1,"undead":1,"glacier":1,"sniper":2,"assassin":2,"dragoon":1,"bomber":2,"thorn":1,"general":1,"bombmaker":1,"slinger":1,"ambush":1,"swift":1,"elite":1,"archmage":1},"skills":{"targ.tagfoe":1,"targ.topatk":3,"eff.attack":2,"eff.bounce":2,"cond.foeenter":1,"targ.enemies":1,"targ.lowfoe":2,"eff.atkup":1,"cond.grave":1,"cond.myturn":1,"cond.abil":2,"eff.silence":2,"eff.grow":2,"targ.select":3,"cond.ailed":1,"cond.allyenter":2,"targ.topally":1,"targ.allyone":1,"eff.trigger":1}},{"name":"戦士型","ab":"trap","chars":{"maiden":1,"heavy":1,"general":2,"elite":1,"plaguelord":1,"mercenary":1,"valkyrie":1,"dragoon":2,"captain":1,"apprentice":2,"knight":1,"priest":1,"tide":1,"counter":1,"veteran":2,"wounded":1},"skills":{"eff.makeattack":2,"cond.foeattacks":2,"targ.enemies":3,"eff.execute":1,"targ.all":1,"eff.bounce":2,"cond.wounded":1,"targ.tagfoe":1,"cond.foegrave":1,"cond.foeturn":1,"targ.lowfoe":2,"eff.silence":2,"targ.foetwo":1,"cond.myturn":1,"cond.attacked":1,"targ.tagself":1,"cond.grave":1,"targ.foeone":1,"eff.atkdown":2,"cond.allygrave":1,"targ.friends":1,"targ.weakally":1}}];
 let LV=1;try{const q=+localStorage.getItem('kumitate-tcg-lv');if(q>=0&&q<=2)LV=q;}catch(e){}
 const LVNAME=['かんたん','ふつう','つよい'];
 function cpuDeck(lv){
@@ -2184,16 +2193,18 @@ function fixText(c){
   const f=TYPES.filter(t=>c.fix&&c.fix[t]).map(t=>TLABEL[t]+':'+SK[t][c.fix[t]].name);
   return f.length?f.join(' / '):'固定なし';
 }
+/* 並び順用: 最初に登場したパックの番号(パックに無い基本カードは先頭) */
+const relIdx=c=>PACKS.findIndex(p=>p.feature===c.key||p.r3.includes(c.key)||p.r2.includes(c.key));
 function edCatalogHTML(){
   const d=ED.d,tabs=[['char','キャラ'],['cond','条件'],['targ','対象'],['eff','効果']];
   let h='<div class="dtabs">'+tabs.map(([k,n])=>'<button class="dtab '+(ED.tab===k?'on':'')+'" data-d="tab" data-id="'+k+'">'+n+(k==='char'?' '+cnt(d.chars)+'/'+DECK_C:' '+typeCnt(d,k))+'</button>').join('')+'</div>'+(ED.tab==='char'?'<div class="tagf">'+[['','すべて']].concat(Object.entries(TAGNAME)).map(([k,n])=>'<button class="'+(ED.tagF===k?'on':'')+'" data-d="tagf" data-id="'+k+'">'+n+'</button>').join('')+'</div><div class="dmsg" style="margin:4px 0">レア3: '+bigCnt(d.chars)+' / '+BIG_MAX+'枚まで</div>':'')+(OWN()?'<div class="dtoggle"><button class="btn'+(ED.onlyOwn?' primary':'')+'" data-d="own">'+(ED.onlyOwn?'持っているカードだけ表示中':'持っているカードだけ表示')+'</button></div>':'')+'<div class="dgrid">';
   if(ED.tab==='char'){
-    CHARS.slice().sort((a,b)=>a.cost-b.cost||a.name.localeCompare(b.name,'ja')).forEach(c=>{
+    CHARS.slice().sort((a,b)=>rare(a)-rare(b)||relIdx(a)-relIdx(b)||a.cost-b.cost||a.name.localeCompare(b.name,'ja')).forEach(c=>{
       const n=d.chars[c.key]||0,mx=capC(c),full=cnt(d.chars)>=DECK_C,ow=OWN(),have=ow?(ow.chars[c.key]||0):null;
       if(ED.onlyOwn&&ow&&!have&&!n)return;
       if(ED.tagF&&c.tag!==ED.tagF)return;
       h+='<div class="dcard '+(n?'has':'')+(ow&&!have?' none':'')+'"><div class="dc-main"><b>'+c.name+tagBadge(c)+'</b><span class="dc-cost">'+cardCost(c)+'</span></div>'
-        +'<div class="dc-sub">ATK '+c.atk+' / HP '+c.hp+(isBig(c)?' ・レア3':'')+'</div>'+(ow?'<span class="own'+(have?'':' zero')+'">'+(have?'所持 '+have+'枚':'未所持')+'</span>':'')
+        +'<div class="dc-sub"><span class="stars r'+rare(c)+'" title="レア'+rare(c)+'">'+'★'.repeat(rare(c))+'</span> ATK '+c.atk+' / HP '+c.hp+'</div>'+(ow?'<span class="own'+(have?'':' zero')+'">'+(have?'所持 '+have+'枚':'未所持')+'</span>':'')
         +'<div class="dc-fix">'+fixText(c)+'</div>'+(Object.keys(c.kw||{}).length?'<div class="u-state">'+kwTags(c)+'</div>':'')
         +'<div class="dc-ctl"><button data-d="dec" data-id="c:'+c.key+'"'+(n?'':' disabled')+'>−</button><span>'+n+'</span><button data-d="inc" data-id="c:'+c.key+'"'+(n>=mx||full||(isBig(c)&&bigCnt(d.chars)>=BIG_MAX)?' disabled':'')+'>＋</button></div></div>';
     });
@@ -2523,6 +2534,7 @@ function pvBegin(seed){
 async function pvStart(mode,code,deck,opt){
   opt=opt||{};PV.bot=!!opt.bot;PV.url=opt.url||'';PV.deck=deck;PV.name=opt.name||'プレイヤー';
   pvLeave();PV.deck=deck;PV.name=opt.name||'プレイヤー';
+  PV.code=mode==='join'?String(code||'').trim().toUpperCase():'';
   try{await pvOpen();}catch(e){pvMsg('サーバーに接続できません。オンライン版で開いてください。');return false;}
   pvSend(mode==='create'?{t:'create'}:{t:'join',code:String(code||'').trim().toUpperCase()});
   return true;
@@ -2560,6 +2572,7 @@ function initMenus(){
       {html:'<b>つよい</b><span>自己対戦で選び抜かれた強いデッキ</span><small>組み合わせをよく考えないと勝てません</small>'}],true);
     if(i<0)return;LV=i;try{localStorage.setItem('kumitate-tcg-lv',String(i));}catch(e){}
     playWith(d,false);});
+  $('gvClose').addEventListener('click',()=>{$('gv').hidden=true;});
   $('tNews').addEventListener('click',()=>{newsShow();});$('newsClose').addEventListener('click',()=>{$('news').hidden=true;});
   $('tStats').addEventListener('click',stShow);$('stClose').addEventListener('click',()=>{$('stats').hidden=true;});
   $('stReset').addEventListener('click',()=>{if(confirm('戦績の記録をすべて消します。よろしいですか?')){stSave({v:1,tot:{g:0,w:0,d:0},by:{},decks:{},chars:{}});stShow();}});
@@ -2582,7 +2595,7 @@ async function sim(n,opt){
   }finally{HEADLESS=sv.HEADLESS;CPURANDOM=sv.CPURANDOM;LIFE=sv.LIFE;HPMULT=sv.HPMULT;speed=sv.speed;}
   return out;
 }
-window.__tcg={fr:{friendsOpen,friendsAdd,inviteSendUI,acctSaveName},news:{newsLoad,NEWSD,nDot,nGrantText,NEWS_BUILTIN},ord:{byTurn,posOf,moveUnit,setG:g=>{G=g;if(!UI)UI={flash:{}};},qpush,drainQ:()=>queue.map(q=>q.unit.name)},st:{stRecord,stLoad,stShow,cpuDeck,STRONG,setLV:v=>{LV=v;}},bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover,rewardReport},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({maxCopies,KWD,ABIL,AB_KEYS,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
+window.__tcg={gv:{graveView},checkOver:()=>checkOver(),fr:{friendsOpen,friendsAdd,inviteSendUI,acctSaveName},news:{newsLoad,NEWSD,nDot,nGrantText,NEWS_BUILTIN},ord:{byTurn,posOf,moveUnit,setG:g=>{G=g;if(!UI)UI={flash:{}};},qpush,drainQ:()=>queue.map(q=>q.unit.name)},st:{stRecord,stLoad,stShow,cpuDeck,STRONG,setLV:v=>{LV=v;}},bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover,rewardReport},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({maxCopies,KWD,ABIL,AB_KEYS,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
   tune:m=>{Object.keys(m).forEach(k=>{if(k==='sur'){SURV=m[k];return;}const [ty,key]=k.split('.');if(ty==='ab'){if(key.endsWith('_s'))ABIL[key.slice(0,-2)].start=m[k];else ABIL[key].cd=m[k];return;}SK[ty][key].inc=m[k];});recost();},
   cfg:o=>{if(o.cap!==undefined)CAP=o.cap;if(o.firstdraw!==undefined)FIRSTDRAW=o.firstdraw;if(o.hp!==undefined)HPMULT=o.hp;if(o.life!==undefined)LIFE=o.life;if(o.handmax!==undefined)HANDMAX=o.handmax;if(o.atkq!==undefined)ATKQ=o.atkq;if(o.ctr!==undefined)CTR=o.ctr;if(o.untg!==undefined)UNTG=o.untg;if(o.autosw!==undefined)AUTOSW=o.autosw;if(o.catch!==undefined)CATCH=o.catch;if(o.catchn!==undefined)CATCHN=o.catchn;if(o.grace!==undefined)GRACE=o.grace;if(o.haste!==undefined)HASTE=o.haste;if(o.sweep){const w=o.sweep;if(w.on!==undefined)SWEEP_ON=w.on;if(w.t!==undefined)SWEEP_T=w.t;if(w.life!==undefined)SWEEP_LIFE=w.life;if(w.diff!==undefined)SWEEP_DIFF=w.diff;}}};
 if(typeof document!=='undefined'&&$('board')){initMenus();showTitle();accInit().then(()=>{if(!ACC.on&&!GA.on)gaInit();newsLoad();});}
