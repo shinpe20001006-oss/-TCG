@@ -192,7 +192,7 @@
   "pursuit",
   "trap"
  ],
- "bigMax": 4,
+ "bigMax": 3,
  "starter": {
   "chars": {
    "scout": 2,
