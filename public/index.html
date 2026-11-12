@@ -370,7 +370,7 @@ body.fx-lite .unit.fx-lunge{animation:none}
 @keyframes movedGlow{0%{box-shadow:0 0 0 0 rgba(255,200,60,.9)}60%{box-shadow:0 0 0 10px rgba(255,200,60,0)}100%{box-shadow:0 0 0 0 rgba(255,200,60,0)}}
 .unit.fx-moved{animation:movedGlow 1s ease-out 1;outline:2px solid rgba(255,190,40,.85);outline-offset:1px}.unit.mine{touch-action:pan-y}.unit.dragging{z-index:60;opacity:.92;cursor:grabbing;transition:none!important;box-shadow:0 10px 24px rgba(0,0,0,.35)}body.fx-lite .unit.fx-moved{animation:none}
 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#e5322d;box-shadow:0 0 0 2px var(--bg,#fff);margin-left:6px;vertical-align:middle}#tNews{position:absolute;top:12px;right:12px;z-index:5}#tNews .dot{position:absolute;top:-3px;right:-3px;margin:0}#news .sheet{max-height:86vh;overflow:auto}.nitem{border-bottom:1px solid rgba(128,128,128,.3)}.nhead{display:flex;width:100%;gap:8px;align-items:center;text-align:left;background:none;border:0;padding:10px 2px;font:inherit;color:inherit;cursor:pointer}.nhead .ndate{font-size:12px;opacity:.65;white-space:nowrap}.nbody{white-space:pre-wrap;font-size:14px;line-height:1.7;padding:0 2px 10px}.ngrant{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:0 2px 12px;font-size:13px}.nnone{opacity:.7}
-</style>
+.fr-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(128,128,128,.3)}.fr-row b{flex:1;word-break:break-all}.fr-row .btn{font-size:12px;padding:4px 10px}.fr-h{font-size:13px;margin:10px 0 2px;color:var(--muted)}.nsec{font-size:12px;color:var(--muted);margin:8px 0 2px}.nfr{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(128,128,128,.3)}.nfr span{flex:1}.nfr .btn{font-size:12px;padding:4px 10px}.nfr .end{color:var(--muted);font-size:12px}</style>
 
 <div class="app">
   <header class="top">
@@ -390,13 +390,14 @@ body.fx-lite .unit.fx-lunge{animation:none}
 </div>
 <div class="fxlayer" id="fx"></div>
 
-<div class="overlay solid" id="title" hidden><button class="btn" id="tNews">お知らせ<i class="dot" id="tNewsDot" hidden></i></button><div class="titlebox"><h1 class="ttl">組み立て<span>TCG</span></h1><p class="tsub">キャラに「条件・対象・効果」を組み付けて戦うカードゲーム</p><div class="tbtns"><button class="tbtn" id="tDeck"><b>デッキ構築</b><span>カードを選んで、能力といっしょに保存する</span></button><button class="tbtn" id="tCpu"><b>CPU戦</b><span>作ったデッキで、CPUと対戦する</span></button><button class="tbtn" id="tGacha"><b>ガチャ</b><span>カードパックを開ける</span></button><button class="tbtn" id="tPvp"><b>対人戦</b><span>ルームコードで友達と対戦(オンライン版のみ)</span></button></div><div class="tmini"><button class="btn" id="tWatch">CPU同士を観戦</button><button class="btn" id="tStats">戦績</button><button class="btn" id="tRules">ルール</button><button class="btn" id="tAcct" hidden>アカウント</button></div><p class="tmsg" id="titleMsg"></p></div></div>
+<div class="overlay solid" id="title" hidden><button class="btn" id="tNews">お知らせ<i class="dot" id="tNewsDot" hidden></i></button><div class="titlebox"><h1 class="ttl">組み立て<span>TCG</span></h1><p class="tsub">キャラに「条件・対象・効果」を組み付けて戦うカードゲーム</p><div class="tbtns"><button class="tbtn" id="tDeck"><b>デッキ構築</b><span>カードを選んで、能力といっしょに保存する</span></button><button class="tbtn" id="tCpu"><b>CPU戦</b><span>作ったデッキで、CPUと対戦する</span></button><button class="tbtn" id="tGacha"><b>ガチャ</b><span>カードパックを開ける</span></button><button class="tbtn" id="tPvp"><b>対人戦</b><span>ルームコードで友達と対戦(オンライン版のみ)</span></button></div><div class="tmini"><button class="btn" id="tWatch">CPU同士を観戦</button><button class="btn" id="tStats">戦績</button><button class="btn" id="tRules">ルール</button><button class="btn" id="tFriends" hidden>フレンド</button><button class="btn" id="tAcct" hidden>アカウント</button></div><p class="tmsg" id="titleMsg"></p></div></div>
 <div class="overlay solid" id="builder" hidden><div class="dsheet"><div class="dhead"><h2>デッキ構築</h2><button class="btn" id="dBack">タイトルへ</button></div><div class="dbody"><section class="dcat" id="dCat"></section><aside class="dside" id="dSide"></aside></div></div></div>
 <div class="overlay solid" id="gacha" hidden><div id="gachaBox"></div></div>
-<div class="overlay" id="lobby" hidden><div class="sheet" role="dialog"><h2>対人戦</h2><div id="lbMenu"><label class="lbl">名前<input id="lbName" maxlength="16" value="プレイヤー"></label><div class="btns"><button class="btn primary" id="lbCreate">ルームを作る</button></div><label class="lbl">ルームコードで参加<input id="lbInput" maxlength="6" placeholder="ABCDE" autocapitalize="characters"></label><div class="btns"><button class="btn" id="lbJoin">参加する</button></div></div><div id="lbWait" hidden><p>このコードを相手に伝えてください。</p><p class="lbcode" id="lbCode"></p><p>相手の参加を待っています…</p></div><p class="tmsg" id="lbMsg"></p><div class="btns"><button class="btn" id="lbBack">戻る</button></div></div></div>
+<div class="overlay" id="lobby" hidden><div class="sheet" role="dialog"><h2>対人戦</h2><div id="lbMenu"><label class="lbl" id="lbNameRow">名前<input id="lbName" maxlength="16" value="プレイヤー"></label><div class="btns"><button class="btn primary" id="lbCreate">ルームを作る</button></div><label class="lbl">ルームコードで参加<input id="lbInput" maxlength="6" placeholder="ABCDE" autocapitalize="characters"></label><div class="btns"><button class="btn" id="lbJoin">参加する</button></div></div><div id="lbWait" hidden><p>このコードを相手に伝えてください。</p><p class="lbcode" id="lbCode"></p><p>相手の参加を待っています…</p><div class="btns"><button class="btn" id="lbFriend" hidden>フレンドに転送</button></div></div><p class="tmsg" id="lbMsg"></p><div class="btns"><button class="btn" id="lbBack">戻る</button></div></div></div>
 <div class="overlay" id="stats" hidden><div class="sheet" role="dialog"><h2>戦績</h2><div id="stBody"></div><div class="btns"><button class="btn" id="stReset">記録を消す</button><button class="btn primary" id="stClose">閉じる</button></div></div></div>
 <div class="overlay" id="news" hidden><div class="sheet" role="dialog"><h2>お知らせ</h2><div id="newsBody"></div><div class="btns"><button class="btn primary" id="newsClose">閉じる</button></div></div></div>
-<div class="overlay" id="acct" hidden><div class="sheet" role="dialog"><h2>アカウント</h2><p id="acInfo"></p><p class="lbcode" id="acCode" style="font-size:26px"></p><label class="lbl">引き継ぎコードを入力<input id="acInput" maxlength="14" placeholder="XXXX-XXXX-XXXX" autocapitalize="characters"></label><div class="btns"><button class="btn" id="acRecover">引き継ぐ</button><button class="btn" id="acRegen">コードを再発行</button><button class="btn primary" id="acClose">閉じる</button></div><p class="tmsg" id="acMsg" style="color:var(--muted)"></p></div></div>
+<div class="overlay" id="friends" hidden><div class="sheet" role="dialog"><h2>フレンド</h2><p>あなたのフレンドコード</p><p class="lbcode" id="frCode" style="font-size:26px"></p><label class="lbl">相手のフレンドコードで申請<input id="frInput" maxlength="9" placeholder="XXXX-XXXX" autocapitalize="characters"></label><div class="btns"><button class="btn" id="frAdd">申請する</button></div><p class="tmsg" id="frMsg"></p><div id="frBody"></div><div class="btns"><button class="btn primary" id="frClose">閉じる</button></div></div></div>
+<div class="overlay" id="acct" hidden><div class="sheet" role="dialog"><h2>アカウント</h2><p id="acInfo"></p><div id="acNameRow" hidden><label class="lbl">プレイヤー名(対人戦・フレンドに表示されます)<input id="acName" maxlength="16"></label><div class="btns"><button class="btn" id="acNameSave">名前を保存</button></div></div><p class="lbcode" id="acCode" style="font-size:26px"></p><label class="lbl">引き継ぎコードを入力<input id="acInput" maxlength="14" placeholder="XXXX-XXXX-XXXX" autocapitalize="characters"></label><div class="btns"><button class="btn" id="acRecover">引き継ぐ</button><button class="btn" id="acRegen">コードを再発行</button><button class="btn primary" id="acClose">閉じる</button></div><p class="tmsg" id="acMsg" style="color:var(--muted)"></p></div></div>
 <div class="overlay" id="rules" hidden>
   <div class="sheet" role="dialog" aria-label="ルール">
     <h2>あそび方</h2>
@@ -1922,18 +1923,19 @@ function storeDecks(a){storeLocal(a);accPush(a);}
 /* ---------- お知らせ(オンライン: サーバー、オフライン: 同梱の一覧。配布の受け取りはオンラインのみ) ---------- */
 const NEWS_BUILTIN=[{"id": "2026-11-12-update", "date": "2026-11-12", "title": "アップデート(11/12)", "body": "・場のユニットを、自分のターン中に左右へ並べ替えられるようになりました(ドラッグ、または「◀左へ」「右へ▶」ボタン)。\n・スキルが同時に発動するときは、同じ側では場の左のユニットから順に発動します(「HP最小」などの同点も左優先)。\n・能力「経費削減」の再使用ターンを3から5に増やしました。\n・このお知らせ機能を追加しました。"}, {"id": "2026-11-11-update", "date": "2026-11-11", "title": "アップデート(11/11)", "body": "・CPU戦に「かんたん/ふつう/つよい」の強さ選択を追加しました。\n・タイトル画面に「戦績」を追加しました(デッキ別・キャラ別の勝率など)。\n・レア3の調整: 無類の護神の固定スキルを変更、不屈の戦王のHPを7に、黒死の毒機を3/5に、アンデッドモンスターのATKを3に変更しました。"}];
 const NK='kumitate-tcg-news-read';
-const NEWSD={items:[]};
+const NEWSD={items:[],inbox:{requests:[],invites:[]}};
 const nEsc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function nLocalRead(){try{return JSON.parse(localStorage.getItem(NK))||{};}catch(e){return{};}}
 function nDot(){
   const el=document.getElementById('tNewsDot');if(!el)return;
-  el.hidden=!NEWSD.items.some(i=>!i.read||(i.grant&&!i.claimed&&!i.offline));
+  const ib=NEWSD.inbox||{requests:[],invites:[]};
+  el.hidden=!(NEWSD.items.some(i=>!i.read||(i.grant&&!i.claimed&&!i.offline))||ib.requests.length||ib.invites.some(v=>v.status==='open'||!v._seen));
 }
 async function newsLoad(){
   if(typeof document==='undefined'||HEADLESS)return;
-  if(ACC.on){try{NEWSD.items=(await api('/api/news')).items||[];}catch(e){NEWSD.items=[];}}
+  if(ACC.on){try{const j=await api('/api/news');NEWSD.items=j.items||[];NEWSD.inbox=j.inbox||{requests:[],invites:[]};}catch(e){NEWSD.items=[];NEWSD.inbox={requests:[],invites:[]};}}
   else{const r=nLocalRead();NEWSD.items=NEWS_BUILTIN.map(n=>({...n,read:!!r[n.id],claimed:false,offline:true}));}
-  nDot();
+  nDot();if(NEWSD.redraw&&!$('news').hidden)NEWSD.redraw();
 }
 async function nMarkRead(it){
   if(it.read)return;it.read=true;
@@ -1949,17 +1951,30 @@ function nGrantText(g){
 }
 function newsShow(){
   const box=$('newsBody');
+  const inboxHtml=()=>{
+    const ib=NEWSD.inbox||{requests:[],invites:[]};let h='';
+    if(ib.requests.length||ib.invites.length)h+='<div class="nsec">フレンド</div>';
+    ib.requests.forEach((r,i)=>{h+='<div class="nfr"><span>フレンド申請:<b>'+nEsc(r.name)+'</b></span><button class="btn primary" data-fa="'+i+'">承認</button><button class="btn" data-fd="'+i+'">拒否</button></div>';});
+    ib.invites.forEach((v,i)=>{h+='<div class="nfr"><span>フレンド<b>'+nEsc(v.name)+'</b>から対戦の申し込み</span>'+(v.status==='open'?'<button class="btn primary" data-ij="'+i+'">参加する</button>':'<span class="end">終了しました</span>')+'</div>';});
+    return h;
+  };
   const draw=()=>{
-    box.innerHTML=NEWSD.items.length?NEWSD.items.map((it,i)=>{
+    box.innerHTML=inboxHtml()+(ACC.on&&(NEWSD.inbox.requests.length||NEWSD.inbox.invites.length)?'<div class="nsec">お知らせ</div>':'')+(NEWSD.items.length?NEWSD.items.map((it,i)=>{
       const open=!!it._open,flag=!it.read||(it.grant&&!it.claimed&&!it.offline);
       let h='<div class="nitem'+(open?' open':'')+'"><button class="nhead" data-i="'+i+'"><span class="ndate">'+nEsc(it.date)+'</span><b>'+nEsc(it.title)+'</b>'+(flag?'<i class="dot"></i>':'')+'</button>';
       if(open){h+='<div class="nbody">'+nEsc(it.body)+'</div>';
         if(it.grant){h+='<div class="ngrant"><span>配布:'+nEsc(nGrantText(it.grant))+'</span>'+(it.offline?'<small>(受け取りはオンライン版のアカウントでできます)</small>':it.claimed?'<small>受け取り済み</small>':'<button class="btn primary" data-claim="'+i+'">受け取る</button>')+'</div>';}
       }
-      return h+'</div>';}).join(''):'<p class="nnone">お知らせはありません。</p>';
+      return h+'</div>';}).join(''):(NEWSD.inbox.requests.length||NEWSD.inbox.invites.length?'':'<p class="nnone">お知らせはありません。</p>'));
   };
-  draw();$('news').hidden=false;
+  NEWSD.redraw=draw;draw();$('news').hidden=false;
+  if(ACC.on&&NEWSD.inbox.invites.some(v=>v.status==='closed'&&!v._seen)){NEWSD.inbox.invites.forEach(v=>{if(v.status==='closed')v._seen=true;});nDot();api('/api/inbox/seen','POST',{}).catch(()=>{});}
   box.onclick=async e=>{
+    const fa=e.target.closest('[data-fa],[data-fd]'),ij=e.target.closest('[data-ij]');
+    if(fa){const acc=fa.dataset.fa!==undefined,r=NEWSD.inbox.requests[+(acc?fa.dataset.fa:fa.dataset.fd)];fa.disabled=true;
+      try{await api('/api/friends/'+(acc?'accept':'decline'),'POST',{code:r.code});}catch(x){alert(x.message);}
+      await newsLoad();return;}
+    if(ij){const v=NEWSD.inbox.invites[+ij.dataset.ij];ij.disabled=true;await inviteJoin(v);return;}
     const hb=e.target.closest('[data-i]'),cb=e.target.closest('[data-claim]');
     if(cb){const it=NEWSD.items[+cb.dataset.claim];cb.disabled=true;
       try{await api('/api/news/claim','POST',{id:it.id});it.claimed=true;it.read=true;
@@ -2023,21 +2038,69 @@ async function accInit(){
       try{localStorage.setItem(AK,ACC.token);}catch(e){}
     }
     await accPull();ACC.on=true;
-    if($('tAcct'))$('tAcct').hidden=false;
+    if($('tAcct'))$('tAcct').hidden=false;if($('tFriends'))$('tFriends').hidden=false;
     if(fresh)acctOpen(fresh);
   }catch(e){ACC.on=false;if($('titleMsg'))$('titleMsg').textContent='サーバーに接続できないため、この端末内だけに保存します。';}
 }
 function acctOpen(code){
+  if($('acNameRow')){$('acNameRow').hidden=!ACC.on;if(ACC.on&&ACC.player)$('acName').value=ACC.player.name||'';}
   $('acInfo').textContent=ACC.player?('ID: '+ACC.player.id+'  名前: '+ACC.player.name):'';
   $('acCode').textContent=code||'';$('acMsg').textContent=code?'この引き継ぎコードをメモしてください。端末を変えたとき、この画面でコードを入力するとデッキや所持カードを引き継げます。再表示はできません(再発行はできます)。':'';
   $('acct').hidden=false;
 }
+async function acctSaveName(){
+  const n=$('acName').value.trim().slice(0,16);if(!n){$('acMsg').textContent='名前を入力してください。';return;}
+  try{await api('/api/me','PATCH',{name:n});ACC.player.name=n;$('acInfo').textContent='ID: '+ACC.player.id+'  名前: '+n;$('acMsg').textContent='名前を保存しました。';}catch(e){$('acMsg').textContent=e.message;}
+}
+/* ---------- フレンド ---------- */
+const frMsg=t=>{$('frMsg').textContent=t||'';};
+async function friendsOpen(){
+  $('friends').hidden=false;frMsg('');await friendsDraw();
+}
+async function friendsDraw(){
+  let f;try{f=await api('/api/friends');}catch(e){frMsg(e.message);return;}
+  $('frCode').textContent=f.code;
+  let h='<div class="fr-h">フレンド('+f.friends.length+'/50)</div>';
+  h+=f.friends.length?f.friends.map((x,i)=>'<div class="fr-row"><b>'+nEsc(x.name)+'</b><button class="btn" data-rm="'+i+'">削除</button></div>').join(''):'<p class="nnone">まだフレンドがいません。</p>';
+  if(f.sent.length)h+='<div class="fr-h">申請中</div>'+f.sent.map((x,i)=>'<div class="fr-row"><b>'+nEsc(x.name)+'</b><button class="btn" data-cx="'+i+'">取り消す</button></div>').join('');
+  $('frBody').innerHTML=h;$('frBody')._f=f;
+}
+async function friendsClick(e){
+  const f=$('frBody')._f;if(!f)return;
+  const rm=e.target.closest('[data-rm]'),cx=e.target.closest('[data-cx]');
+  try{
+    if(rm){const x=f.friends[+rm.dataset.rm];if(!confirm('フレンド「'+x.name+'」を削除しますか?'))return;await api('/api/friends/remove','POST',{code:x.code});}
+    else if(cx){await api('/api/friends/cancel','POST',{code:f.sent[+cx.dataset.cx].code});}
+    else return;
+  }catch(x){frMsg(x.message);}
+  await friendsDraw();
+}
+async function friendsAdd(){
+  const c=$('frInput').value.trim();if(!c)return;
+  try{const r=await api('/api/friends/request','POST',{code:c});$('frInput').value='';frMsg(r.status==='accepted'?r.name+'さんとフレンドになりました。':r.name+'さんに申請しました。承認されるとフレンドになります。');}catch(e){frMsg(e.message);return;}
+  await friendsDraw();
+}
+async function inviteSendUI(){
+  let f;try{f=await api('/api/friends');}catch(e){pvMsg(e.message);return;}
+  if(!f.friends.length){pvMsg('フレンドがいません。タイトルの「フレンド」から追加できます。');return;}
+  const i=await openPick('フレンドに転送','対戦コードを送る相手を選んでください',f.friends.map(x=>({html:'<b>'+nEsc(x.name)+'</b>'})),true);
+  if(i<0)return;
+  try{await api('/api/invites','POST',{code:f.friends[i].code,room:PV.code});pvMsg(f.friends[i].name+'さんに送りました。参加を待っています…');}catch(e){pvMsg(e.message);}
+}
+async function inviteJoin(v){
+  $('news').hidden=true;
+  const d=await chooseDeck();if(!d){await newsLoad();return;}
+  let r;try{r=await api('/api/invites/join','POST',{id:v.id});}catch(e){alert(e.message);await newsLoad();return;}
+  lobbyOpen();$('lbMenu').hidden=true;pvMsg('接続中…');
+  const ok=await pvStart('join',r.room,d,{name:ACC.player.name});if(!ok)$('lbMenu').hidden=false;
+}
+setInterval(()=>{if(ACC.on&&typeof document!=='undefined'&&!document.hidden&&!HEADLESS&&$('title')&&!$('title').hidden)newsLoad();},30000);
 async function acctRecover(){
   const c=$('acInput').value.trim();if(!c)return;
   try{
     const r=await api('/api/recover','POST',{code:c},'none');
     ACC.token=r.token;ACC.player=r.player;try{localStorage.setItem(AK,r.token);}catch(e){}
-    await accPull();$('acCode').textContent='';$('acMsg').textContent='引き継ぎました。デッキと所持カードを読み込みました。';$('acInfo').textContent='ID: '+r.player.id+'  名前: '+r.player.name;
+    await accPull();if($('acName'))$('acName').value=r.player.name||'';$('acCode').textContent='';$('acMsg').textContent='引き継ぎました。デッキと所持カードを読み込みました。';$('acInfo').textContent='ID: '+r.player.id+'  名前: '+r.player.name;
   }catch(e){$('acMsg').textContent=e.message;}
 }
 async function acctRegen(){
@@ -2430,7 +2493,7 @@ function pvOpen(){
 }
 function pvHandle(m){
   if(m.t==='g'){if(PV.started){if(m.s!==++PV.rs){TRACE.push('GAP exp '+PV.rs+' got '+m.s);netDesync('通信の欠落');return;}netPush(m.m);}return;}
-  if(m.t==='created'){PV.code=m.code;pvMsg('');$('lbCode').textContent=m.code;$('lbWait').hidden=false;$('lbMenu').hidden=true;return;}
+  if(m.t==='created'){PV.code=m.code;pvMsg('');$('lbCode').textContent=m.code;$('lbWait').hidden=false;$('lbMenu').hidden=true;$('lbFriend').hidden=!ACC.on;return;}
   if(m.t==='error'){pvMsg(m.msg||'エラー');return;}
   if(m.t==='joined'){
     PV.seat=m.seat;pvMsg('相手が見つかりました。準備中…');
@@ -2466,19 +2529,21 @@ async function pvStart(mode,code,deck,opt){
 }
 function lobbyOpen(){
   $('lbMenu').hidden=false;$('lbWait').hidden=true;pvMsg('');$('lbCode').textContent='';$('lobby').hidden=false;
+  $('lbNameRow').hidden=!!ACC.on;$('lbFriend').hidden=true;
 }
 async function lobbyAction(mode){
   const d=await chooseDeck();if(!d)return;
   const code=$('lbInput').value;
   if(mode==='join'&&!code.trim()){pvMsg('ルームコードを入力してください。');return;}
   pvMsg('接続中…');
-  await pvStart(mode,code,d,{name:($('lbName').value||'プレイヤー').slice(0,16)});
+  await pvStart(mode,code,d,{name:(ACC.on&&ACC.player?ACC.player.name:($('lbName').value||'プレイヤー')).slice(0,16)});
 }
 function initMenus(){
   $('tAcct').addEventListener('click',()=>acctOpen(''));
   $('acClose').addEventListener('click',()=>{$('acct').hidden=true;});
   $('acRecover').addEventListener('click',acctRecover);
-  $('acRegen').addEventListener('click',acctRegen);
+  $('acRegen').addEventListener('click',acctRegen);$('acNameSave').addEventListener('click',acctSaveName);
+  $('tFriends').addEventListener('click',friendsOpen);$('frClose').addEventListener('click',()=>{$('friends').hidden=true;});$('frAdd').addEventListener('click',friendsAdd);$('frBody').addEventListener('click',friendsClick);$('lbFriend').addEventListener('click',inviteSendUI);
   $('tGacha').addEventListener('click',gaOpenScreen);
   $('gachaBox').addEventListener('click',gaClick);
   $('tPvp').addEventListener('click',()=>{if(location.protocol==='file:'||!/^https?:$/.test(location.protocol)||window.__OFFLINE__){$('titleMsg').textContent='対人戦はオンライン版でのみ遊べます。';return;}lobbyOpen();});
@@ -2517,7 +2582,7 @@ async function sim(n,opt){
   }finally{HEADLESS=sv.HEADLESS;CPURANDOM=sv.CPURANDOM;LIFE=sv.LIFE;HPMULT=sv.HPMULT;speed=sv.speed;}
   return out;
 }
-window.__tcg={news:{newsLoad,NEWSD,nDot,nGrantText,NEWS_BUILTIN},ord:{byTurn,posOf,moveUnit,setG:g=>{G=g;if(!UI)UI={flash:{}};},qpush,drainQ:()=>queue.map(q=>q.unit.name)},st:{stRecord,stLoad,stShow,cpuDeck,STRONG,setLV:v=>{LV=v;}},bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover,rewardReport},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({maxCopies,KWD,ABIL,AB_KEYS,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
+window.__tcg={fr:{friendsOpen,friendsAdd,inviteSendUI,acctSaveName},news:{newsLoad,NEWSD,nDot,nGrantText,NEWS_BUILTIN},ord:{byTurn,posOf,moveUnit,setG:g=>{G=g;if(!UI)UI={flash:{}};},qpush,drainQ:()=>queue.map(q=>q.unit.name)},st:{stRecord,stLoad,stShow,cpuDeck,STRONG,setLV:v=>{LV=v;}},bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover,rewardReport},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({maxCopies,KWD,ABIL,AB_KEYS,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
   tune:m=>{Object.keys(m).forEach(k=>{if(k==='sur'){SURV=m[k];return;}const [ty,key]=k.split('.');if(ty==='ab'){if(key.endsWith('_s'))ABIL[key.slice(0,-2)].start=m[k];else ABIL[key].cd=m[k];return;}SK[ty][key].inc=m[k];});recost();},
   cfg:o=>{if(o.cap!==undefined)CAP=o.cap;if(o.firstdraw!==undefined)FIRSTDRAW=o.firstdraw;if(o.hp!==undefined)HPMULT=o.hp;if(o.life!==undefined)LIFE=o.life;if(o.handmax!==undefined)HANDMAX=o.handmax;if(o.atkq!==undefined)ATKQ=o.atkq;if(o.ctr!==undefined)CTR=o.ctr;if(o.untg!==undefined)UNTG=o.untg;if(o.autosw!==undefined)AUTOSW=o.autosw;if(o.catch!==undefined)CATCH=o.catch;if(o.catchn!==undefined)CATCHN=o.catchn;if(o.grace!==undefined)GRACE=o.grace;if(o.haste!==undefined)HASTE=o.haste;if(o.sweep){const w=o.sweep;if(w.on!==undefined)SWEEP_ON=w.on;if(w.t!==undefined)SWEEP_T=w.t;if(w.life!==undefined)SWEEP_LIFE=w.life;if(w.diff!==undefined)SWEEP_DIFF=w.diff;}}};
 if(typeof document!=='undefined'&&$('board')){initMenus();showTitle();accInit().then(()=>{if(!ACC.on&&!GA.on)gaInit();newsLoad();});}
