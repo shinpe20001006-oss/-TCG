@@ -370,7 +370,7 @@ body.fx-lite .unit.fx-lunge{animation:none}
 @keyframes movedGlow{0%{box-shadow:0 0 0 0 rgba(255,200,60,.9)}60%{box-shadow:0 0 0 10px rgba(255,200,60,0)}100%{box-shadow:0 0 0 0 rgba(255,200,60,0)}}
 .unit.fx-moved{animation:movedGlow 1s ease-out 1;outline:2px solid rgba(255,190,40,.85);outline-offset:1px}.unit.mine{touch-action:pan-y}.unit.dragging{z-index:60;opacity:.92;cursor:grabbing;transition:none!important;box-shadow:0 10px 24px rgba(0,0,0,.35)}body.fx-lite .unit.fx-moved{animation:none}
 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#e5322d;box-shadow:0 0 0 2px var(--bg,#fff);margin-left:6px;vertical-align:middle}#tNews{position:absolute;top:12px;right:12px;z-index:5}#tNews .dot{position:absolute;top:-3px;right:-3px;margin:0}#news .sheet{max-height:86vh;overflow:auto}.nitem{border-bottom:1px solid rgba(128,128,128,.3)}.nhead{display:flex;width:100%;gap:8px;align-items:center;text-align:left;background:none;border:0;padding:10px 2px;font:inherit;color:inherit;cursor:pointer}.nhead .ndate{font-size:12px;opacity:.65;white-space:nowrap}.nbody{white-space:pre-wrap;font-size:14px;line-height:1.7;padding:0 2px 10px}.ngrant{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:0 2px 12px;font-size:13px}.nnone{opacity:.7}
-.fr-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(128,128,128,.3)}.fr-row b{flex:1;word-break:break-all}.fr-row .btn{font-size:12px;padding:4px 10px}.fr-h{font-size:13px;margin:10px 0 2px;color:var(--muted)}.nsec{font-size:12px;color:var(--muted);margin:8px 0 2px}.nfr{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(128,128,128,.3)}.nfr span{flex:1}.nfr .btn{font-size:12px;padding:4px 10px}.nfr .end{color:var(--muted);font-size:12px}.stars{letter-spacing:1px;font-size:12px;color:#9aa3ad}.stars.r2{color:#4a8fd8}.stars.r3{color:#e0a100}.gvbtn{font-size:11px;padding:2px 8px;margin-left:6px}.gv-h{font-size:13px;margin:8px 0 2px}.gvi{position:relative;cursor:default}.gvn{position:absolute;right:10px;top:8px;font-style:normal;font-weight:700}</style>
+.fr-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(128,128,128,.3)}.fr-row b{flex:1;word-break:break-all}.fr-row .btn{font-size:12px;padding:4px 10px}.fr-h{font-size:13px;margin:10px 0 2px;color:var(--muted)}.nsec{font-size:12px;color:var(--muted);margin:8px 0 2px}.nfr{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(128,128,128,.3)}.nfr span{flex:1}.nfr .btn{font-size:12px;padding:4px 10px}.nfr .end{color:var(--muted);font-size:12px}.stars{letter-spacing:1px;font-size:12px;color:#9aa3ad}.stars.r2{color:#4a8fd8}.stars.r3{color:#e0a100}.gvbtn{font-size:11px;padding:2px 8px;margin-left:6px}.gv-h{font-size:13px;margin:8px 0 2px}.gvi{position:relative;cursor:default}.gvn{position:absolute;right:10px;top:8px;font-style:normal;font-weight:700}.fr-code{display:block;font-size:12px;font-weight:400;color:var(--muted);letter-spacing:1px;user-select:all}.logbox [hidden]{display:none!important}.logtabs{display:flex;gap:4px}.logtabs button{flex:1;position:relative;font:inherit;font-size:12px;font-weight:700;padding:5px 4px;border:1px solid var(--line);border-radius:8px;background:none;color:var(--muted);cursor:pointer}.logtabs button.on{color:var(--ink);border-color:var(--ink)}.logtabs .dot{position:absolute;top:3px;right:6px}#chatPane{display:flex;flex-direction:column;gap:6px;min-height:0}#chatList{min-height:80px;max-height:calc(100vh - 230px)}#chatForm{display:flex;gap:4px}#chatIn{flex:1;min-width:0;font:inherit;font-size:16px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}#chatForm .btn{padding:4px 10px;font-size:12px}#chatMsg{margin:0;font-size:11px;min-height:0}@media (max-width:920px){#chatList{max-height:200px}}.dot[hidden]{display:none}</style>
 
 <div class="app">
   <header class="top">
@@ -385,7 +385,7 @@ body.fx-lite .unit.fx-lunge{animation:none}
   </header>
   <div class="layout">
     <main class="board" id="board"></main>
-    <aside class="logbox"><h2>ログ</h2><ol id="log"></ol></aside>
+    <aside class="logbox"><h2 id="logH">ログ</h2><div class="logtabs" id="logTabs" hidden><button type="button" id="tabLog" class="on">ログ</button><button type="button" id="tabChat">チャット<i class="dot" id="chatDot" hidden></i></button></div><ol id="log"></ol><div id="chatPane" hidden><ol id="chatList"></ol><form id="chatForm" autocomplete="off"><input id="chatIn" maxlength="100" placeholder="メッセージ(100文字まで)"><button class="btn" type="submit">送信</button></form><p class="tmsg" id="chatMsg"></p></div></aside>
   </div>
 </div>
 <div class="fxlayer" id="fx"></div>
@@ -686,6 +686,7 @@ function init(auto,decks,opts){
   opts=opts||{};uidc=0;RNG=mulberry(opts.seed!=null?opts.seed:Math.floor(Math.random()*4294967296));
   CHARS.forEach(c=>{c.hp=Math.max(1,Math.round(c.hpBase*HPMULT));});
   queue=[];chain=new Set();logs=[];orderc=0;
+  try{chatInit(!!opts.net&&!opts.bot);}catch(e){}
   G={seed:opts.seed,runId:(G?G.runId:0)+1,turn:0,cur:0,phase:'init',busy:false,over:null,auto:!!auto,net:!!opts.net,bot:!!opts.bot,oppName:opts.oppName||'',drawLeft:0,first:0,plays:[],abUses:{},p:[newPlayer(),newPlayer()]};
   ME=opts.net?opts.me:0;UI={selChar:null,picks:{},selUnit:null,mode:null,attacker:null,prompt:null,hint:'',flash:{},drawRes:null,endRes:null,discardRes:null};
   buildDecks(G.p[0],decks&&decks[0]);buildDecks(G.p[1],decks&&decks[1]);
@@ -1924,8 +1925,8 @@ function validateDeck(d){
   if(c!==DECK_C)e.push('キャラは'+DECK_C+'枚必要です(いま'+c+'枚)');
   if(s2!==DECK_S)e.push('スキルは'+DECK_S+'枚必要です(いま'+s2+'枚)');
   TYPES.forEach(t=>{if(s2&&typeCnt(d,t)===0)e.push(TLABEL[t]+'スキルが1枚もありません');});
-  Object.entries(d.chars).forEach(([k,n])=>{const ch=CHAR_BY[k];if(!ch)e.push('不明なキャラがあります');else if(n>maxCopies(ch))e.push('「'+ch.name+'」は'+maxCopies(ch)+'枚までです');});
-  Object.entries(d.skills).forEach(([id,n])=>{const [t,k]=id.split('.');if(!SK[t]||!SK[t][k])e.push('不明なスキルがあります');else if(n>3)e.push('「'+SK[t][k].name+'」は3枚までです');});
+  Object.entries(d.chars).forEach(([k,n])=>{const ch=Object.prototype.hasOwnProperty.call(CHAR_BY,k)?CHAR_BY[k]:null;if(!ch)e.push('不明なキャラがあります');else if(n>maxCopies(ch))e.push('「'+ch.name+'」は'+maxCopies(ch)+'枚までです');});
+  Object.entries(d.skills).forEach(([id,n])=>{const [t,k]=id.split('.');if(!SK[t]||!Object.prototype.propertyIsEnumerable.call(SK[t],k)||!SK[t][k])e.push('不明なスキルがあります');else if(n>3)e.push('「'+SK[t][k].name+'」は3枚までです');});
   if(bigCnt(d.chars)>BIG_MAX)e.push('レア3は'+BIG_MAX+'枚までです(いま'+bigCnt(d.chars)+'枚)');
   if(!ABIL[d.ab])e.push('能力を選んでください');
   return e;
@@ -1956,7 +1957,7 @@ function loadDecks(){
 function storeLocal(a){memDecks=a;try{localStorage.setItem(LS_KEY,JSON.stringify(a));}catch(e){storageOk=false;}}
 function storeDecks(a){storeLocal(a);accPush(a);}
 /* ---------- お知らせ(オンライン: サーバー、オフライン: 同梱の一覧。配布の受け取りはオンラインのみ) ---------- */
-const NEWS_BUILTIN=[{"id": "2026-11-13-newcards", "date": "2026-11-13", "title": "新カード6枚を追加しました(11/13)", "body": "新カードを6枚追加しました。第4〜6弾のパックで登場予定です(まだ引けません)。\n\n【自壊型サポート(レア2)】基本コスト0で、出したターンの終わりに自壊するお手軽サポートです。\n・正義の剣(コスト3):場に出たとき、自分以外の味方全員のATKを永続+1。\n・聖なる灯(コスト3):場に出たとき、自分以外の味方全員にシールド。\n・爆裂機(コスト1+スキル):自分が墓地に送られたときが固定。対象と効果は自由に組めます。\n\n【専用スキル持ち(レア2)】そのキャラにだけ付く専用スキルが、スロットのどれかに固定されています。\n・自動追撃機(コスト4+スキル):条件が「味方が攻撃したとき」で固定。\n・報復の番人(コスト5+効果):条件「味方が攻撃されたとき」、対象「その相手を」が固定。\n・追い毒の司祭(コスト5+スキル):対象が「状態異常のキャラを全て」(敵味方どちらも)で固定。\n\n新カード実装のお祝いとして、正義の剣・自動追撃機・聖なる灯を1枚ずつ配布します。下の「受け取る」を押してください。", "grant": {"chars": {"sword": 1, "chaser": 1, "lamp": 1}}}, {"id": "2026-11-12-update2", "date": "2026-11-12", "title": "アップデート(11/12 その2)", "body": "・フレンド機能を追加しました(オンライン版)。タイトルの「フレンド」からフレンドコードで申請でき、承認されるとフレンドになります。対人戦のルームコード画面の「フレンドに転送」で、フレンドに対戦を申し込めます。\n・プレイヤー名はアカウント画面で設定する形に変更しました(対人戦の画面では入力しません)。\n・対人戦・CPU戦に「墓地を見る」ボタンを追加しました。\n・対人戦の終了後、ルームに参加した側がエナジーをもらえない不具合を修正しました。\n・デッキに入れられるレア3を4枚から3枚までに変更しました(CPU「つよい」のデッキも調整)。\n・デッキ構築画面で、キャラをレア順(1→3)に並べ、全キャラにレア度を★で表示するようにしました。\n・「手札に戻す」の制限を「同一ターン中に同一カードにつき1回まで」に変更しました。"}, {"id": "2026-11-12-update", "date": "2026-11-12", "title": "アップデート(11/12)", "body": "・場のユニットを、自分のターン中に左右へ並べ替えられるようになりました(ドラッグ、または「◀左へ」「右へ▶」ボタン)。\n・スキルが同時に発動するときは、同じ側では場の左のユニットから順に発動します(「HP最小」などの同点も左優先)。\n・能力「経費削減」の再使用ターンを3から5に増やしました。\n・このお知らせ機能を追加しました。"}, {"id": "2026-11-11-update", "date": "2026-11-11", "title": "アップデート(11/11)", "body": "・CPU戦に「かんたん/ふつう/つよい」の強さ選択を追加しました。\n・タイトル画面に「戦績」を追加しました(デッキ別・キャラ別の勝率など)。\n・レア3の調整: 無類の護神の固定スキルを変更、不屈の戦王のHPを7に、黒死の毒機を3/5に、アンデッドモンスターのATKを3に変更しました。"}];
+const NEWS_BUILTIN=[{"id": "2026-11-13-debug", "date": "2026-11-13", "title": "全体デバッグを行いました(11/13 その5)", "body": "・未発売の新カード(レア2)が、登録ボーナスや天井交換で出てしまう不具合を修正しました。\n・対戦相手の名前に特殊な文字が入っていてもログが崩れないようにしました。\n・デッキの検証・保存まわりを強化し、不正なデータが保存されないようにしました。\n・通信エラー時の応答を整理しました。\n・ランダム対戦4000戦などの自動テストで、停止やエラーが起きないことを確認しました。"}, {"id": "2026-11-13-chat", "date": "2026-11-13", "title": "対人戦にチャットを追加しました(11/13 その4)", "body": "・対人戦の画面で、ログの欄を「ログ/チャット」で切り替えられるようになりました(オンライン版)。\n・チャットは1回100文字まで、連投はできません。対戦が終わると消えます。\n・ログを見ている間に相手から届くと、「チャット」のタブに赤い丸が出ます。"}, {"id": "2026-11-13-cpu2", "date": "2026-11-13", "title": "CPUのデッキを調整しました(11/13 その3)", "body": "・CPU「かんたん」は、デッキにレア3を入れなくなりました。\n・CPU「ふつう」は、デッキのレア3が1体か2体だけになりました。2体のときは、「つよい」デッキからの入れ替え(ランダム性)を増やして、強さが変わらないようにしています。"}, {"id": "2026-11-13-cpu", "date": "2026-11-13", "title": "CPUの強さとフレンド画面を調整しました(11/13 その2)", "body": "・CPU「つよい」のデッキを作り直しました。属性統一(戦士・魔術・機械・獣)のデッキを、自己対戦で探索して最強の構成にしています(レア3は3枚まで)。\n・CPU「ふつう」の強さをほんの少し上げました。\n・フレンド画面で、フレンドごとのフレンドコードが見られるようになりました。"}, {"id": "2026-11-13-newcards", "date": "2026-11-13", "title": "新カード6枚を追加しました(11/13)", "body": "新カードを6枚追加しました。第4〜6弾のパックで登場予定です(まだ引けません)。\n\n【自壊型サポート(レア2)】基本コスト0で、出したターンの終わりに自壊するお手軽サポートです。\n・正義の剣(コスト3):場に出たとき、自分以外の味方全員のATKを永続+1。\n・聖なる灯(コスト3):場に出たとき、自分以外の味方全員にシールド。\n・爆裂機(コスト1+スキル):自分が墓地に送られたときが固定。対象と効果は自由に組めます。\n\n【専用スキル持ち(レア2)】そのキャラにだけ付く専用スキルが、スロットのどれかに固定されています。\n・自動追撃機(コスト4+スキル):条件が「味方が攻撃したとき」で固定。\n・報復の番人(コスト5+効果):条件「味方が攻撃されたとき」、対象「その相手を」が固定。\n・追い毒の司祭(コスト5+スキル):対象が「状態異常のキャラを全て」(敵味方どちらも)で固定。\n\n新カード実装のお祝いとして、正義の剣・自動追撃機・聖なる灯を1枚ずつ配布します。下の「受け取る」を押してください。", "grant": {"chars": {"sword": 1, "chaser": 1, "lamp": 1}}}, {"id": "2026-11-12-update2", "date": "2026-11-12", "title": "アップデート(11/12 その2)", "body": "・フレンド機能を追加しました(オンライン版)。タイトルの「フレンド」からフレンドコードで申請でき、承認されるとフレンドになります。対人戦のルームコード画面の「フレンドに転送」で、フレンドに対戦を申し込めます。\n・プレイヤー名はアカウント画面で設定する形に変更しました(対人戦の画面では入力しません)。\n・対人戦・CPU戦に「墓地を見る」ボタンを追加しました。\n・対人戦の終了後、ルームに参加した側がエナジーをもらえない不具合を修正しました。\n・デッキに入れられるレア3を4枚から3枚までに変更しました(CPU「つよい」のデッキも調整)。\n・デッキ構築画面で、キャラをレア順(1→3)に並べ、全キャラにレア度を★で表示するようにしました。\n・「手札に戻す」の制限を「同一ターン中に同一カードにつき1回まで」に変更しました。"}, {"id": "2026-11-12-update", "date": "2026-11-12", "title": "アップデート(11/12)", "body": "・場のユニットを、自分のターン中に左右へ並べ替えられるようになりました(ドラッグ、または「◀左へ」「右へ▶」ボタン)。\n・スキルが同時に発動するときは、同じ側では場の左のユニットから順に発動します(「HP最小」などの同点も左優先)。\n・能力「経費削減」の再使用ターンを3から5に増やしました。\n・このお知らせ機能を追加しました。"}, {"id": "2026-11-11-update", "date": "2026-11-11", "title": "アップデート(11/11)", "body": "・CPU戦に「かんたん/ふつう/つよい」の強さ選択を追加しました。\n・タイトル画面に「戦績」を追加しました(デッキ別・キャラ別の勝率など)。\n・レア3の調整: 無類の護神の固定スキルを変更、不屈の戦王のHPを7に、黒死の毒機を3/5に、アンデッドモンスターのATKを3に変更しました。"}];
 const NK='kumitate-tcg-news-read';
 const NEWSD={items:[],inbox:{requests:[],invites:[]}};
 const nEsc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -2096,7 +2097,7 @@ async function friendsDraw(){
   let f;try{f=await api('/api/friends');}catch(e){frMsg(e.message);return;}
   $('frCode').textContent=f.code;
   let h='<div class="fr-h">フレンド('+f.friends.length+'/50)</div>';
-  h+=f.friends.length?f.friends.map((x,i)=>'<div class="fr-row"><b>'+nEsc(x.name)+'</b><button class="btn" data-rm="'+i+'">削除</button></div>').join(''):'<p class="nnone">まだフレンドがいません。</p>';
+  h+=f.friends.length?f.friends.map((x,i)=>'<div class="fr-row"><b>'+nEsc(x.name)+'<small class="fr-code">'+nEsc(x.code)+'</small></b><button class="btn" data-rm="'+i+'">削除</button></div>').join(''):'<p class="nnone">まだフレンドがいません。</p>';
   if(f.sent.length)h+='<div class="fr-h">申請中</div>'+f.sent.map((x,i)=>'<div class="fr-row"><b>'+nEsc(x.name)+'</b><button class="btn" data-cx="'+i+'">取り消す</button></div>').join('');
   $('frBody').innerHTML=h;$('frBody')._f=f;
 }
@@ -2144,11 +2145,12 @@ async function acctRegen(){
 }
 const allDecks=()=>PRESETS.concat(loadDecks());
 function pickW(list,w){let t=0;const ws=list.map(x=>{const v=w(x);t+=v;return v;});let r=Math.random()*t;for(let i=0;i<list.length;i++){r-=ws[i];if(r<=0)return list[i];}return list[list.length-1];}
-function randomDeck(base,limit){
+function randomDeck(base,limit,maxBig){
+  if(maxBig===undefined)maxBig=BIG_MAX;
   const d=base?cloneDeck(base):{name:'CPUデッキ',chars:{},skills:{},ab:AB_KEYS[Math.floor(Math.random()*AB_KEYS.length)]};
   let n=cnt(d.chars),g=0;
   const w=c=>isBig(c)?0.5:(c.cost<=2?3:(c.cost<=4?2:1));
-  while(n<DECK_C&&g++<4000){const c=pickW(CHARS,w);if((d.chars[c.key]||0)>=(limit?capC(c):maxCopies(c))||(isBig(c)&&bigCnt(d.chars)>=BIG_MAX))continue;d.chars[c.key]=(d.chars[c.key]||0)+1;n++;}
+  while(n<DECK_C&&g++<4000){const c=pickW(CHARS,w);if((d.chars[c.key]||0)>=(limit?capC(c):maxCopies(c))||(isBig(c)&&bigCnt(d.chars)>=maxBig))continue;d.chars[c.key]=(d.chars[c.key]||0)+1;n++;}
   let m=cnt(d.skills);g=0;
   const order=['cond','targ','eff'];
   while(m<DECK_S&&g++<4000){
@@ -2161,17 +2163,26 @@ function randomDeck(base,limit){
 }
 const deckSummary=d=>'キャラ'+cnt(d.chars)+'/'+DECK_C+' スキル'+cnt(d.skills)+'/'+DECK_S+' ・能力:'+(ABIL[d.ab]?ABIL[d.ab].name:'未選択');
 /* CPUの「つよい」用デッキ(自己対戦の探索で選ばれた構築) */
-const STRONG=[{"name":"自由構築型","ab":"reaper","chars":{"herald":3,"tide":2,"bombmaker":2,"ironclad":1,"plaguelord":1,"swift":1,"archer":1,"apprentice":1,"mage":3,"knight":1,"drummer":2,"watch":1,"general":1},"skills":{"targ.all":3,"eff.shield":1,"eff.swapatk":1,"cond.allyenter":2,"targ.enemies":2,"cond.enter":2,"eff.fortify":1,"targ.topatk":2,"eff.attack":1,"eff.trigger":1,"targ.tagfoe":1,"targ.lowfoe":1,"cond.foeenter":1,"targ.self":2,"cond.allygrave":3,"eff.bounce":2,"targ.allyone":1,"targ.others":1,"eff.grow":1,"eff.atkup":1}},{"name":"獣型","ab":"reaper","chars":{"charger":1,"venomblade":2,"giant":1,"dragoon":1,"night":1,"swift":1,"warking":1,"priest":1,"herald":2,"snake":1,"archer":2,"avenger":1,"sealer":1,"scout":1,"signal":1,"counter":1,"thorn":1},"skills":{"targ.all":3,"eff.makeattack":3,"cond.foeenter":2,"targ.enemies":3,"eff.bounce":2,"eff.silence":1,"cond.enter":3,"targ.allyone":2,"targ.foetwo":1,"targ.topally":1,"eff.atkup":1,"targ.select":2,"eff.shield":2,"eff.ping":1,"cond.myturn":1,"cond.foeturn":1,"targ.foeone":1}},{"name":"機械型","ab":"reaper","chars":{"sentinel":2,"tide":1,"undead":1,"glacier":1,"sniper":2,"assassin":2,"dragoon":1,"bomber":2,"thorn":1,"general":1,"bombmaker":1,"slinger":1,"ambush":1,"swift":1,"elite":1,"archmage":1},"skills":{"targ.tagfoe":1,"targ.topatk":3,"eff.attack":2,"eff.bounce":2,"cond.foeenter":1,"targ.enemies":1,"targ.lowfoe":2,"eff.atkup":1,"cond.grave":1,"cond.myturn":1,"cond.abil":2,"eff.silence":2,"eff.grow":2,"targ.select":3,"cond.ailed":1,"cond.allyenter":2,"targ.topally":1,"targ.allyone":1,"eff.trigger":1}},{"name":"戦士型","ab":"trap","chars":{"maiden":1,"heavy":1,"general":2,"elite":1,"plaguelord":1,"mercenary":1,"valkyrie":1,"dragoon":2,"captain":1,"apprentice":2,"knight":1,"priest":1,"tide":1,"counter":1,"veteran":2,"wounded":1},"skills":{"eff.makeattack":2,"cond.foeattacks":2,"targ.enemies":3,"eff.execute":1,"targ.all":1,"eff.bounce":2,"cond.wounded":1,"targ.tagfoe":1,"cond.foegrave":1,"cond.foeturn":1,"targ.lowfoe":2,"eff.silence":2,"targ.foetwo":1,"cond.myturn":1,"cond.attacked":1,"targ.tagself":1,"cond.grave":1,"targ.foeone":1,"eff.atkdown":2,"cond.allygrave":1,"targ.friends":1,"targ.weakally":1}}];
+/* CPU「つよい」用: 自己対戦で探索した統一デッキ(レア3は3枚まで) */
+const STRONG=[{"name":"魔術統一","ab":"reaper","chars":{"general":1,"priest":2,"tide":2,"fool":1,"wardgod":1,"curse":2,"undead":1,"archmage":2,"mistwitch":2,"medic":1,"drummer":1,"bombmaker":1,"dragoon":1,"giant":1,"mage":1},"skills":{"eff.makeattack":3,"cond.foeattacks":1,"targ.enemies":3,"targ.all":1,"eff.bounce":3,"targ.tagfoe":3,"targ.lowfoe":3,"targ.foetwo":1,"targ.foeone":1,"cond.allygrave":1,"targ.friends":1,"targ.select":2,"cond.foeenter":3,"eff.attack":1,"cond.enter":2,"targ.tagself":1}},{"name":"戦士統一","ab":"reaper","chars":{"heavy":2,"general":2,"elite":2,"plaguelord":1,"mercenary":1,"captain":2,"knight":1,"priest":1,"tide":2,"veteran":1,"warking":1,"paladin":2,"mistwitch":1,"warlord":1},"skills":{"eff.makeattack":3,"cond.foeattacks":1,"targ.enemies":3,"targ.all":2,"eff.bounce":3,"targ.tagfoe":2,"cond.foeturn":2,"targ.lowfoe":1,"eff.silence":1,"targ.foetwo":2,"eff.atkdown":1,"cond.allygrave":1,"targ.friends":1,"cond.foeenter":3,"cond.allyenter":1,"targ.foeone":1,"cond.wounded":1,"cond.enter":1}},{"name":"機械統一","ab":"fortress","chars":{"plaguelord":1,"veteran":2,"ambush":3,"assassin":2,"bastion":1,"bombmaker":2,"ironclad":1,"sentinel":2,"glacier":1,"tide":2,"mistwitch":1,"sniper":1,"shield":1},"skills":{"eff.makeattack":3,"cond.foeattacks":2,"targ.enemies":3,"targ.all":1,"eff.bounce":3,"targ.tagfoe":1,"targ.lowfoe":2,"targ.foetwo":2,"eff.atkdown":2,"cond.allygrave":1,"targ.friends":3,"cond.enter":2,"cond.allyenter":2,"cond.attacked":1,"targ.tagally":1,"eff.shield":1}},{"name":"獣統一","ab":"reaper","chars":{"dragoon":2,"venomblade":2,"giant":2,"trainer":2,"swift":1,"charger":1,"watch":1,"avenger":2,"mistwitch":1,"warking":1,"bombmaker":1,"priest":1,"plaguelord":1,"berserk":2},"skills":{"eff.makeattack":3,"targ.enemies":3,"targ.all":2,"eff.bounce":3,"cond.foeturn":1,"targ.foetwo":1,"targ.tagself":2,"targ.foeone":1,"targ.friends":2,"eff.freeze":2,"eff.trigger":1,"cond.enter":3,"targ.tagally":2,"cond.foeenter":1,"eff.ping":1,"cond.allyenter":1,"cond.foegrave":1}}];
 let LV=1;try{const q=+localStorage.getItem('kumitate-tcg-lv');if(q>=0&&q<=2)LV=q;}catch(e){}
 const LVNAME=['かんたん','ふつう','つよい'];
-function cpuDeck(lv){
-  if(lv===0)return randomDeck();
+/* ふつう: レア3は1〜2体だけ。2体のときは「つよい」デッキからの入れ替え(ランダム性)を増やす [外すキャラ枚数, 外すスキル枚数] */
+const LV1P={1:[14,24],2:[16,27]};
+function cpuDeck(lv,forceN){
+  if(lv===0)return randomDeck(null,false,0); // かんたん: レア3なし
   const s=STRONG[Math.floor(Math.random()*STRONG.length)];
   const d=cloneDeck(s);d.name='CPUデッキ';
   if(lv===2)return d;
+  const n=forceN||(Math.random()<0.5?1:2);
+  const bigs=[];Object.keys(d.chars).forEach(k=>{if(isBig(CHAR_BY[k]))for(let i=0;i<d.chars[k];i++)bigs.push(k);});
+  bigs.forEach(k=>{delete d.chars[k];});
+  for(let i=bigs.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[bigs[i],bigs[j]]=[bigs[j],bigs[i]];}
+  const keep={};bigs.slice(0,n).forEach(k=>{keep[k]=(keep[k]||0)+1;});
   const drop=(o,k)=>{for(let i=0;i<k;i++){const ks=Object.keys(o);if(!ks.length)break;const q=ks[Math.floor(Math.random()*ks.length)];o[q]--;if(!o[q])delete o[q];}};
-  drop(d.chars,16);drop(d.skills,24);
-  return randomDeck(d,true);
+  drop(d.chars,LV1P[n][0]);drop(d.skills,LV1P[n][1]);
+  Object.keys(keep).forEach(k=>{d.chars[k]=keep[k];});
+  return randomDeck(d,true,n);
 }
 /* 戦績(この端末のブラウザに保存) */
 const ST_KEY='kumitate-tcg-stats';
@@ -2336,13 +2347,13 @@ const packLive=p=>p.live||!!window.__OFFLINE__, packOpen=p=>p.open||!!window.__O
 const openPacks=()=>PACKS.filter(packOpen);
 let gaPackIdx=0,gaDetail=false;
 const curPack=()=>{const L=openPacks();return L[Math.min(gaPackIdx,L.length-1)];};
-const released=c=>rare(c)!==3||PACKS.some(p=>p.live&&(p.feature===c.key||p.r3.includes(c.key)));
+const released=c=>rare(c)<2||PACKS.some(p=>p.live&&(p.feature===c.key||p.r3.includes(c.key)||p.r2.includes(c.key)));
 const GA={on:false,s:null,ok:true};
 const starterInv=()=>{const i={chars:{},skills:{}};Object.entries(STARTER_DECK.chars).forEach(([k,n])=>{i.chars[k]=n;});Object.entries(STARTER_DECK.skills).forEach(([k,n])=>{i.skills[k]=n;});return i;};
 function gaBonus(inv){ // 登録ボーナス:スターターに加え10枚(レア3を1・レア2を2・レア1を2・スキル5)。上限枚数は超えない
   const pk=a=>a[Math.floor(Math.random()*a.length)];
   const takeC=(list,n)=>{for(let i=0,g=0;i<n&&g++<300;){const c=pk(list);if((inv.chars[c.key]||0)>=maxCopies(c))continue;inv.chars[c.key]=(inv.chars[c.key]||0)+1;i++;}};
-  takeC(CHARS.filter(c=>rare(c)===3&&released(c)),1);takeC(CHARS.filter(c=>rare(c)===2),2);takeC(CHARS.filter(c=>rare(c)===1),2);
+  takeC(CHARS.filter(c=>rare(c)===3&&released(c)),1);takeC(CHARS.filter(c=>rare(c)===2&&released(c)),2);takeC(CHARS.filter(c=>rare(c)===1),2);
   for(let i=0,g=0;i<5&&g++<300;){const id=pk(SKILL_IDS);if((inv.skills[id]||0)>=3)continue;inv.skills[id]=(inv.skills[id]||0)+1;i++;}
 }
 function gaFresh(){const inv=starterInv();gaBonus(inv);return{v:1,inv,energy:E_START,t:Date.now(),pity:0,opened:0,bonus:1};}
@@ -2528,7 +2539,33 @@ function pvOpen(){
     ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data);}catch(e){return;}pvHandle(m);};
   });
 }
+/* ---------- 対戦チャット(ログと切り替え) ---------- */
+const CHAT={tab:'log',unread:0,last:0};
+function chatTab(t){
+  CHAT.tab=t;$('log').hidden=t!=='log';$('chatPane').hidden=t!=='chat';
+  $('tabLog').classList.toggle('on',t==='log');$('tabChat').classList.toggle('on',t==='chat');
+  if(t==='chat'){CHAT.unread=0;$('chatDot').hidden=true;const ol=$('chatList');ol.scrollTop=ol.scrollHeight;}
+}
+function chatInit(on){
+  $('logTabs').hidden=!on;$('logH').hidden=on;$('chatList').innerHTML='';$('chatMsg').textContent='';
+  CHAT.unread=0;CHAT.last=0;$('chatDot').hidden=true;chatTab('log');
+}
+function chatAdd(who,name,text){
+  const ol=$('chatList'),near=ol.scrollHeight-ol.scrollTop-ol.clientHeight<50;
+  const li=document.createElement('li');li.className=who;
+  const b=document.createElement('b');b.textContent=name+': ';li.appendChild(b);li.appendChild(document.createTextNode(text));
+  ol.appendChild(li);if(near||who==='me')ol.scrollTop=ol.scrollHeight;
+  if(who==='foe'&&CHAT.tab!=='chat'){CHAT.unread++;$('chatDot').hidden=false;}
+}
+function chatSend(){
+  const inp=$('chatIn'),t=inp.value.trim().slice(0,100);
+  if(!t||!PV.started||PV.bot)return;
+  const now=Date.now();
+  if(now-CHAT.last<3000){$('chatMsg').textContent='連投はできません。少し待ってください。';return;}
+  CHAT.last=now;pvSend({t:'c',m:t});chatAdd('me',PV.name,t);inp.value='';$('chatMsg').textContent='';
+}
 function pvHandle(m){
+  if(m.t==='c'){if(PV.started&&!PV.bot)chatAdd('foe',PV.opp?PV.opp.name:'相手',String(m.m==null?'':m.m).slice(0,100));return;}
   if(m.t==='g'){if(PV.started){if(m.s!==++PV.rs){TRACE.push('GAP exp '+PV.rs+' got '+m.s);netDesync('通信の欠落');return;}netPush(m.m);}return;}
   if(m.t==='created'){PV.code=m.code;pvMsg('');$('lbCode').textContent=m.code;$('lbWait').hidden=false;$('lbMenu').hidden=true;$('lbFriend').hidden=!ACC.on;return;}
   if(m.t==='error'){pvMsg(m.msg||'エラー');return;}
@@ -2540,7 +2577,7 @@ function pvHandle(m){
   if(m.t==='p'){
     const p=m.m||{};
     if(p.k==='hello'){
-      PV.opp={deck:p.deck,name:String(p.name||'相手').slice(0,16)};
+      PV.opp={deck:p.deck,name:String(p.name||'相手').replace(/[<>&"'`\\]/g,'').slice(0,16)||'相手'};
       if(PV.seat===0){const seed=Math.floor(Math.random()*4294967296);pvSend({t:'p',m:{k:'seed',seed}});pvBegin(seed);}
     }else if(p.k==='seed'&&PV.seat===1&&PV.opp)pvBegin(p.seed>>>0);
   }
@@ -2599,6 +2636,8 @@ function initMenus(){
     if(i<0)return;LV=i;try{localStorage.setItem('kumitate-tcg-lv',String(i));}catch(e){}
     playWith(d,false);});
   $('gvClose').addEventListener('click',()=>{$('gv').hidden=true;});
+  $('tabLog').addEventListener('click',()=>chatTab('log'));$('tabChat').addEventListener('click',()=>chatTab('chat'));
+  $('chatForm').addEventListener('submit',e=>{e.preventDefault();chatSend();});
   $('tNews').addEventListener('click',()=>{newsShow();});$('newsClose').addEventListener('click',()=>{$('news').hidden=true;});
   $('tStats').addEventListener('click',stShow);$('stClose').addEventListener('click',()=>{$('stats').hidden=true;});
   $('stReset').addEventListener('click',()=>{if(confirm('戦績の記録をすべて消します。よろしいですか?')){stSave({v:1,tot:{g:0,w:0,d:0},by:{},decks:{},chars:{}});stShow();}});
@@ -2621,7 +2660,7 @@ async function sim(n,opt){
   }finally{HEADLESS=sv.HEADLESS;CPURANDOM=sv.CPURANDOM;LIFE=sv.LIFE;HPMULT=sv.HPMULT;speed=sv.speed;}
   return out;
 }
-window.__tcg={eng:{init:(a,d,o)=>init(a,d,o),makeUnit:(o,ch,pk)=>makeUnit(o,ch,pk),act:fn=>act(fn),playBody:(i,c,p)=>playBody(i,c,p),basic:(u,t)=>basicAttackBody(u,t),hit:(a,b,d,m)=>hit(a,b,d,m),decay:i=>decayTick(i),poison:i=>poisonTick(i),emitEnter:u=>emitEnter(u),ucost:u=>ucost(u),setHead:()=>{HEADLESS=true;speed=0;}},gv:{graveView},checkOver:()=>checkOver(),fr:{friendsOpen,friendsAdd,inviteSendUI,acctSaveName},news:{newsLoad,NEWSD,nDot,nGrantText,NEWS_BUILTIN},ord:{byTurn,posOf,moveUnit,setG:g=>{G=g;if(!UI)UI={flash:{}};},qpush,drainQ:()=>queue.map(q=>q.unit.name)},st:{stRecord,stLoad,stShow,cpuDeck,STRONG,setLV:v=>{LV=v;}},bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover,rewardReport},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({maxCopies,KWD,ABIL,AB_KEYS,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
+window.__tcg={eng:{init:(a,d,o)=>init(a,d,o),makeUnit:(o,ch,pk)=>makeUnit(o,ch,pk),act:fn=>act(fn),playBody:(i,c,p)=>playBody(i,c,p),basic:(u,t)=>basicAttackBody(u,t),hit:(a,b,d,m)=>hit(a,b,d,m),decay:i=>decayTick(i),poison:i=>poisonTick(i),emitEnter:u=>emitEnter(u),ucost:u=>ucost(u),setHead:()=>{HEADLESS=true;speed=0;}},gv:{graveView},checkOver:()=>checkOver(),fr:{friendsOpen,friendsAdd,inviteSendUI,acctSaveName},news:{newsLoad,NEWSD,nDot,nGrantText,NEWS_BUILTIN},ord:{byTurn,posOf,moveUnit,setG:g=>{G=g;if(!UI)UI={flash:{}};},qpush,drainQ:()=>queue.map(q=>q.unit.name)},st:{LV1P,stRecord,stLoad,stShow,cpuDeck,STRONG,setLV:v=>{LV=v;}},bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover,rewardReport},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({maxCopies,KWD,ABIL,AB_KEYS,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
   tune:m=>{Object.keys(m).forEach(k=>{if(k==='sur'){SURV=m[k];return;}const [ty,key]=k.split('.');if(ty==='ab'){if(key.endsWith('_s'))ABIL[key.slice(0,-2)].start=m[k];else ABIL[key].cd=m[k];return;}SK[ty][key].inc=m[k];});recost();},
   cfg:o=>{if(o.cap!==undefined)CAP=o.cap;if(o.firstdraw!==undefined)FIRSTDRAW=o.firstdraw;if(o.hp!==undefined)HPMULT=o.hp;if(o.life!==undefined)LIFE=o.life;if(o.handmax!==undefined)HANDMAX=o.handmax;if(o.atkq!==undefined)ATKQ=o.atkq;if(o.ctr!==undefined)CTR=o.ctr;if(o.untg!==undefined)UNTG=o.untg;if(o.autosw!==undefined)AUTOSW=o.autosw;if(o.catch!==undefined)CATCH=o.catch;if(o.catchn!==undefined)CATCHN=o.catchn;if(o.grace!==undefined)GRACE=o.grace;if(o.haste!==undefined)HASTE=o.haste;if(o.sweep){const w=o.sweep;if(w.on!==undefined)SWEEP_ON=w.on;if(w.t!==undefined)SWEEP_T=w.t;if(w.life!==undefined)SWEEP_LIFE=w.life;if(w.diff!==undefined)SWEEP_DIFF=w.diff;}}};
 if(typeof document!=='undefined'&&$('board')){initMenus();showTitle();accInit().then(()=>{if(!ACC.on&&!GA.on)gaInit();newsLoad();});}
