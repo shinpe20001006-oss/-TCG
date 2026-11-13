@@ -474,6 +474,13 @@ const EFF={
   swapatk:{name:'ATKを入れ替える',inc:2}, fortify:{name:'最大HPを+2する',inc:1}, execute:{name:'HP2以下なら倒す',inc:3}, cure:{name:'状態異常を治す',inc:2}
 };
 const SK={cond:COND,targ:TARG,eff:EFF};
+/* 専用スキル: 特定のキャラの固定スロットにだけ付く。enumerable:false なので、スキルカード一覧・ガチャ・カタログには出ない */
+const XSK=(o,k,v)=>Object.defineProperty(o,k,{value:v,enumerable:false});
+XSK(COND,'allyattacks',{name:'味方が攻撃したとき',inc:2});
+XSK(COND,'allyattacked',{name:'味方が攻撃されたとき',inc:3});
+XSK(TARG,'source',{name:'その相手を',inc:2});
+XSK(TARG,'ailedall',{name:'状態異常のキャラを全て',inc:4});
+const XKEYS=[['cond','allyattacks'],['cond','allyattacked'],['targ','source'],['targ','ailedall']];
 const DESC={
   cond:{attacked:'攻撃を受けて、HPが残ったとき。',attacks:'このカードが攻撃したとき(同じカードで1ターンに1回まで)。',grave:'このカードが墓地に送られたとき。',
     wounded:'ダメージでHPが最大の半分以下に下がったとき。回復して半分より上に戻れば、もう一度発動できる(半分以下のまま続けて受けても発動しない)。',
@@ -497,7 +504,11 @@ const DESC={
     cure:'対象の毒・凍結・沈黙をすべて治す(何もなければ不発)。',
     swapatk:'このカードと対象のATKを、永続で入れ替える(自分を対象にしたときは不発)。',fortify:'対象の最大HPだけを+2する(現在のHPは増えない。例:HP4/4が4/6になる。永続で、元のHP+4まで)。「HPが半分以下になったとき」は、HPが減ったときだけ判定する。',execute:'対象のHPが2以下なら、墓地に送る(ダメージではないので装甲・シールド・耐久は無視)。HPが3以上なら不発。'}
 };
-const TSIDE={lowfoe:'e',foetwo:'e',topally:'f',self:'f',allyone:'f',weakally:'f',others:'f',friends:'f',foeone:'e',topatk:'e',enemies:'e',select:'m',all:'m',tagself:'f',tagally:'f',tagfoe:'e'};
+XSK(DESC.cond,'allyattacks','自分以外の味方が攻撃したとき(基本攻撃と「攻撃する」の効果。1回の攻撃ごとに発動。回数の制限なし)。専用スキル。');
+XSK(DESC.cond,'allyattacked','自分以外の味方が攻撃を受けて、HPが残ったとき(シールドや装甲で防いだときも含む)。専用スキル。');
+XSK(DESC.targ,'source','発動のきっかけになった、攻撃してきたカード(すでに場にいなければ不発)。専用スキル。');
+XSK(DESC.targ,'ailedall','場にいる毒・凍結・沈黙のカード全部(敵味方どちらも)。専用スキル。');
+const TSIDE={source:'e',ailedall:'m',lowfoe:'e',foetwo:'e',topally:'f',self:'f',allyone:'f',weakally:'f',others:'f',friends:'f',foeone:'e',topatk:'e',enemies:'e',select:'m',all:'m',tagself:'f',tagally:'f',tagfoe:'e'};
 const EKIND={ping:'harm',attack:'harm',poison:'harm',freeze:'harm',silence:'harm',atkdown:'harm',atkup:'help',grow:'help',heal:'help',shield:'help',makeattack:'att',trigger:'trig',bounce:'bounce',swapatk:'harm',fortify:'help',execute:'harm',cure:'help'};
 const ABIL={
   fortress:{name:'籠城の構え',cd:6,desc:'次の相手のターン、自分のライフへの直接攻撃を無効にする。'},
@@ -510,7 +521,7 @@ const ABIL={
   trap:{name:'巧妙な罠',cd:18,desc:'次の相手のターン、相手が最初に召喚したカードを即座に墓地に送る。使ったことは相手に知らされない。'}
 };
 const AB_KEYS=Object.keys(ABIL);
-const REPEAT=new Set(['myturn','foeturn','foeweak']), WIDE=new Set(['friends','enemies','all','others','foetwo','tagself','tagally','tagfoe']);
+const REPEAT=new Set(['myturn','foeturn','foeweak']), WIDE=new Set(['friends','enemies','all','others','foetwo','tagself','tagally','tagfoe','ailedall']);
 let SURV=SURCHARGE;
 const sur=(c,t,e)=>((REPEAT.has(c)&&WIDE.has(t))?SURV:0)+((e==='bounce'&&WIDE.has(t))?5:0);
 const ROWS=[
@@ -542,6 +553,12 @@ const ROWS=[
   ['swift','韋駄天',3,3,4,{cond:'enter'},{haste:1}],
   ['wardgod','無類の護神',5,2,10,{cond:'myturn',targ:'weakally',eff:'shield'},{endure:1}],
   ['fool','愚者の城',4,4,7,{cond:'attacked',eff:'silence'},{armor:5,decay:1}],
+  ['sword','正義の剣',0,2,1,{cond:'enter',targ:'others',eff:'grow'},{decay:1}],
+  ['lamp','聖なる灯',0,1,1,{cond:'enter',targ:'others',eff:'shield'},{decay:1}],
+  ['blaster','爆裂機',0,3,1,{cond:'grave'},{decay:1}],
+  ['chaser','自動追撃機',3,3,4,{cond:'allyattacks'}],
+  ['retaliator','報復の番人',2,2,6,{cond:'allyattacked',targ:'source'}],
+  ['poisonpriest','追い毒の司祭',2,2,4,{targ:'ailedall'}],
   ['undead','アンデッドモンスター',5,3,3,{targ:'self'},{undead:1}],
   ['veteran','古参兵',4,4,6,null],['charger','突撃兵',4,6,4,null],['elite','精兵',5,4,8,null],
   ['paladin','墓守',4,4,5,{cond:'allygrave'}],['trainer','猟兵',4,4,5,{cond:'foegrave'}],['mercenary','傭兵',4,4,5,{cond:'wounded'}],
@@ -553,7 +570,7 @@ const KWD={pierce:'貫通:このカードの攻撃(基本攻撃・「攻撃す�
 const kwName=(k,v)=>({guard:'守護',armor:'装甲'+v,counter:'反撃',double:'連撃',pierce:'貫通',adapt:'適応',haste:'速攻',endure:'耐久',decay:'自壊',undead:'死者'})[k];
 const CHARS=ROWS.map(([key,name,b,atk,hp,fix,kw])=>({key,name,b,cost:b,atk,hp,hpBase:hp,fix,kw:kw||{}}));
 const TAGNAME={w:'戦士',m:'魔術',b:'獣',k:'機械'};
-const TAGMAP={apprentice:'w',heavy:'w',general:'w',knight:'w',wounded:'w',counter:'w',maiden:'w',captain:'w',warlord:'w',valkyrie:'w',lance:'w',warking:'w',veteran:'w',elite:'w',paladin:'w',mercenary:'w',
+const TAGMAP={sword:'w',lamp:'m',blaster:'k',chaser:'k',retaliator:'w',poisonpriest:'m',apprentice:'w',heavy:'w',general:'w',knight:'w',wounded:'w',counter:'w',maiden:'w',captain:'w',warlord:'w',valkyrie:'w',lance:'w',warking:'w',veteran:'w',elite:'w',paladin:'w',mercenary:'w',
  mage:'m',archmage:'m',medic:'m',weaken:'m',mourner:'m',priest:'m',witch:'m',frost:'m',sealer:'m',mistwitch:'m',wardgod:'m',fool:'m',undead:'m',scribe:'m',curse:'m',tide:'m',
  scout:'b',dragoon:'b',giant:'b',watch:'b',herald:'b',needle:'b',signal:'b',berserk:'b',avenger:'b',snake:'b',night:'b',thorn:'b',swift:'b',charger:'b',trainer:'b',venomblade:'b',
  shield:'k',archer:'k',bomber:'k',guardian:'k',sniper:'k',slinger:'k',smith:'k',assassin:'k',drummer:'k',bombmaker:'k',bastion:'k',ironclad:'k',sentinel:'k',plaguelord:'k',glacier:'k',ambush:'k'};
@@ -777,11 +794,16 @@ function emit(ev,u,direct){
   if(ev==='attacks'){
     if(u.alive&&!silenced(u)&&u.slots.cond.key==='attacks'&&u.condAtkTurn!==G.turn){u.condAtkTurn=G.turn;queue.push({unit:u,event:ev});}
     G.p[1-u.owner].field.slice().sort(byTurn).forEach(v=>qpush(v,'foeattacks'));
+    if(u.uid!==undefined)G.p[u.owner].field.filter(v=>v!==u).sort(byTurn).forEach(v=>qpush(v,'allyattacks',u));
   }else if(ev==='grave'){
     if(u.slots.cond.key==='grave'&&!silenced(u))queue.push({unit:u,event:'grave'});
     if(!direct)G.p[u.owner].field.slice().sort(byTurn).forEach(v=>qpush(v,'allygrave'));
     G.p[1-u.owner].field.slice().sort(byTurn).forEach(v=>qpush(v,'foegrave'));
   }else qpush(u,ev);
+}
+function emitAtkd(v,src){ // 攻撃を受けて残ったとき: 本人の「攻撃されたとき」と、味方の「味方が攻撃されたとき」
+  emit('attacked',v);
+  if(src&&src.uid!==undefined)G.p[v.owner].field.filter(w=>w!==v).sort(byTurn).forEach(w=>qpush(w,'allyattacked',src));
 }
 function emitEnter(u){
   emit('enter',u);
@@ -884,7 +906,7 @@ async function hit(src,t,dmg,mode,np){
     const h=Math.min(dmg,v.maxHp-v.hp);v.hp+=h;popup('u'+v.uid,'+'+h,'buff');flash('u'+v.uid,'fire',450);
     log(un(src)+'→'+un(v)+':死者なのでダメージが回復になった(+'+h+' HP'+v.hp+'/'+v.maxHp+')',sideOf(src));
     render();await wait(480);
-    if(isAtk)emit('attacked',v);
+    if(isAtk)emitAtkd(v,src);
     if(mode!=='basic'&&mode!=='counter'&&src!==v)emit('effected',v);
     if(mode==='basic'&&v.alive&&((v.char.kw&&v.char.kw.counter)||CTR>0)&&src&&src.alive&&src.uid!==undefined&&src!==v)await hit(v,{unit:src},(v.char.kw&&v.char.kw.counter)?atkOf(v):Math.ceil(atkOf(v)*CTR),'counter');
     return;
@@ -900,7 +922,7 @@ async function hit(src,t,dmg,mode,np){
     const d2=Math.max(0,dmg-armor);
     if(d2<dmg){log(un(v)+'の装甲がダメージを'+(dmg-d2)+'減らした。',sideOf(src));dmg=d2;
       if(dmg===0){popup('u'+v.uid,'装甲','info');flash('u'+v.uid,'fire',450);render();await wait(480);
-        if(isAtk)emit('attacked',v);await counterBack();return;}}
+        if(isAtk)emitAtkd(v,src);await counterBack();return;}}
   }
   if(GRACE&&!v.graceUsed&&G.turn===v.summonedTurn+1&&v.owner!==G.cur&&dmg>1){
     v.graceUsed=true;const g=Math.ceil(dmg/2);log(un(v)+'は出したての加護でダメージが'+(dmg-g)+'減った。',sideOf(src));popup('u'+v.uid,'加護','info');dmg=g;
@@ -910,7 +932,7 @@ async function hit(src,t,dmg,mode,np){
     v.shield=false;popup('u'+v.uid,'防いだ','info');flash('u'+v.uid,'fire',500);
     log(un(src)+'→'+un(v)+':シールドがダメージを防いだ。',sideOf(src));
     render();await wait(480);
-    if(isAtk)emit('attacked',v);
+    if(isAtk)emitAtkd(v,src);
     if(mode!=='basic'&&mode!=='counter'&&src!==v)emit('effected',v);
     await counterBack();
     return;
@@ -922,7 +944,7 @@ async function hit(src,t,dmg,mode,np){
   render();await wait(480);
   if(v.hp<=0){sendToGrave(v,'倒された');}
   else{
-    if(isAtk)emit('attacked',v);
+    if(isAtk)emitAtkd(v,src);
     if(mode!=='basic'&&mode!=='counter'&&src!==v)emit('effected',v);
     woundChk(v);
     await counterBack();
@@ -952,6 +974,8 @@ async function runEffect(u,targ,eff){
   else if(targ==='tagally'){if(P.field.length){const c1=await choose(me,P.field.map(unit=>({unit})),text,ctx);const tg=c1.unit.char.tag;targets=P.field.filter(x=>x.char.tag===tg).map(unit=>({unit}));}}
   else if(targ==='tagfoe'){const o=F.field.map(unit=>({unit}));if(dmgEff&&!o.length)o.push(plr());if(o.length){const c1=await choose(me,o,text,ctx);if(c1.unit){const tg=c1.unit.char.tag;targets=F.field.filter(x=>x.char.tag===tg).map(unit=>({unit}));}else targets=[c1];}}
   else if(targ==='others')targets=P.field.filter(x=>x!==u).map(unit=>({unit}));
+  else if(targ==='source'){const sj=u.trigSubj;if(sj&&sj.alive&&sj.uid!==undefined)targets=[{unit:sj}];}
+  else if(targ==='ailedall')targets=P.field.concat(F.field).filter(x=>x.alive&&(x.poison>0||silenced(x)||x.frozenTurn>=G.turn)).map(unit=>({unit}));
   else if(targ==='enemies'){targets=F.field.map(unit=>({unit}));if(dmgEff&&!targets.length)targets=[plr()];}
   else if(targ==='all'){targets=P.field.concat(F.field).map(unit=>({unit}));if(dmgEff&&!F.field.length)targets.push(plr());}
   else if(targ==='weakally'){if(P.field.length)targets=[{unit:P.field.reduce((m,x)=>x.hp<m.hp?x:m)}];}
@@ -1467,6 +1491,7 @@ function synergy(idx,ch,c,t,e){
   if(k==='trig')s+=1+(wf?myN:0);
   if(k==='bounce')s+=foeN?3:-2;
   if(t==='all')s-=12;
+  if(t==='ailedall'){const aff=u=>u.poison>0||silenced(u)||u.frozenTurn>=G.turn,mine=G.p[idx].field.filter(aff).length,theirs=G.p[1-idx].field.filter(aff).length;s+=(k==='harm'?theirs-mine:k==='help'?mine-theirs:0)-1;}
   if(e==='heal'&&(c==='enter'||c==='attacks'))s-=1;
   if(e==='cure'&&c!=='ailed'&&c!=='myturn'&&c!=='foeturn')s-=3;
   if(e==='atkup'&&(c==='enter'||c==='grave'||c==='wounded'||c==='foeturn'))s-=4;
@@ -1576,7 +1601,7 @@ function plate(t,key,fixed){
 function kwTags(c){
   return Object.keys(c.kw||{}).map(k=>'<span class="tag kw" title="'+KWD[k]+'">'+kwName(k,c.kw[k])+'</span>').join('');
 }
-const R2KW=['sentinel'];const rare=c=>R2KW.includes(c.key)?2:Object.keys(c.kw||{}).length?3:(c.cost>=4?2:1);
+const R2KW=['sentinel','sword','lamp','blaster'];const rare=c=>R2KW.includes(c.key)?2:Object.keys(c.kw||{}).length?3:(c.cost>=4?2:1);
 function unitHTML(u,side){
   const key='u'+u.uid,foe=side===1;
   const targetable=(UI.prompt&&UI.prompt.keys.has(key))||(UI.mode==='attack'&&foe&&!UI.prompt&&basicPool(FOE()).includes(u));
@@ -1879,6 +1904,7 @@ $('btnSpeed').addEventListener('click',()=>{
 (function(){
   let h='<tr><th>種類</th><th>名前</th><th>+コスト</th><th>意味</th></tr>';
   TYPES.forEach(t=>{Object.keys(SK[t]).forEach(k=>{h+='<tr><td class="c-'+t+'">'+TLABEL[t]+'</td><td>'+SK[t][k].name+'</td><td>+'+SK[t][k].inc+'</td><td>'+DESC[t][k]+'</td></tr>';});});
+  XKEYS.forEach(([t,k])=>{h+='<tr><td class="c-'+t+'">'+TLABEL[t]+'(専用)</td><td>'+SK[t][k].name+'</td><td>+'+SK[t][k].inc+'</td><td>'+DESC[t][k]+'</td></tr>';});
   $('ref').innerHTML=h;
   $('abref').innerHTML=AB_KEYS.map(k=>'<li><b>'+ABIL[k].name+'</b>(再使用まで'+ABIL[k].cd+'ターン):'+ABIL[k].desc+'</li>').join('');
 })();
@@ -1930,7 +1956,7 @@ function loadDecks(){
 function storeLocal(a){memDecks=a;try{localStorage.setItem(LS_KEY,JSON.stringify(a));}catch(e){storageOk=false;}}
 function storeDecks(a){storeLocal(a);accPush(a);}
 /* ---------- お知らせ(オンライン: サーバー、オフライン: 同梱の一覧。配布の受け取りはオンラインのみ) ---------- */
-const NEWS_BUILTIN=[{"id": "2026-11-12-update2", "date": "2026-11-12", "title": "アップデート(11/12 その2)", "body": "・フレンド機能を追加しました(オンライン版)。タイトルの「フレンド」からフレンドコードで申請でき、承認されるとフレンドになります。対人戦のルームコード画面の「フレンドに転送」で、フレンドに対戦を申し込めます。\n・プレイヤー名はアカウント画面で設定する形に変更しました(対人戦の画面では入力しません)。\n・対人戦・CPU戦に「墓地を見る」ボタンを追加しました。\n・対人戦の終了後、ルームに参加した側がエナジーをもらえない不具合を修正しました。\n・デッキに入れられるレア3を4枚から3枚までに変更しました(CPU「つよい」のデッキも調整)。\n・デッキ構築画面で、キャラをレア順(1→3)に並べ、全キャラにレア度を★で表示するようにしました。\n・「手札に戻す」の制限を「同一ターン中に同一カードにつき1回まで」に変更しました。"}, {"id": "2026-11-12-update", "date": "2026-11-12", "title": "アップデート(11/12)", "body": "・場のユニットを、自分のターン中に左右へ並べ替えられるようになりました(ドラッグ、または「◀左へ」「右へ▶」ボタン)。\n・スキルが同時に発動するときは、同じ側では場の左のユニットから順に発動します(「HP最小」などの同点も左優先)。\n・能力「経費削減」の再使用ターンを3から5に増やしました。\n・このお知らせ機能を追加しました。"}, {"id": "2026-11-11-update", "date": "2026-11-11", "title": "アップデート(11/11)", "body": "・CPU戦に「かんたん/ふつう/つよい」の強さ選択を追加しました。\n・タイトル画面に「戦績」を追加しました(デッキ別・キャラ別の勝率など)。\n・レア3の調整: 無類の護神の固定スキルを変更、不屈の戦王のHPを7に、黒死の毒機を3/5に、アンデッドモンスターのATKを3に変更しました。"}];
+const NEWS_BUILTIN=[{"id": "2026-11-13-newcards", "date": "2026-11-13", "title": "新カード6枚を追加しました(11/13)", "body": "新カードを6枚追加しました。第4〜6弾のパックで登場予定です(まだ引けません)。\n\n【自壊型サポート(レア2)】基本コスト0で、出したターンの終わりに自壊するお手軽サポートです。\n・正義の剣(コスト3):場に出たとき、自分以外の味方全員のATKを永続+1。\n・聖なる灯(コスト3):場に出たとき、自分以外の味方全員にシールド。\n・爆裂機(コスト1+スキル):自分が墓地に送られたときが固定。対象と効果は自由に組めます。\n\n【専用スキル持ち(レア2)】そのキャラにだけ付く専用スキルが、スロットのどれかに固定されています。\n・自動追撃機(コスト4+スキル):条件が「味方が攻撃したとき」で固定。\n・報復の番人(コスト5+効果):条件「味方が攻撃されたとき」、対象「その相手を」が固定。\n・追い毒の司祭(コスト5+スキル):対象が「状態異常のキャラを全て」(敵味方どちらも)で固定。\n\n新カード実装のお祝いとして、正義の剣・自動追撃機・聖なる灯を1枚ずつ配布します。下の「受け取る」を押してください。", "grant": {"chars": {"sword": 1, "chaser": 1, "lamp": 1}}}, {"id": "2026-11-12-update2", "date": "2026-11-12", "title": "アップデート(11/12 その2)", "body": "・フレンド機能を追加しました(オンライン版)。タイトルの「フレンド」からフレンドコードで申請でき、承認されるとフレンドになります。対人戦のルームコード画面の「フレンドに転送」で、フレンドに対戦を申し込めます。\n・プレイヤー名はアカウント画面で設定する形に変更しました(対人戦の画面では入力しません)。\n・対人戦・CPU戦に「墓地を見る」ボタンを追加しました。\n・対人戦の終了後、ルームに参加した側がエナジーをもらえない不具合を修正しました。\n・デッキに入れられるレア3を4枚から3枚までに変更しました(CPU「つよい」のデッキも調整)。\n・デッキ構築画面で、キャラをレア順(1→3)に並べ、全キャラにレア度を★で表示するようにしました。\n・「手札に戻す」の制限を「同一ターン中に同一カードにつき1回まで」に変更しました。"}, {"id": "2026-11-12-update", "date": "2026-11-12", "title": "アップデート(11/12)", "body": "・場のユニットを、自分のターン中に左右へ並べ替えられるようになりました(ドラッグ、または「◀左へ」「右へ▶」ボタン)。\n・スキルが同時に発動するときは、同じ側では場の左のユニットから順に発動します(「HP最小」などの同点も左優先)。\n・能力「経費削減」の再使用ターンを3から5に増やしました。\n・このお知らせ機能を追加しました。"}, {"id": "2026-11-11-update", "date": "2026-11-11", "title": "アップデート(11/11)", "body": "・CPU戦に「かんたん/ふつう/つよい」の強さ選択を追加しました。\n・タイトル画面に「戦績」を追加しました(デッキ別・キャラ別の勝率など)。\n・レア3の調整: 無類の護神の固定スキルを変更、不屈の戦王のHPを7に、黒死の毒機を3/5に、アンデッドモンスターのATKを3に変更しました。"}];
 const NK='kumitate-tcg-news-read';
 const NEWSD={items:[],inbox:{requests:[],invites:[]}};
 const nEsc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -2299,11 +2325,11 @@ const PACKS=[
   blurb:'倒れない護神が、盤面を支える。守りと回復のカードが多め。'},
  {id:'p3',name:'第3弾 疾風迅雷',art:['迅雷','疾風'],feature:'swift',r3:['lance','warlord','valkyrie','plaguelord'],r2:['dragoon','archmage','charger','assassin','sniper','bombmaker','venomblade','trainer','drummer','tide','mistwitch','mercenary'],featW:1.2,live:true,open:true,
   blurb:'出た瞬間に駆け抜ける。速攻と攻撃のカードが多め。'},
- {id:'p4',name:'第4弾 朽ちる契約',art:['契約','朽ちる'],feature:'fool',r3:['plaguelord','thorn','warlord'],r2:['paladin','trainer','glacier','scribe','mistwitch','bombmaker','curse','dragoon','assassin','veteran','tide','mercenary','sentinel'],featW:1.2,live:false,open:false,
+ {id:'p4',name:'第4弾 朽ちる契約',art:['契約','朽ちる'],feature:'fool',r3:['plaguelord','thorn','warlord'],r2:['paladin','trainer','glacier','scribe','mistwitch','bombmaker','curse','dragoon','assassin','veteran','tide','mercenary','sentinel','sword','lamp','blaster'],featW:1.2,live:false,open:false,
   blurb:'朽ちゆく城が、攻撃者を黙らせる。墓地と呪いのカードが多め。【仮案】'},
- {id:'p5',name:'第5弾 死者の行進',art:['死者','行進'],feature:'undead',r3:['plaguelord','valkyrie','bastion','ironclad'],r2:['paladin','trainer','glacier','priest','captain','mercenary','curse','scribe','night','elite','drummer','sniper'],featW:1.2,live:false,open:false,
+ {id:'p5',name:'第5弾 死者の行進',art:['死者','行進'],feature:'undead',r3:['plaguelord','valkyrie','bastion','ironclad'],r2:['paladin','trainer','glacier','priest','captain','mercenary','curse','scribe','night','elite','drummer','sniper','blaster','chaser','retaliator'],featW:1.2,live:false,open:false,
   blurb:'墓から起き上がる者たち。墓地のカードが多め。【仮案】'},
- {id:'p6',name:'第6弾 適応の森',art:['適応','の森'],feature:'warking',r3:['lance','thorn','valkyrie'],r2:['mistwitch','curse','tide','scribe','glacier','venomblade','priest','giant','general','elite','drummer','archmage','sentinel'],featW:1.2,live:false,open:false,
+ {id:'p6',name:'第6弾 適応の森',art:['適応','の森'],feature:'warking',r3:['lance','thorn','valkyrie'],r2:['mistwitch','curse','tide','scribe','glacier','venomblade','priest','giant','general','elite','drummer','archmage','sentinel','poisonpriest','chaser','retaliator'],featW:1.2,live:false,open:false,
   blurb:'どんな状態異常も効かない王。状態異常と全体効果のカードが多め。【仮案】'}
 ];
 const packLive=p=>p.live||!!window.__OFFLINE__, packOpen=p=>p.open||!!window.__OFFLINE__;
@@ -2595,7 +2621,7 @@ async function sim(n,opt){
   }finally{HEADLESS=sv.HEADLESS;CPURANDOM=sv.CPURANDOM;LIFE=sv.LIFE;HPMULT=sv.HPMULT;speed=sv.speed;}
   return out;
 }
-window.__tcg={gv:{graveView},checkOver:()=>checkOver(),fr:{friendsOpen,friendsAdd,inviteSendUI,acctSaveName},news:{newsLoad,NEWSD,nDot,nGrantText,NEWS_BUILTIN},ord:{byTurn,posOf,moveUnit,setG:g=>{G=g;if(!UI)UI={flash:{}};},qpush,drainQ:()=>queue.map(q=>q.unit.name)},st:{stRecord,stLoad,stShow,cpuDeck,STRONG,setLV:v=>{LV=v;}},bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover,rewardReport},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({maxCopies,KWD,ABIL,AB_KEYS,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
+window.__tcg={eng:{init:(a,d,o)=>init(a,d,o),makeUnit:(o,ch,pk)=>makeUnit(o,ch,pk),act:fn=>act(fn),playBody:(i,c,p)=>playBody(i,c,p),basic:(u,t)=>basicAttackBody(u,t),hit:(a,b,d,m)=>hit(a,b,d,m),decay:i=>decayTick(i),poison:i=>poisonTick(i),emitEnter:u=>emitEnter(u),ucost:u=>ucost(u),setHead:()=>{HEADLESS=true;speed=0;}},gv:{graveView},checkOver:()=>checkOver(),fr:{friendsOpen,friendsAdd,inviteSendUI,acctSaveName},news:{newsLoad,NEWSD,nDot,nGrantText,NEWS_BUILTIN},ord:{byTurn,posOf,moveUnit,setG:g=>{G=g;if(!UI)UI={flash:{}};},qpush,drainQ:()=>queue.map(q=>q.unit.name)},st:{stRecord,stLoad,stShow,cpuDeck,STRONG,setLV:v=>{LV=v;}},bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover,rewardReport},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({maxCopies,KWD,ABIL,AB_KEYS,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
   tune:m=>{Object.keys(m).forEach(k=>{if(k==='sur'){SURV=m[k];return;}const [ty,key]=k.split('.');if(ty==='ab'){if(key.endsWith('_s'))ABIL[key.slice(0,-2)].start=m[k];else ABIL[key].cd=m[k];return;}SK[ty][key].inc=m[k];});recost();},
   cfg:o=>{if(o.cap!==undefined)CAP=o.cap;if(o.firstdraw!==undefined)FIRSTDRAW=o.firstdraw;if(o.hp!==undefined)HPMULT=o.hp;if(o.life!==undefined)LIFE=o.life;if(o.handmax!==undefined)HANDMAX=o.handmax;if(o.atkq!==undefined)ATKQ=o.atkq;if(o.ctr!==undefined)CTR=o.ctr;if(o.untg!==undefined)UNTG=o.untg;if(o.autosw!==undefined)AUTOSW=o.autosw;if(o.catch!==undefined)CATCH=o.catch;if(o.catchn!==undefined)CATCHN=o.catchn;if(o.grace!==undefined)GRACE=o.grace;if(o.haste!==undefined)HASTE=o.haste;if(o.sweep){const w=o.sweep;if(w.on!==undefined)SWEEP_ON=w.on;if(w.t!==undefined)SWEEP_T=w.t;if(w.life!==undefined)SWEEP_LIFE=w.life;if(w.diff!==undefined)SWEEP_DIFF=w.diff;}}};
 if(typeof document!=='undefined'&&$('board')){initMenus();showTitle();accInit().then(()=>{if(!ACC.on&&!GA.on)gaInit();newsLoad();});}
