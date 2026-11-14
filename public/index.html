@@ -370,6 +370,7 @@ body.fx-lite .unit.fx-lunge{animation:none}
 @keyframes movedGlow{0%{box-shadow:0 0 0 0 rgba(255,200,60,.9)}60%{box-shadow:0 0 0 10px rgba(255,200,60,0)}100%{box-shadow:0 0 0 0 rgba(255,200,60,0)}}
 .unit.fx-moved{animation:movedGlow 1s ease-out 1;outline:2px solid rgba(255,190,40,.85);outline-offset:1px}.unit.mine{touch-action:pan-y}.unit.dragging{z-index:60;opacity:.92;cursor:grabbing;transition:none!important;box-shadow:0 10px 24px rgba(0,0,0,.35)}body.fx-lite .unit.fx-moved{animation:none}
 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#e5322d;box-shadow:0 0 0 2px var(--bg,#fff);margin-left:6px;vertical-align:middle}#tNews{position:absolute;top:12px;right:12px;z-index:5}#tNews .dot{position:absolute;top:-3px;right:-3px;margin:0}#news .sheet{max-height:86vh;overflow:auto}.nitem{border-bottom:1px solid rgba(128,128,128,.3)}.nhead{display:flex;width:100%;gap:8px;align-items:center;text-align:left;background:none;border:0;padding:10px 2px;font:inherit;color:inherit;cursor:pointer}.nhead .ndate{font-size:12px;opacity:.65;white-space:nowrap}.nbody{white-space:pre-wrap;font-size:14px;line-height:1.7;padding:0 2px 10px}.ngrant{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:0 2px 12px;font-size:13px}.nnone{opacity:.7}
+.pdot{display:inline-block;flex:none;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle;background:#9aa0a6}.pdot.p2{background:#2fb344}.pdot.p1{background:#f0ad00}.fr-leg{font-size:11px;opacity:.75;margin:0 0 4px}.fr-leg .pdot{width:8px;height:8px;margin:0 3px 0 8px}.fr-leg .pdot:first-child{margin-left:0}#toasts{position:fixed;right:12px;bottom:12px;z-index:9999;display:flex;flex-direction:column;gap:6px;align-items:flex-end;pointer-events:none}.toast{background:rgba(30,30,30,.92);color:#fff;padding:9px 14px;border-radius:8px;font-size:13px;max-width:min(320px,86vw);box-shadow:0 2px 10px rgba(0,0,0,.35);animation:toastin .2s ease-out}@keyframes toastin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .fr-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(128,128,128,.3)}.fr-row b{flex:1;word-break:break-all}.fr-row .btn{font-size:12px;padding:4px 10px}.fr-h{font-size:13px;margin:10px 0 2px;color:var(--muted)}.nsec{font-size:12px;color:var(--muted);margin:8px 0 2px}.nfr{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(128,128,128,.3)}.nfr span{flex:1}.nfr .btn{font-size:12px;padding:4px 10px}.nfr .end{color:var(--muted);font-size:12px}.stars{letter-spacing:1px;font-size:12px;color:#9aa3ad}.stars.r2{color:#4a8fd8}.stars.r3{color:#e0a100}.gvbtn{font-size:11px;padding:2px 8px;margin-left:6px}.gv-h{font-size:13px;margin:8px 0 2px}.gvi{position:relative;cursor:default}.gvn{position:absolute;right:10px;top:8px;font-style:normal;font-weight:700}.fr-code{display:block;font-size:12px;font-weight:400;color:var(--muted);letter-spacing:1px;user-select:all}.logbox [hidden]{display:none!important}.logtabs{display:flex;gap:4px}.logtabs button{flex:1;position:relative;font:inherit;font-size:12px;font-weight:700;padding:5px 4px;border:1px solid var(--line);border-radius:8px;background:none;color:var(--muted);cursor:pointer}.logtabs button.on{color:var(--ink);border-color:var(--ink)}.logtabs .dot{position:absolute;top:3px;right:6px}#chatPane{display:flex;flex-direction:column;gap:6px;min-height:0}#chatList{min-height:80px;max-height:calc(100vh - 230px)}#chatForm{display:flex;gap:4px}#chatIn{flex:1;min-width:0;font:inherit;font-size:16px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}#chatForm .btn{padding:4px 10px;font-size:12px}#chatMsg{margin:0;font-size:11px;min-height:0}@media (max-width:920px){#chatList{max-height:200px}}.dot[hidden]{display:none}</style>
 
 <div class="app">
@@ -398,36 +399,84 @@ body.fx-lite .unit.fx-lunge{animation:none}
 <div class="overlay" id="news" hidden><div class="sheet" role="dialog"><h2>お知らせ</h2><div id="newsBody"></div><div class="btns"><button class="btn primary" id="newsClose">閉じる</button></div></div></div>
 <div class="overlay" id="friends" hidden><div class="sheet" role="dialog"><h2>フレンド</h2><p>あなたのフレンドコード</p><p class="lbcode" id="frCode" style="font-size:26px"></p><label class="lbl">相手のフレンドコードで申請<input id="frInput" maxlength="9" placeholder="XXXX-XXXX" autocapitalize="characters"></label><div class="btns"><button class="btn" id="frAdd">申請する</button></div><p class="tmsg" id="frMsg"></p><div id="frBody"></div><div class="btns"><button class="btn primary" id="frClose">閉じる</button></div></div></div>
 <div class="overlay" id="acct" hidden><div class="sheet" role="dialog"><h2>アカウント</h2><p id="acInfo"></p><div id="acNameRow" hidden><label class="lbl">プレイヤー名(対人戦・フレンドに表示されます)<input id="acName" maxlength="16"></label><div class="btns"><button class="btn" id="acNameSave">名前を保存</button></div></div><p class="lbcode" id="acCode" style="font-size:26px"></p><label class="lbl">引き継ぎコードを入力<input id="acInput" maxlength="14" placeholder="XXXX-XXXX-XXXX" autocapitalize="characters"></label><div class="btns"><button class="btn" id="acRecover">引き継ぐ</button><button class="btn" id="acRegen">コードを再発行</button><button class="btn primary" id="acClose">閉じる</button></div><p class="tmsg" id="acMsg" style="color:var(--muted)"></p></div></div>
+<div id="toasts"></div>
 <div class="overlay" id="rules" hidden>
   <div class="sheet" role="dialog" aria-label="ルール">
     <h2>あそび方</h2>
     <h3>勝ち方</h3>
-    <p>相手のライフ(30)を0にしたら勝ちです。相手の場にカードがあるあいだは、プレイヤーではなくカードしか攻撃できません。</p>
+    <ul>
+      <li>相手の<b>ライフ(30)を0</b>にしたら勝ち。</li>
+      <li>相手の場にカードがいる間は、<b>カードしか攻撃できません</b>(プレイヤーは狙えない)。</li>
+    </ul>
     <h3>ターンの流れ</h3>
     <ol>
-      <li>ドロー:キャラ山札とスキル山札から、好きな配分で合計3枚引く(最初の手札は6枚。先攻の1ターン目は2枚だけ)。</li>
-      <li>メイン:キャラにスキルを組み立てて出す、ユニットで攻撃する、墓地に送る、を好きな順に。</li>
-      <li>終了:手札が11枚を超えていたら捨てる。</li>
+      <li><b>ドロー</b>:キャラ/スキル山札から合計3枚(配分は自由)。最初の手札は6枚、先攻の1ターン目は2枚。</li>
+      <li><b>メイン</b>:組み立てて出す・攻撃・墓地に送る、を好きな順に。</li>
+      <li><b>終了</b>:手札が11枚を超えたら捨てる。</li>
     </ol>
     <h3>組み立て</h3>
-    <p>キャラ1枚に「条件・対象・効果」を1枚ずつ付けたものがユニットです。キャラによっては一部のスキルが最初から印刷されていて(固定)、その分コストが安くなります。場のユニットのコスト合計は40までです。</p>
-    <h3>戦闘とスキル</h3>
     <ul>
-      <li>基本攻撃はユニット1体につき1ターン1回。出したターンは攻撃できません。ATK分のダメージで、反撃はありません。</li>
-      <li>スキルは条件を満たすと自動で発動します。1回の行動から始まる連鎖の中で、同じカードのスキルは1回しか発動しません。</li>
-      <li>「攻撃したとき」は、同じカードで1ターンに1回までです。</li>
-      <li>攻撃の対象が2つ以上のときは、ダメージがATKの半分(切り上げ)になります。「1ダメージを与える」はATKと関係なく1で、攻撃ではありません。</li>
-      <li>ATK+1はそのターンの終わりまで。永続で強くする「鍛える」は、元のATK+2までです。</li>
-      <li>手札に戻すを敵に使うと、キャラだけ手札に戻り、スキルは墓地へ行きます。同じキャラは1ターンに1回しか「場に出たとき」を発動できません。</li>
-      <li>広い対象(味方全員・敵全員・全体・自分以外の味方全員)と組むとき、「自身のターン」「相手のターン」ならコスト+2、「手札に戻す」ならコスト+3が加わります。</li>
-      <li>大型キャラ(レア3)は「性質」を持ちます。守護=相手の基本攻撃は守護を持つカードにしか向けられない/装甲N=攻撃のダメージがN減る(毒・1ダメージ・直接ダメージには無効)/反撃=基本攻撃を受けて生き残ったら攻撃元にATK分を返す/連撃=1ターンに基本攻撃2回。スキル枠が自由な大型もいます。</li>
-      <li>デッキ:キャラ20枚・スキル30枚で作ります(同名3枚まで。大型キャラは1枚まで)。デッキごとに能力を1つ選び、名前を付けて保存できます。連鎖(1回の行動で2つ以上のスキルが続けて発動すること)が起きると、画面に「N連鎖!」と出ます。</li>
-      <li>追い上げ:自分のターン開始時に、相手の場のコスト合計が自分より6以上多いと、ドローが2枚増えます(出し負けたときの救済です)。</li>
-      <li>大掃除:1ゲームに1回、自分のメインフェーズにライフ5を払って宣言できます。お互いの場にいる、ユニットのコストが9以下のカードをすべて破壊します(破壊されたカードのスキルは通常どおり発動します)。出し負けたときの巻き返し用です。</li>
-      <li>毒は持ち主のターン開始時に1ダメージ(3回)、凍結は持ち主の次のターンの基本攻撃を封じ(持ち主のターン中に受けたときは、そのターンの残りの基本攻撃を封じ)、沈黙は次のターンの終わりまでスキルを止めます。シールドは次の1回のダメージを無効にします(毒は防げません)。</li>
-      <li>デモ版の決め事:攻撃させるは、対象が発動者の敵を攻撃します。山札が尽きたら墓地を戻して3ダメージ。100ターンで引き分けです。デモのスキル山札は全種類入りの共通デッキで、全体の約70%は「条件・対象・効果」を1枚ずつ含む3枚1組(組の中の順番はランダム)で並び、残りはばらばらに混ざります。種類の偏りによる手札事故を減らすための仕組みです。</li>
+      <li>キャラ1枚に<b>条件・対象・効果</b>を1枚ずつ付けたものが「ユニット」。</li>
+      <li>固定スキル(最初から印刷されたスキル)があるキャラは、その分コストが安い。</li>
+      <li>場のユニットの<b>コスト合計は40まで</b>。</li>
+      <li>広い対象(味方全員・敵全員・全体・自分以外の味方全員)は追加コスト:「自身/相手のターン」と組むと+2、「手札に戻す」と組むと+3。</li>
     </ul>
-    <h3>属性統一</h3><p>キャラには戦士・魔術・獣・機械のいずれかの属性があります。デッキのキャラ20枚のうち15枚以上が同じ属性だと、その属性に応じた恩恵が受けられます。<br>戦士統一:レア1のキャラのHP+1 / 魔術統一:自分のターン2回に1回、ドローで引ける枚数+1 / 機械統一:能力の再使用ターン数-2(最低1) / 獣統一:攻撃(通常攻撃・スキルの攻撃)が10%でクリティカル(ダメージ+2。追い討ち・1ダメージ・反撃は対象外)</p><h3>能力</h3><p>戦闘前に能力を1つ選びます。自分のメインフェーズに1回使え、使ったあとは決まったターン数(画面左上のターン表示で数えます)が過ぎるまで再使用できません。相手も能力を持っていて、使われるまで何かは分かりません。</p><ul id="abref"></ul><h3>スキル早見表</h3>
+    <h3>攻撃とダメージ</h3>
+    <ul>
+      <li><b>基本攻撃</b>:1体につき1ターン1回。出したターンは不可。ATK分のダメージで、反撃はなし。</li>
+      <li>対象が2つ以上の攻撃は、ダメージが<b>ATKの半分</b>(切り上げ)。</li>
+      <li>「1ダメージを与える」は常に1で、攻撃ではない。</li>
+      <li>「ATK+1」はそのターンだけ。「鍛える」は永続で、元のATK+2まで。</li>
+    </ul>
+    <h3>スキル</h3>
+    <ul>
+      <li>条件を満たすと<b>自動で発動</b>。</li>
+      <li>1回の行動から続く<b>連鎖</b>の中では、同じカードのスキルは1回だけ(2つ以上続くと「N連鎖!」と表示)。</li>
+      <li>「攻撃したとき」「場に出たとき」は、同じカードで1ターン1回まで。</li>
+      <li>「手札に戻す」を敵に使うと、キャラは手札へ、スキルは墓地へ。</li>
+    </ul>
+    <h3>状態異常</h3>
+    <ul>
+      <li><b>毒</b>:持ち主のターン開始時に1ダメージ(3回)。</li>
+      <li><b>凍結</b>:次のターンの基本攻撃を封じる(持ち主のターン中に受けたら、そのターンの残りを封じる)。</li>
+      <li><b>沈黙</b>:次のターンの終わりまでスキルが止まる。</li>
+      <li><b>シールド</b>:次の1回のダメージを無効にする(毒は防げない)。</li>
+    </ul>
+    <h3>大型キャラ(レア3)の性質</h3>
+    <ul>
+      <li><b>守護</b>:相手の基本攻撃は、守護を持つカードにしか向けられない。</li>
+      <li><b>装甲N</b>:攻撃のダメージがN減る(毒・1ダメージ・直接ダメージには無効)。</li>
+      <li><b>反撃</b>:基本攻撃を受けて生き残ったら、攻撃元にATK分を返す。</li>
+      <li><b>連撃</b>:1ターンに基本攻撃を2回。</li>
+      <li>スキル枠が自由な大型キャラもいる。</li>
+    </ul>
+    <h3>デッキ</h3>
+    <ul>
+      <li><b>キャラ20枚+スキル30枚</b>。同名は3枚まで、大型キャラは各1枚・合計3枚まで。</li>
+      <li>デッキごとに<b>能力</b>を1つ選び、名前を付けて保存できる。</li>
+    </ul>
+    <h3>巻き返しの仕組み</h3>
+    <ul>
+      <li><b>追い上げ</b>:自分のターン開始時、相手の場のコスト合計が自分より6以上多いと、ドローが2枚増える。</li>
+      <li><b>大掃除</b>:1ゲームに1回、メインでライフ5を払って宣言。お互いの場の「コスト9以下」のユニットをすべて破壊する(スキルは通常どおり発動)。</li>
+    </ul>
+    <h3>属性統一</h3>
+    <p>キャラは戦士・魔術・獣・機械のいずれかの属性を持ち、デッキのキャラ20枚のうち<b>15枚以上が同じ属性</b>だと恩恵があります。</p>
+    <ul>
+      <li><b>戦士</b>:レア1のキャラのHP+1。</li>
+      <li><b>魔術</b>:自分のターン2回に1回、ドローで引ける枚数+1。</li>
+      <li><b>機械</b>:能力の再使用ターン数-2(最低1)。</li>
+      <li><b>獣</b>:攻撃が10%でクリティカル(ダメージ+2。追い討ち・1ダメージ・反撃は対象外)。</li>
+    </ul>
+    <h3>能力</h3>
+    <p>戦闘前に1つ選び、自分のメインフェーズに1回使えます。使うと、決まったターン数が過ぎるまで再使用できません(画面左上のターン表示で数えます)。相手の能力は、使われるまで分かりません。</p><ul id="abref"></ul>
+    <h3>その他</h3>
+    <ul>
+      <li>「攻撃させる」は、対象が発動者の敵を攻撃する。</li>
+      <li>山札が尽きたら、墓地を戻して3ダメージ。100ターンで引き分け。</li>
+      <li>デモ版のスキル山札は全種入りの共通デッキで、約70%は「条件・対象・効果」の3枚1組で並ぶ(手札事故を減らす仕組み)。</li>
+    </ul>
+    <h3>スキル早見表</h3>
     <div class="tbl"><table id="ref"></table></div>
     <div class="btns"><button class="btn primary" id="btnRulesClose">閉じる</button></div>
   </div>
@@ -1957,7 +2006,7 @@ function loadDecks(){
 function storeLocal(a){memDecks=a;try{localStorage.setItem(LS_KEY,JSON.stringify(a));}catch(e){storageOk=false;}}
 function storeDecks(a){storeLocal(a);accPush(a);}
 /* ---------- お知らせ(オンライン: サーバー、オフライン: 同梱の一覧。配布の受け取りはオンラインのみ) ---------- */
-const NEWS_BUILTIN=[{"id": "2026-11-13-debug", "date": "2026-11-13", "title": "全体デバッグを行いました(11/13 その5)", "body": "・未発売の新カード(レア2)が、登録ボーナスや天井交換で出てしまう不具合を修正しました。\n・対戦相手の名前に特殊な文字が入っていてもログが崩れないようにしました。\n・デッキの検証・保存まわりを強化し、不正なデータが保存されないようにしました。\n・通信エラー時の応答を整理しました。\n・ランダム対戦4000戦などの自動テストで、停止やエラーが起きないことを確認しました。"}, {"id": "2026-11-13-chat", "date": "2026-11-13", "title": "対人戦にチャットを追加しました(11/13 その4)", "body": "・対人戦の画面で、ログの欄を「ログ/チャット」で切り替えられるようになりました(オンライン版)。\n・チャットは1回100文字まで、連投はできません。対戦が終わると消えます。\n・ログを見ている間に相手から届くと、「チャット」のタブに赤い丸が出ます。"}, {"id": "2026-11-13-cpu2", "date": "2026-11-13", "title": "CPUのデッキを調整しました(11/13 その3)", "body": "・CPU「かんたん」は、デッキにレア3を入れなくなりました。\n・CPU「ふつう」は、デッキのレア3が1体か2体だけになりました。2体のときは、「つよい」デッキからの入れ替え(ランダム性)を増やして、強さが変わらないようにしています。"}, {"id": "2026-11-13-cpu", "date": "2026-11-13", "title": "CPUの強さとフレンド画面を調整しました(11/13 その2)", "body": "・CPU「つよい」のデッキを作り直しました。属性統一(戦士・魔術・機械・獣)のデッキを、自己対戦で探索して最強の構成にしています(レア3は3枚まで)。\n・CPU「ふつう」の強さをほんの少し上げました。\n・フレンド画面で、フレンドごとのフレンドコードが見られるようになりました。"}, {"id": "2026-11-13-newcards", "date": "2026-11-13", "title": "新カード6枚を追加しました(11/13)", "body": "新カードを6枚追加しました。第4〜6弾のパックで登場予定です(まだ引けません)。\n\n【自壊型サポート(レア2)】基本コスト0で、出したターンの終わりに自壊するお手軽サポートです。\n・正義の剣(コスト3):場に出たとき、自分以外の味方全員のATKを永続+1。\n・聖なる灯(コスト3):場に出たとき、自分以外の味方全員にシールド。\n・爆裂機(コスト1+スキル):自分が墓地に送られたときが固定。対象と効果は自由に組めます。\n\n【専用スキル持ち(レア2)】そのキャラにだけ付く専用スキルが、スロットのどれかに固定されています。\n・自動追撃機(コスト4+スキル):条件が「味方が攻撃したとき」で固定。\n・報復の番人(コスト5+効果):条件「味方が攻撃されたとき」、対象「その相手を」が固定。\n・追い毒の司祭(コスト5+スキル):対象が「状態異常のキャラを全て」(敵味方どちらも)で固定。\n\n新カード実装のお祝いとして、正義の剣・自動追撃機・聖なる灯を1枚ずつ配布します。下の「受け取る」を押してください。", "grant": {"chars": {"sword": 1, "chaser": 1, "lamp": 1}}}, {"id": "2026-11-12-update2", "date": "2026-11-12", "title": "アップデート(11/12 その2)", "body": "・フレンド機能を追加しました(オンライン版)。タイトルの「フレンド」からフレンドコードで申請でき、承認されるとフレンドになります。対人戦のルームコード画面の「フレンドに転送」で、フレンドに対戦を申し込めます。\n・プレイヤー名はアカウント画面で設定する形に変更しました(対人戦の画面では入力しません)。\n・対人戦・CPU戦に「墓地を見る」ボタンを追加しました。\n・対人戦の終了後、ルームに参加した側がエナジーをもらえない不具合を修正しました。\n・デッキに入れられるレア3を4枚から3枚までに変更しました(CPU「つよい」のデッキも調整)。\n・デッキ構築画面で、キャラをレア順(1→3)に並べ、全キャラにレア度を★で表示するようにしました。\n・「手札に戻す」の制限を「同一ターン中に同一カードにつき1回まで」に変更しました。"}, {"id": "2026-11-12-update", "date": "2026-11-12", "title": "アップデート(11/12)", "body": "・場のユニットを、自分のターン中に左右へ並べ替えられるようになりました(ドラッグ、または「◀左へ」「右へ▶」ボタン)。\n・スキルが同時に発動するときは、同じ側では場の左のユニットから順に発動します(「HP最小」などの同点も左優先)。\n・能力「経費削減」の再使用ターンを3から5に増やしました。\n・このお知らせ機能を追加しました。"}, {"id": "2026-11-11-update", "date": "2026-11-11", "title": "アップデート(11/11)", "body": "・CPU戦に「かんたん/ふつう/つよい」の強さ選択を追加しました。\n・タイトル画面に「戦績」を追加しました(デッキ別・キャラ別の勝率など)。\n・レア3の調整: 無類の護神の固定スキルを変更、不屈の戦王のHPを7に、黒死の毒機を3/5に、アンデッドモンスターのATKを3に変更しました。"}];
+const NEWS_BUILTIN=[{"id": "2026-11-14-instant", "date": "2026-11-14", "title": "お知らせの即時反映(11/14 その2)", "body": "・フレンド申請・承認・削除や、対戦の招待が終了したときなどが、30秒待たずにすぐ反映されるようになりました。\n・フレンド一覧のオンライン表示の凡例を外しました。"}, {"id": "2026-11-14-presence", "date": "2026-11-14", "title": "フレンドのオンライン表示と申し込み通知(11/14)", "body": "・フレンド一覧の名前の手前に、オンライン状態の丸が付きました(緑=見ている / 黄=別のタブを見ている / 灰=オフライン)。\n・フレンドから対戦の申し込みが来ると、画面の右下に5秒間だけ通知が出ます(どの画面でも出ます。参加はお知らせから行います)。\n・「ルール」の内容を、短く読みやすく整理しました。"}, {"id": "2026-11-13-debug", "date": "2026-11-13", "title": "全体デバッグを行いました(11/13 その5)", "body": "・未発売の新カード(レア2)が、登録ボーナスや天井交換で出てしまう不具合を修正しました。\n・対戦相手の名前に特殊な文字が入っていてもログが崩れないようにしました。\n・デッキの検証・保存まわりを強化し、不正なデータが保存されないようにしました。\n・通信エラー時の応答を整理しました。\n・ランダム対戦4000戦などの自動テストで、停止やエラーが起きないことを確認しました。"}, {"id": "2026-11-13-chat", "date": "2026-11-13", "title": "対人戦にチャットを追加しました(11/13 その4)", "body": "・対人戦の画面で、ログの欄を「ログ/チャット」で切り替えられるようになりました(オンライン版)。\n・チャットは1回100文字まで、連投はできません。対戦が終わると消えます。\n・ログを見ている間に相手から届くと、「チャット」のタブに赤い丸が出ます。"}, {"id": "2026-11-13-cpu2", "date": "2026-11-13", "title": "CPUのデッキを調整しました(11/13 その3)", "body": "・CPU「かんたん」は、デッキにレア3を入れなくなりました。\n・CPU「ふつう」は、デッキのレア3が1体か2体だけになりました。2体のときは、「つよい」デッキからの入れ替え(ランダム性)を増やして、強さが変わらないようにしています。"}, {"id": "2026-11-13-cpu", "date": "2026-11-13", "title": "CPUの強さとフレンド画面を調整しました(11/13 その2)", "body": "・CPU「つよい」のデッキを作り直しました。属性統一(戦士・魔術・機械・獣)のデッキを、自己対戦で探索して最強の構成にしています(レア3は3枚まで)。\n・CPU「ふつう」の強さをほんの少し上げました。\n・フレンド画面で、フレンドごとのフレンドコードが見られるようになりました。"}, {"id": "2026-11-13-newcards", "date": "2026-11-13", "title": "新カード6枚を追加しました(11/13)", "body": "新カードを6枚追加しました。第4〜6弾のパックで登場予定です(まだ引けません)。\n\n【自壊型サポート(レア2)】基本コスト0で、出したターンの終わりに自壊するお手軽サポートです。\n・正義の剣(コスト3):場に出たとき、自分以外の味方全員のATKを永続+1。\n・聖なる灯(コスト3):場に出たとき、自分以外の味方全員にシールド。\n・爆裂機(コスト1+スキル):自分が墓地に送られたときが固定。対象と効果は自由に組めます。\n\n【専用スキル持ち(レア2)】そのキャラにだけ付く専用スキルが、スロットのどれかに固定されています。\n・自動追撃機(コスト4+スキル):条件が「味方が攻撃したとき」で固定。\n・報復の番人(コスト5+効果):条件「味方が攻撃されたとき」、対象「その相手を」が固定。\n・追い毒の司祭(コスト5+スキル):対象が「状態異常のキャラを全て」(敵味方どちらも)で固定。\n\n新カード実装のお祝いとして、正義の剣・自動追撃機・聖なる灯を1枚ずつ配布します。下の「受け取る」を押してください。", "grant": {"chars": {"sword": 1, "chaser": 1, "lamp": 1}}}, {"id": "2026-11-12-update2", "date": "2026-11-12", "title": "アップデート(11/12 その2)", "body": "・フレンド機能を追加しました(オンライン版)。タイトルの「フレンド」からフレンドコードで申請でき、承認されるとフレンドになります。対人戦のルームコード画面の「フレンドに転送」で、フレンドに対戦を申し込めます。\n・プレイヤー名はアカウント画面で設定する形に変更しました(対人戦の画面では入力しません)。\n・対人戦・CPU戦に「墓地を見る」ボタンを追加しました。\n・対人戦の終了後、ルームに参加した側がエナジーをもらえない不具合を修正しました。\n・デッキに入れられるレア3を4枚から3枚までに変更しました(CPU「つよい」のデッキも調整)。\n・デッキ構築画面で、キャラをレア順(1→3)に並べ、全キャラにレア度を★で表示するようにしました。\n・「手札に戻す」の制限を「同一ターン中に同一カードにつき1回まで」に変更しました。"}, {"id": "2026-11-12-update", "date": "2026-11-12", "title": "アップデート(11/12)", "body": "・場のユニットを、自分のターン中に左右へ並べ替えられるようになりました(ドラッグ、または「◀左へ」「右へ▶」ボタン)。\n・スキルが同時に発動するときは、同じ側では場の左のユニットから順に発動します(「HP最小」などの同点も左優先)。\n・能力「経費削減」の再使用ターンを3から5に増やしました。\n・このお知らせ機能を追加しました。"}, {"id": "2026-11-11-update", "date": "2026-11-11", "title": "アップデート(11/11)", "body": "・CPU戦に「かんたん/ふつう/つよい」の強さ選択を追加しました。\n・タイトル画面に「戦績」を追加しました(デッキ別・キャラ別の勝率など)。\n・レア3の調整: 無類の護神の固定スキルを変更、不屈の戦王のHPを7に、黒死の毒機を3/5に、アンデッドモンスターのATKを3に変更しました。"}];
 const NK='kumitate-tcg-news-read';
 const NEWSD={items:[],inbox:{requests:[],invites:[]}};
 const nEsc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -2073,7 +2122,7 @@ async function accInit(){
       ACC.token=g.token;ACC.player=g.player;fresh=g.recovery;
       try{localStorage.setItem(AK,ACC.token);}catch(e){}
     }
-    await accPull();ACC.on=true;
+    await accPull();ACC.on=true;psConnect();
     if($('tAcct'))$('tAcct').hidden=false;if($('tFriends'))$('tFriends').hidden=false;
     if(fresh)acctOpen(fresh);
   }catch(e){ACC.on=false;if($('titleMsg'))$('titleMsg').textContent='サーバーに接続できないため、この端末内だけに保存します。';}
@@ -2097,7 +2146,7 @@ async function friendsDraw(){
   let f;try{f=await api('/api/friends');}catch(e){frMsg(e.message);return;}
   $('frCode').textContent=f.code;
   let h='<div class="fr-h">フレンド('+f.friends.length+'/50)</div>';
-  h+=f.friends.length?f.friends.map((x,i)=>'<div class="fr-row"><b>'+nEsc(x.name)+'<small class="fr-code">'+nEsc(x.code)+'</small></b><button class="btn" data-rm="'+i+'">削除</button></div>').join(''):'<p class="nnone">まだフレンドがいません。</p>';
+  h+=f.friends.length?f.friends.map((x,i)=>'<div class="fr-row"><span class="pdot p'+(x.online|0)+'" title="'+['オフライン','別のタブを見ています','オンライン'][x.online|0]+'"></span><b>'+nEsc(x.name)+'<small class="fr-code">'+nEsc(x.code)+'</small></b><button class="btn" data-rm="'+i+'">削除</button></div>').join(''):'<p class="nnone">まだフレンドがいません。</p>';
   if(f.sent.length)h+='<div class="fr-h">申請中</div>'+f.sent.map((x,i)=>'<div class="fr-row"><b>'+nEsc(x.name)+'</b><button class="btn" data-cx="'+i+'">取り消す</button></div>').join('');
   $('frBody').innerHTML=h;$('frBody')._f=f;
 }
@@ -2130,7 +2179,38 @@ async function inviteJoin(v){
   lobbyOpen();$('lbMenu').hidden=true;pvMsg('接続中…');
   const ok=await pvStart('join',r.room,d,{name:ACC.player.name});if(!ok)$('lbMenu').hidden=false;
 }
-setInterval(()=>{if(ACC.on&&typeof document!=='undefined'&&!document.hidden&&!HEADLESS&&$('title')&&!$('title').hidden)newsLoad();},30000);
+let psTick=0; // 即時通知が使えているときは、念のための確認を2分に1回にする(つながっていないときは30秒に1回)
+setInterval(()=>{if(ACC.on&&typeof document!=='undefined'&&!document.hidden&&!HEADLESS&&(!(PS.ws&&PS.ws.readyState===1)||++psTick%4===0))newsLoad();},30000);
+/* ---------- オンライン表示・即時通知(タブごとに軽い接続を1本つなぐ。対戦の通信とは別) ---------- */
+const PS={ws:null,t:null,wait:3000};
+function toast(msg){
+  const box=$('toasts');if(!box)return;
+  const d=document.createElement('div');d.className='toast';d.textContent=msg;box.appendChild(d);
+  while(box.children.length>3)box.removeChild(box.firstChild);
+  setTimeout(()=>{if(d.parentNode)d.parentNode.removeChild(d);},5000);
+}
+const psVis=()=>typeof document!=='undefined'&&!document.hidden&&(typeof document.hasFocus!=='function'||document.hasFocus());
+function psSend(o){try{if(PS.ws&&PS.ws.readyState===1)PS.ws.send(JSON.stringify(o));}catch(e){}}
+function psConnect(){
+  if(HEADLESS||!ACC.on||PS.ws||typeof WebSocket==='undefined'||typeof location==='undefined'||!/^https?:/.test(location.protocol))return;
+  let ws;try{ws=new WebSocket(pvUrl());}catch(e){return;}
+  PS.ws=ws;
+  ws.onopen=()=>{PS.wait=3000;psSend({t:'hi',token:ACC.token,v:psVis()});};
+  ws.onmessage=ev=>{
+    let m;try{m=JSON.parse(ev.data);}catch(e){return;}
+    if(!m||m.t!=='n')return;
+    if(m.k==='invite')toast(String(m.name||'フレンド').slice(0,16)+'さんから対戦の申し込みが届きました');
+    newsLoad();if($('friends')&&!$('friends').hidden)friendsDraw();
+  };
+  ws.onclose=()=>{if(PS.ws===ws)PS.ws=null;clearTimeout(PS.t);if(ACC.on)PS.t=setTimeout(psConnect,PS.wait);PS.wait=Math.min(PS.wait*2,60000);};
+  ws.onerror=()=>{};
+}
+if(typeof document!=='undefined'&&typeof window!=='undefined'){
+  const pv=()=>psSend({t:'v',v:psVis()});
+  document.addEventListener('visibilitychange',pv);window.addEventListener('focus',pv);window.addEventListener('blur',pv);
+  setInterval(()=>{if(ACC.on&&!PS.ws&&!PS.t)psConnect();},20000);
+  setInterval(()=>{if(!$('friends').hidden&&!document.hidden)friendsDraw();},10000);
+}
 async function acctRecover(){
   const c=$('acInput').value.trim();if(!c)return;
   try{
