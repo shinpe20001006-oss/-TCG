@@ -10,10 +10,10 @@ async function start(port, dbUrl) {
   const st = await store.open(dbUrl);
   const app = express();
   app.set('trust proxy', 1);
-  app.use('/api', router(st, c => { const r = rooms.rooms.get(String(c)); return !!r && !r.b; }));
+  app.use('/api', router(st, c => { const r = rooms.rooms.get(String(c)); return !!r && !r.b; }, rooms.hub));
   app.use(express.static(path.join(__dirname, 'public'), { maxAge: 0 }));
   const server = http.createServer(app);
-  const wss = rooms.attach(server);
+  const wss = rooms.attach(server, t => st.byToken(t), async c => { for (const id of await st.closeInvitesByRoom(c)) rooms.hub.notify(id, { k: 'inv' }); });
   await new Promise(r => server.listen(port, r));
   return { server, st, wss, port: server.address().port, close: async () => { wss.clients.forEach(c => c.terminate()); await new Promise(r => server.close(r)); await st.close(); } };
 }
