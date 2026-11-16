@@ -68,7 +68,6 @@
   "peeker": 2,
   "sealcard": 2,
   "duelcard": 2,
-  "gravedig": 2,
   "raider": 2,
   "salvo": 2,
   "veteran": 2,
@@ -152,7 +151,6 @@
   "peeker": 2,
   "sealcard": 2,
   "duelcard": 2,
-  "gravedig": 2,
   "raider": 2,
   "salvo": 2,
   "veteran": 2,
@@ -284,6 +282,70 @@
   }
  },
  "packs": [
+  {
+   "id": "p0",
+   "name": "常設パック スタンダード",
+   "art": [
+    "常設",
+    "定番"
+   ],
+   "feature": null,
+   "featW": 1,
+   "live": true,
+   "open": true,
+   "r3": [
+    "warlord",
+    "valkyrie",
+    "ironclad",
+    "thorn",
+    "bastion",
+    "plaguelord"
+   ],
+   "r2": [
+    "archmage",
+    "dragoon",
+    "giant",
+    "sniper",
+    "assassin",
+    "bombmaker",
+    "venomblade",
+    "trainer",
+    "glacier",
+    "tide",
+    "charger",
+    "general",
+    "elite",
+    "priest",
+    "captain",
+    "night",
+    "veteran",
+    "paladin",
+    "mercenary",
+    "scribe",
+    "curse",
+    "sentinel",
+    "drummer",
+    "mistwitch",
+    "sword",
+    "lamp",
+    "blaster",
+    "levy",
+    "rushord",
+    "tomb",
+    "taboo",
+    "salute",
+    "barrier",
+    "peeker",
+    "sealcard",
+    "duelcard",
+    "raider",
+    "salvo",
+    "chaser",
+    "retaliator",
+    "poisonpriest"
+   ],
+   "blurb": "いつでも引ける定番パック。各弾の目玉を除く、ほぼ全種類のカードが出る。目玉はなし。"
+  },
   {
    "id": "p1",
    "name": "第1弾 槍帝降臨",
@@ -421,14 +483,13 @@
     "peeker",
     "sealcard",
     "duelcard",
-    "gravedig",
     "raider",
     "salvo"
    ],
    "featW": 1.2,
-   "live": false,
-   "open": false,
-   "blurb": "朽ちゆく城が、攻撃者を黙らせる。墓地と呪いのカードが多め。【仮案】"
+   "live": true,
+   "open": true,
+   "blurb": "朽ちゆく城が、攻撃者を黙らせる。墓地と呪いのカードが多め。"
   },
   {
    "id": "p5",
@@ -469,14 +530,13 @@
     "peeker",
     "sealcard",
     "duelcard",
-    "gravedig",
     "raider",
     "salvo"
    ],
    "featW": 1.2,
-   "live": false,
-   "open": false,
-   "blurb": "墓から起き上がる者たち。墓地のカードが多め。【仮案】"
+   "live": true,
+   "open": true,
+   "blurb": "墓から起き上がる者たち。墓地のカードが多め。"
   },
   {
    "id": "p6",
@@ -517,14 +577,13 @@
     "peeker",
     "sealcard",
     "duelcard",
-    "gravedig",
     "raider",
     "salvo"
    ],
    "featW": 1.2,
-   "live": false,
-   "open": false,
-   "blurb": "どんな状態異常も効かない王。状態異常と全体効果のカードが多め。【仮案】"
+   "live": true,
+   "open": true,
+   "blurb": "どんな状態異常も効かない王。状態異常と全体効果のカードが多め。"
   }
  ]
 }
