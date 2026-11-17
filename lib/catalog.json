@@ -1,4 +1,10 @@
 {
+ "p0only": [
+  "twinfang",
+  "mirror",
+  "autocure",
+  "tough"
+ ],
  "chars": {
   "apprentice": 3,
   "scout": 3,
@@ -59,6 +65,10 @@
   "retaliator": 2,
   "poisonpriest": 2,
   "undead": 1,
+  "twinfang": 3,
+  "mirror": 3,
+  "autocure": 2,
+  "tough": 2,
   "levy": 2,
   "rushord": 2,
   "tomb": 2,
@@ -142,6 +152,10 @@
   "retaliator": 2,
   "poisonpriest": 2,
   "undead": 3,
+  "twinfang": 1,
+  "mirror": 1,
+  "autocure": 2,
+  "tough": 2,
   "levy": 2,
   "rushord": 2,
   "tomb": 2,
@@ -234,6 +248,19 @@
   "redo",
   "lockdown"
  ],
+ "abcost": {
+  "fortress": 2,
+  "reaper": 3,
+  "foresight": 2,
+  "revive": 1,
+  "discount": 1,
+  "cleanse": 1,
+  "pursuit": 2,
+  "trap": 2,
+  "redo": 1,
+  "lockdown": 2
+ },
+ "abBudget": 3,
  "bigMax": 3,
  "starter": {
   "chars": {
@@ -342,7 +369,9 @@
     "salvo",
     "chaser",
     "retaliator",
-    "poisonpriest"
+    "poisonpriest",
+    "autocure",
+    "tough"
    ],
    "blurb": "いつでも引ける定番パック。各弾の目玉を除く、ほぼ全種類のカードが出る。目玉はなし。"
   },
