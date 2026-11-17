@@ -457,7 +457,7 @@ body.fx-lite .unit.fx-lunge{animation:none}
     <h3>デッキ</h3>
     <ul>
       <li><b>キャラ20枚+スキル30枚</b>。同名は3枚まで、大型キャラは各1枚・合計3枚まで。</li>
-      <li>デッキごとに<b>能力</b>を1つ選び、名前を付けて保存できる。</li>
+      <li>デッキごとに<b>能力</b>を選び、名前を付けて保存できる。能力にはコスト(1〜3)があり、合計3まで持てる。</li>
     </ul>
     <h3>巻き返しの仕組み</h3>
     <ul>
@@ -473,7 +473,7 @@ body.fx-lite .unit.fx-lunge{animation:none}
       <li><b>獣</b>:攻撃が10%でクリティカル(ダメージ+2。追い討ち・1ダメージ・反撃は対象外)。</li>
     </ul>
     <h3>能力</h3>
-    <p>戦闘前に1つ選び、自分のメインフェーズに1回使えます。使うと、決まったターン数が過ぎるまで再使用できません(画面左上のターン表示で数えます)。相手の能力は、使われるまで分かりません。</p><ul id="abref"></ul>
+    <p>戦闘前に、能力コストの合計が3以内になるように選びます(コスト3を1つ、2+1、1+1+1など。同じ能力は重複不可)。自分のメインフェーズに使えますが、<b>使えるのは1ターンに1回だけ</b>(どの能力を使うかは自由)。使うと、その能力は決まったターン数が過ぎるまで再使用できません(再使用までのターン数は能力ごとに別々。画面左上のターン表示で数えます)。「能力を使ったとき」の条件は、どの能力を使っても発動します。相手の能力は、使われるまで分かりません(使った能力だけが公開されます)。相手の能力は、使われるまで分かりません。</p><ul id="abref"></ul>
     <h3>その他</h3>
     <ul>
       <li>「攻撃させる」は、対象が発動者の敵を攻撃する。</li>
@@ -617,6 +617,13 @@ const ABIL={
   lockdown:{name:'万全な対策',cd:12,len:4,desc:'相手は、次の4ターンの間、能力を使えなくなる。'}
 };
 const AB_KEYS=Object.keys(ABIL);
+const AB_BUDGET=3;
+Object.entries({fortress:2,reaper:3,foresight:2,revive:1,discount:1,cleanse:1,pursuit:2,trap:2,redo:1,lockdown:2}).forEach(([k,c])=>{ABIL[k].c=c;});
+const abList=v=>{const a=Array.isArray(v)?v:(v?[v]:[]);return [...new Set(a)].filter(k=>typeof k==='string'&&Object.prototype.hasOwnProperty.call(ABIL,k));};
+const abCost=v=>abList(v).reduce((t,k)=>t+ABIL[k].c,0);
+const abFit=v=>{let c=0;return abList(v).filter(k=>(c+=ABIL[k].c)<=AB_BUDGET);};
+const randAbs=()=>{const ks=AB_KEYS.slice().sort(()=>Math.random()-.5),out=[];let c=0;for(const k of ks){if(c+ABIL[k].c<=AB_BUDGET&&(out.length===0||Math.random()<.7)){out.push(k);c+=ABIL[k].c;}}return out;};
+const AB_ORDER=AB_KEYS.slice().sort((a,b)=>ABIL[a].c-ABIL[b].c);
 const REPEAT=new Set(['myturn','foeturn','foeweak','gravefull']), WIDE=new Set(['friends','enemies','all','others','foetwo','tagself','tagally','tagfoe','ailedall']);
 let GFN=12,SURV=SURCHARGE,GPSTEP=5,GPMAX=2,AHDMG=2,TURNHOOK=null;
 const sur=(c,t,e)=>((REPEAT.has(c)&&WIDE.has(t))?SURV:0)+((e==='bounce'&&WIDE.has(t))?5:0);
@@ -656,6 +663,10 @@ const ROWS=[
   ['retaliator','報復の番人',2,2,6,{cond:'allyattacked',targ:'source'}],
   ['poisonpriest','追い毒の司祭',2,2,4,{targ:'ailedall'}],
   ['undead','アンデッドモンスター',5,3,3,{targ:'self'},{undead:1}],
+  ['twinfang','双牙の狼',2,2,3,null,{double:1}],
+  ['mirror','鏡の見習い',2,2,4,{cond:'attacked'},{counter:1}],
+  ['autocure','自動治療機',2,2,4,{eff:'cure'},{adapt:1}],
+  ['tough','不屈の傭兵',3,3,3,null,{endure:1}],
   ['levy','臨時徴兵令',0,1,1,{cond:'enter',targ:'meplayer',eff:'capup'},{decay:1}],
   ['rushord','群れの急襲',2,1,1,{cond:'enter',targ:'justin',eff:'haste'},{decay:1}],
   ['tomb','墓所の写本',0,1,1,{cond:'enter',targ:'gskill',eff:'bounce'},{decay:1}],
@@ -673,11 +684,11 @@ const ROWS=[
   ['curse','呪い師',2,3,5,{cond:'foeturn',eff:'atkdown'}],['tide','潮読み',2,1,3,{cond:'foeenter',eff:'bounce'}],
   ['venomblade','毒使い',3,3,4,{cond:'attacks',targ:'foeone',eff:'poison'}]
 ];
-const KWD={pierce:'貫通:このカードの攻撃(基本攻撃・「攻撃する」の効果)は、相手の装甲とシールドを無視する。シールドは破壊され、ダメージは通る。能力「追い討ち」には効かない。',guard:'守護:このカードがいる間、相手の基本攻撃はこのカード(守護を持つカード)にしか向けられない。',armor:'装甲:攻撃で受けるダメージが減る(最低0)。毒・1ダメージ・直接ダメージには効かない。',counter:'反撃:基本攻撃を受けて生き残ったとき、攻撃してきたカードにATK分のダメージを返す。',double:'連撃:1ターンに基本攻撃を2回できる。',adapt:'適応:毒・凍結・沈黙・火傷・帯電・手札に戻る効果を受けない。',haste:'速攻:場に出たターンから基本攻撃ができる。',endure:'耐久:死ぬダメージを受けても、HP1で耐える。1回のみ。',decay:'自壊:毎ターンの終わり(自分のターンも相手のターンも)に、自身が1ダメージを受ける。',undead:'死者:このカードへの回復とダメージが反転する(ダメージで回復、回復でダメージ)。回復は最大HPまで。'};
+const KWD={pierce:'貫通:このカードの攻撃(基本攻撃・「攻撃する」の効果)は、相手の装甲とシールドを無視する。シールドは破壊され、ダメージは通る。能力「追い討ち」には効かない。',guard:'守護:このカードがいる間、相手の基本攻撃はこのカード(守護を持つカード)にしか向けられない。',armor:'装甲:攻撃で受けるダメージが減る(最低0)。毒・1ダメージ・直接ダメージには効かない。',counter:'反撃:基本攻撃を受けて生き残ったとき、攻撃してきたカードにATK分のダメージを返す。',double:'連撃:1ターンに基本攻撃を2回できる。',adapt:'適応:毒・凍結・沈黙・火傷・帯電・手札に戻る効果を受けない。',haste:'速攻:場に出たターンから基本攻撃ができる。',endure:'耐久:死ぬダメージを受けても、HP1で耐える。1回のみ。',decay:'自壊:毎ターンの終わり(自分のターンも相手のターンも)に、自身が1ダメージを受ける。',undead:'死者:このカードへの回復とダメージが反転する(ダメージで回復、回復でダメージ)。回復は最大HPまで。シールドは普通のカードと同じく、攻撃で剥がれる(その攻撃は防ぐ。貫通なら剥がれて回復になる)。'};
 const kwName=(k,v)=>({guard:'守護',armor:'装甲'+v,counter:'反撃',double:'連撃',pierce:'貫通',adapt:'適応',haste:'速攻',endure:'耐久',decay:'自壊',undead:'死者'})[k];
 const CHARS=ROWS.map(([key,name,b,atk,hp,fix,kw])=>({key,name,b,cost:b,atk,hp,hpBase:hp,fix,kw:kw||{}}));
 const TAGNAME={w:'戦士',m:'魔術',b:'獣',k:'機械'};
-const TAGMAP={levy:'w',rushord:'b',tomb:'m',taboo:'m',salute:'k',barrier:'b',peeker:'b',sealcard:'k',duelcard:'w',raider:'b',salvo:'w',sword:'w',lamp:'m',blaster:'k',chaser:'k',retaliator:'w',poisonpriest:'m',apprentice:'w',heavy:'w',general:'w',knight:'w',wounded:'w',counter:'w',maiden:'w',captain:'w',warlord:'w',valkyrie:'w',lance:'w',warking:'w',veteran:'w',elite:'w',paladin:'w',mercenary:'w',
+const TAGMAP={levy:'w',rushord:'b',tomb:'m',taboo:'m',salute:'k',barrier:'b',peeker:'b',sealcard:'k',duelcard:'w',raider:'b',salvo:'w',twinfang:'b',mirror:'m',autocure:'k',tough:'w',sword:'w',lamp:'m',blaster:'k',chaser:'k',retaliator:'w',poisonpriest:'m',apprentice:'w',heavy:'w',general:'w',knight:'w',wounded:'w',counter:'w',maiden:'w',captain:'w',warlord:'w',valkyrie:'w',lance:'w',warking:'w',veteran:'w',elite:'w',paladin:'w',mercenary:'w',
  mage:'m',archmage:'m',medic:'m',weaken:'m',mourner:'m',priest:'m',witch:'m',frost:'m',sealer:'m',mistwitch:'m',wardgod:'m',fool:'m',undead:'m',scribe:'m',curse:'m',tide:'m',
  scout:'b',dragoon:'b',giant:'b',watch:'b',herald:'b',needle:'b',signal:'b',berserk:'b',avenger:'b',snake:'b',night:'b',thorn:'b',swift:'b',charger:'b',trainer:'b',venomblade:'b',
  shield:'k',archer:'k',bomber:'k',guardian:'k',sniper:'k',slinger:'k',smith:'k',assassin:'k',drummer:'k',bombmaker:'k',bastion:'k',ironclad:'k',sentinel:'k',plaguelord:'k',glacier:'k',ambush:'k'};
@@ -763,7 +774,7 @@ const wait=ms=>{const rid=G.runId;if(HEADLESS||speed===0)return rid!==G.runId?Pr
 const nextTurnOf=owner=>G.cur===owner?G.turn+2:G.turn+1;
 
 /* ---------- setup ---------- */
-function newPlayer(){return{unity:null,life:LIFE,hand:[],cdeck:[],sdeck:[],cgrave:[],sgrave:[],field:[],ab:null,abUsed:-99,abRevealed:false,fortressTurn:-99,trapTurn:-99,trapHide:false,swept:false,abLock:-99};}
+function newPlayer(){return{unity:null,life:LIFE,hand:[],cdeck:[],sdeck:[],cgrave:[],sgrave:[],field:[],abs:[],abU:{},abTurn:-99,abRv:{},fortressTurn:-99,trapTurn:-99,trapHide:false,swept:false,abLock:-99};}
 let BUNDLE=0.7;const BUNDLE_SET=v=>{BUNDLE=v;};
 function arrangeSkills(cards){
   const by={cond:[],targ:[],eff:[]};shuffle(cards.slice()).forEach(c=>by[c.type].push(c));
@@ -1035,7 +1046,7 @@ async function hit(src,t,dmg,mode,np){
     const P=G.p[t.player];
     if(P.fortressTurn===G.turn){
       popup('P'+t.player,'無効','info');flash('P'+t.player,'fire',500);
-      log(sname(t.player)+'の「籠城の構え」が直接攻撃を無効にした。',t.player===ME?'me':'foe');P.abRevealed=true;
+      log(sname(t.player)+'の「籠城の構え」が直接攻撃を無効にした。',t.player===ME?'me':'foe');P.abRv.fortress=1;
       render();await wait(450);return;
     }
     P.life-=dmg;
@@ -1044,6 +1055,19 @@ async function hit(src,t,dmg,mode,np){
     render();await wait(550);return;
   }
   const v=t.unit;if(!v.alive)return;
+  if(v.char.kw&&v.char.kw.undead&&v.shield){ // 死者でもシールドは攻撃で剥がれる(貫通は剥がして回復になる)
+    v.shield=false;
+    if(pierce){popup('u'+v.uid,'貫通','dmg');log(un(src)+'の貫通がシールドを破壊した。',sideOf(src));}
+    else{
+      popup('u'+v.uid,'防いだ','info');flash('u'+v.uid,'fire',500);
+      log(un(src)+'→'+un(v)+':シールドがダメージを防いだ。',sideOf(src));
+      render();await wait(480);
+      if(isAtk)emitAtkd(v,src);
+      if(mode!=='basic'&&mode!=='counter'&&src!==v)emit('effected',v);
+      if(mode==='basic'&&v.alive&&((v.char.kw&&v.char.kw.counter)||CTR>0)&&src&&src.alive&&src.uid!==undefined&&src!==v)await hit(v,{unit:src},(v.char.kw&&v.char.kw.counter)?atkOf(v):Math.ceil(atkOf(v)*CTR),'counter');
+      return;
+    }
+  }
   if(v.char.kw&&v.char.kw.undead){
     const h=Math.min(dmg,v.maxHp-v.hp);v.hp+=h;popup('u'+v.uid,'+'+h,'buff');flash('u'+v.uid,'fire',450);
     log(un(src)+'→'+un(v)+':死者なのでダメージが回復になった(+'+h+' HP'+v.hp+'/'+v.maxHp+')',sideOf(src));
@@ -1415,7 +1439,7 @@ function perform(idx,m){
   }
   if(m.t==='sac'){const u=findUnit(m.u);if(!u){netDesync('sac');throw new Abort();}return (async()=>{sendToGrave(u,'自ら墓地に送られた',true);})();}
   if(m.t==='move'){const u=findUnit(m.u);if(!u||u.owner!==idx||!(m.to>=0)){netDesync('move');throw new Abort();}return (async()=>{moveUnit(u,m.to);})();}
-  if(m.t==='ability')return abilityBody(idx);
+  if(m.t==='ability')return abilityBody(idx,m.k);
   if(m.t==='sweep')return sweepBody(idx);
   netDesync('act '+m.t);throw new Abort();
 }
@@ -1447,7 +1471,7 @@ async function playBody(idx,ch,picks){
   flash('u'+u.uid,'enter',400);render();vfx('u'+u.uid,'summon');await wait(520);
   const O=G.p[1-idx];
   if(O.trapTurn===G.turn){
-    O.trapTurn=-99;O.trapHide=false;O.abRevealed=true;G.abUses.trapHit=(G.abUses.trapHit||0)+1;
+    O.trapTurn=-99;O.trapHide=false;O.abRv.trap=1;G.abUses.trapHit=(G.abUses.trapHit||0)+1;
     log('🪤 '+sname(1-idx)+'の「巧妙な罠」が発動!',idx===ME?'foe':'me');popup('u'+u.uid,'罠!','dmg');render();await wait(600);
     sendToGrave(u,'罠にかかって墓地に送られた');return;
   }
@@ -1508,7 +1532,7 @@ async function turn(idx){
   if(G.over)return;
   await act(async()=>{await decayTick(idx);await decayTick(1-idx);});
   if(G.over)return;
-  {const P=G.p[idx];if(P.peeked){P.peeked=false;P.foreLock=null;P.abUsed=G.turn;log('👁 '+sname(idx)+'は予知の眼を使わずにターンを終えた(使用済み扱い)。',idx===ME?'me':'foe');}}
+  {const P=G.p[idx];if(P.peeked){P.peeked=false;P.foreLock=null;P.abU.foresight=G.turn;P.abTurn=G.turn;log('👁 '+sname(idx)+'は予知の眼を使わずにターンを終えた(使用済み扱い)。',idx===ME?'me':'foe');}}
   await handLimit(idx);
 }
 async function startGame(auto,opts){
@@ -1516,15 +1540,15 @@ async function startGame(auto,opts){
   init(auto,opts.decks,opts);G.lv=opts.lv;G.myDeck=dk[ME]||null;if(!HEADLESS){$('result').hidden=true;$('pick').hidden=true;$('title').hidden=true;$('builder').hidden=true;}render();
   try{
     log('ゲーム開始。ライフ'+LIFE+'、場のコスト上限'+CAP+'。','sys');
-    if(G.net){G.p[0].ab=dk[0].ab;G.p[1].ab=dk[1].ab;}
+    if(G.net){G.p[0].abs=abFit(dk[0].ab);G.p[1].abs=abFit(dk[1].ab);}
     else{
-    G.p[1].ab=(dk[1]&&dk[1].ab)||AB_KEYS[Math.floor(Math.random()*AB_KEYS.length)];
-    if(G.auto)G.p[0].ab=(dk[0]&&dk[0].ab)||AB_KEYS[Math.floor(Math.random()*AB_KEYS.length)];
-    else if(dk[0]&&dk[0].ab){G.p[0].ab=dk[0].ab;log('デッキ「'+dk[0].name+'」の能力は「'+ABIL[dk[0].ab].name+'」。','me');}
+    G.p[1].abs=abFit(dk[1]&&dk[1].ab);if(!G.p[1].abs.length)G.p[1].abs=randAbs();
+    if(G.auto){G.p[0].abs=abFit(dk[0]&&dk[0].ab);if(!G.p[0].abs.length)G.p[0].abs=randAbs();}
+    else if(dk[0]&&abFit(dk[0].ab).length){G.p[0].abs=abFit(dk[0].ab);log('デッキ「'+dk[0].name+'」の能力は「'+G.p[0].abs.map(k=>ABIL[k].name).join('」「')+'」。','me');}
     else{
       const i=await openPick('能力を選ぶ','戦闘前に1つ選びます。自分のターンに使え、使ったあとは決まったターン数が過ぎるまで再使用できません。',
         AB_KEYS.map(k=>({html:'<b>'+ABIL[k].name+'</b><span>再使用まで '+ABIL[k].cd+' ターン</span><small>'+ABIL[k].desc+'</small>'})),false);
-      G.p[0].ab=AB_KEYS[i];log('あなたの能力は「'+ABIL[G.p[0].ab].name+'」。','me');
+      G.p[0].abs=[AB_KEYS[i]];log('あなたの能力は「'+ABIL[AB_KEYS[i]].name+'」。','me');
     }
     }
     for(const i of [ME,1-ME])await drawPhase(i,6);
@@ -1558,12 +1582,14 @@ function cpuSweep(idx){
   return foeC.length>=2&&gain>=SWEEP_DIFF;
 }
 /* ---------- abilities ---------- */
-const abCd=i=>Math.max(1,ABIL[G.p[i].ab].cd-(G.p[i].unity==='k'?2:0));
-const abNext=i=>Math.max(G.p[i].abUsed+abCd(i),ABIL[G.p[i].ab].start||0,G.p[i].abLock);
-const abReady=i=>!!G.p[i].ab&&G.turn>=abNext(i);
-function abCan(i){
-  const P=G.p[i],F=G.p[1-i];
-  switch(P.ab){
+const abK=(i,k)=>k||G.p[i].abs[0];
+const hasAb=(i,k)=>G.p[i].abs.includes(k);
+const abCd=(i,k)=>{k=abK(i,k);return Math.max(1,ABIL[k].cd-(G.p[i].unity==='k'?2:0));};
+const abNext=(i,k)=>{k=abK(i,k);const P=G.p[i];return Math.max((P.abU[k]===undefined?-99:P.abU[k])+abCd(i,k),ABIL[k].start||0,P.abLock);};
+const abReady=(i,k)=>{k=abK(i,k);return !!k&&hasAb(i,k)&&G.turn>=abNext(i,k)&&G.p[i].abTurn!==G.turn;};
+function abCan(i,k){
+  const P=G.p[i],F=G.p[1-i];k=abK(i,k);
+  switch(k){
     case 'reaper':return F.field.length>0;
     case 'foresight':return P.cdeck.length+P.sdeck.length>0;
     case 'revive':return P.hand.some(c=>c.kind==='char')&&canDraw(i,'skill');
@@ -1571,8 +1597,8 @@ function abCan(i){
     case 'cleanse':return P.field.some(curable);
     case 'pursuit':return F.field.length>0&&P.field.length>0;
     case 'redo':return P.cgrave.length+P.sgrave.length+F.cgrave.length+F.sgrave.length>0;
-    case 'lockdown':return !!F.ab;
-    default:return !!P.ab;
+    case 'lockdown':return F.abs.length>0;
+    default:return !!k&&hasAb(i,k);
   }
 }
 function openPick(title,sub,items,cancel){
@@ -1638,13 +1664,13 @@ async function foresightUI(idx){
   if(j<0)return null;
   return{dk,card:top[j]};
 }
-async function abilityBody(idx){
-  const P=G.p[idx],F=G.p[1-idx],k=P.ab,A=ABIL[k];
+async function abilityBody(idx,k){
+  const P=G.p[idx],F=G.p[1-idx];k=abK(idx,k);if(!k||!hasAb(idx,k)||!abReady(idx,k))return;const A=ABIL[k];
   const pub=m=>log(m,idx===ME?'me':'foe');
   const named=idx===ME||G.auto;
   const ctx={me:idx,eff:k};
-  const use=()=>{P.foreLock=null;P.peeked=false;P.abUsed=G.turn;G.abUses[k]=(G.abUses[k]||0)+1;P.field.slice().sort(byTurn).forEach(v=>qpush(v,'abil'));};
-  const announce=()=>{P.abRevealed=true;pub('✦ '+sname(idx)+'が能力「'+A.name+'」を使った。');};
+  const use=()=>{P.foreLock=null;P.peeked=false;P.abU[k]=G.turn;P.abTurn=G.turn;G.abUses[k]=(G.abUses[k]||0)+1;P.field.slice().sort(byTurn).forEach(v=>qpush(v,'abil'));};
+  const announce=()=>{P.abRv[k]=1;pub('✦ '+sname(idx)+'が能力「'+A.name+'」を使った。');};
   if(k==='fortress'){
     use();announce();P.fortressTurn=G.turn+1;popup('P'+idx,'籠城','info');flash('P'+idx,'fire',700);render();await wait(500);
   }else if(k==='reaper'){
@@ -1709,8 +1735,9 @@ async function abilityBody(idx){
 }
 async function cpuAbilityPhase(idx,phase){
   const P=G.p[idx],F=G.p[1-idx];
-  if(!P.ab||G.over||!abReady(idx)||!abCan(idx))return;
-  const k=P.ab;let go=false;
+  if(G.over)return;
+  for(const k of P.abs){
+  if(G.over||!abReady(idx,k)||!abCan(idx,k))continue;let go=false;
   const maxA=P.field.reduce((m,u)=>Math.max(m,atkOf(u)),0);
   const chars=P.hand.filter(c=>c.kind==='char').length;
   if(phase==='start'){
@@ -1718,7 +1745,7 @@ async function cpuAbilityPhase(idx,phase){
     else if(k==='revive')go=chars>=2&&(P.hand.length-chars)<=3;
     else if(k==='discount')go=capOf(idx)-fieldCost(idx)<12;
     else if(k==='redo'){const gr=P.cgrave.length+P.sgrave.length;go=gr>=5&&(P.cdeck.length<=3||P.sdeck.length<=4)||gr+F.cgrave.length+F.sgrave.length>=22;}
-    else if(k==='lockdown')go=!!F.ab&&(F.abRevealed||G.turn>=8)&&abNext(1-idx)<=G.turn+3&&Math.random()<0.8;
+    else if(k==='lockdown')go=F.abs.length>0&&(Object.keys(F.abRv).length>0||G.turn>=8)&&F.abs.some(x=>abNext(1-idx,x)<=G.turn+3)&&Math.random()<0.8;
   }else if(phase==='pre'){
     if(k==='reaper')go=F.field.some(u=>ucost(u)>=6||atkOf(u)>=4)||F.field.length>=3;
     else if(k==='pursuit')go=maxA>=2&&F.field.some(u=>u.hp<=maxA||atkOf(u)>=4);
@@ -1727,7 +1754,8 @@ async function cpuAbilityPhase(idx,phase){
     if(k==='fortress')go=P.life<=LIFE*0.75||F.field.reduce((s,u)=>s+atkOf(u),0)>=P.life*0.3;
     else if(k==='trap')go=Math.random()<0.85;
   }
-  if(go){await doAct(idx,{t:'ability'});await wait(300);}
+  if(go){await doAct(idx,{t:'ability',k});await wait(300);return;}
+  }
 }
 function senseWarn(c,t,e){
   const side=TSIDE[t],k=EKIND[e];
@@ -1895,7 +1923,8 @@ function plate(t,key,fixed){
 function kwTags(c){
   return Object.keys(c.kw||{}).map(k=>'<span class="tag kw" title="'+KWD[k]+'">'+kwName(k,c.kw[k])+'</span>').join('');
 }
-const R2KW=['sentinel','sword','lamp','blaster','levy','rushord','tomb','taboo','salute','barrier','peeker','sealcard','duelcard','raider','salvo'];const rare=c=>R2KW.includes(c.key)?2:Object.keys(c.kw||{}).length?3:(c.cost>=4?2:1);
+const R1KW=['twinfang','mirror'],P0ONLY=['twinfang','mirror','autocure','tough'];/* 性質付きのレア1・2(常設パックでしか出ない) */
+const R2KW=['autocure','tough','sentinel','sword','lamp','blaster','levy','rushord','tomb','taboo','salute','barrier','peeker','sealcard','duelcard','raider','salvo'];const rare=c=>R1KW.includes(c.key)?1:R2KW.includes(c.key)?2:Object.keys(c.kw||{}).length?3:(c.cost>=4?2:1);
 function unitHTML(u,side){
   const key='u'+u.uid,foe=side===1;
   const targetable=(UI.prompt&&UI.prompt.keys.has(key))||(UI.mode==='attack'&&foe&&!UI.prompt&&basicPool(FOE()).includes(u));
@@ -1924,14 +1953,20 @@ function sweepHTML(i){
   const btn=(i===ME&&!G.auto&&G.phase==='main')?'<button class="btn" data-act="sweep"'+(canAct()&&sweepCan(ME)?'':' disabled')+'>宣言する</button>':'';
   return '<div class="abil '+(P.swept?'':'ready')+'" title="1ゲームに1回、自分のターンにライフ'+SWEEP_LIFE+'を払って宣言。お互いの場のコスト'+SWEEP_T+'以下のカードをすべて破壊する。"><i>大掃除</i><span>'+(P.swept?'使用済み':'未使用(ライフ-'+SWEEP_LIFE+')')+'</span>'+btn+'</div>';
 }
+function abilOne(i,k){
+  const P=G.p[i],A=ABIL[k],opp=i!==ME&&!G.auto,hideUse=(opp&&k==='trap'&&P.trapHide);
+  const cdOk=hideUse||G.turn>=abNext(i,k),usedNow=!opp&&P.abTurn===G.turn,ready=cdOk&&!usedNow;
+  const st=cdOk?(usedNow?'今ターンは使用済み':'使用可'):(G.turn<P.abLock?'🔒封じられている(ターン'+abNext(i,k)+'以降)':'ターン'+abNext(i,k)+'以降に再使用');
+  const btn=(i===ME&&!G.auto&&G.phase==='main')?'<button class="btn" data-act="ability" data-k="'+k+'"'+(canAct()&&ready&&abCan(i,k)?'':' disabled')+'>使う</button>':'';
+  return '<div class="abil '+(cdOk&&(hideUse||!usedNow)?'ready':'')+'" title="'+A.desc+'(使用後'+abCd(i,k)+'ターンで再使用)"><i>能力</i><b>'+A.name+'</b><span>'+st+'</span>'+btn+'</div>';
+}
 function abilHTML(i){
   const P=G.p[i];
-  if(!P.ab)return '';
-  if(!(i===ME||G.auto||P.abRevealed))return '<div class="abil hidden"><i>能力</i><b>???</b></div>';
-  const A=ABIL[P.ab],hideUse=(i!==ME&&!G.auto&&P.ab==='trap'&&P.trapHide),ready=hideUse||abReady(i);
-  const st=ready?'使用可':(G.turn<P.abLock?'🔒封じられている(ターン'+abNext(i)+'以降)':'ターン'+abNext(i)+'以降に再使用');
-  const btn=(i===ME&&!G.auto&&G.phase==='main')?'<button class="btn" data-act="ability"'+(canAct()&&ready&&abCan(i)?'':' disabled')+'>使う</button>':'';
-  return '<div class="abil '+(ready?'ready':'')+'" title="'+A.desc+'(使用後'+abCd(i)+'ターンで再使用)"><i>能力</i><b>'+A.name+'</b><span>'+st+'</span>'+btn+'</div>';
+  if(!P.abs.length)return '';
+  const vis=i===ME||G.auto,ks=vis?P.abs:P.abs.filter(k=>P.abRv[k]);
+  let h=ks.map(k=>abilOne(i,k)).join('');
+  if(!vis&&ks.length<P.abs.length)h+='<div class="abil hidden"><i>能力</i><b>???</b></div>';
+  return h;
 }
 function statusHTML(i){
   const P=G.p[i],foe=i!==ME,used=fieldCost(i);
@@ -2132,9 +2167,10 @@ $('board').addEventListener('click',e=>{
     run(doAct(ME,{t:'sweep'}));
   }
   else if(a==='ability'){
-    if(!canAct()||!abReady(ME)||!abCan(ME))return;
+    const k=el.dataset.k;
+    if(!canAct()||!abReady(ME,k)||!abCan(ME,k))return;
     UI.selUnit=null;UI.selChar=null;UI.picks={};UI.mode=null;
-    run(doAct(ME,{t:'ability'}));
+    run(doAct(ME,{t:'ability',k}));
   }
   else if(a==='mvl'||a==='mvr'){
     if(!canAct())return;
@@ -2202,7 +2238,7 @@ $('btnSpeed').addEventListener('click',()=>{
   TYPES.forEach(t=>{Object.keys(SK[t]).forEach(k=>{h+='<tr><td class="c-'+t+'">'+TLABEL[t]+'</td><td>'+SK[t][k].name+'</td><td>+'+SK[t][k].inc+'</td><td>'+DESC[t][k]+'</td></tr>';});});
   XKEYS.forEach(([t,k])=>{h+='<tr><td class="c-'+t+'">'+TLABEL[t]+'(専用)</td><td>'+SK[t][k].name+'</td><td>+'+SK[t][k].inc+'</td><td>'+DESC[t][k]+'</td></tr>';});
   $('ref').innerHTML=h;
-  $('abref').innerHTML=AB_KEYS.map(k=>'<li><b>'+ABIL[k].name+'</b>(再使用まで'+ABIL[k].cd+'ターン):'+ABIL[k].desc+'</li>').join('');
+  $('abref').innerHTML=AB_ORDER.map(k=>'<li><b>'+ABIL[k].name+'</b>(コスト'+ABIL[k].c+'・再使用まで'+ABIL[k].cd+'ターン):'+ABIL[k].desc+'</li>').join('');
 })();
 }
 
@@ -2214,7 +2250,7 @@ const maxCopies=c=>isBig(c)?1:(rare(c)===2?2:3);
 const cnt=o=>Object.values(o).reduce((a,b)=>a+b,0);
 const BIG_MAX=3,bigCnt=o=>Object.entries(o).reduce((a,[k,n])=>a+(CHAR_BY[k]&&isBig(CHAR_BY[k])?n:0),0);
 const typeCnt=(d,t)=>Object.entries(d.skills).filter(([id])=>id.indexOf(t+'.')===0).reduce((a,[,n])=>a+n,0);
-const cloneDeck=d=>({name:d.name,chars:Object.assign({},d.chars),skills:Object.assign({},d.skills),ab:d.ab});
+const cloneDeck=d=>({name:d.name,chars:Object.assign({},d.chars),skills:Object.assign({},d.skills),ab:abList(d.ab)});
 function validateDeck(d){
   const e=[],c=cnt(d.chars),s2=cnt(d.skills);
   if(c!==DECK_C)e.push('キャラは'+DECK_C+'枚必要です(いま'+c+'枚)');
@@ -2223,7 +2259,7 @@ function validateDeck(d){
   Object.entries(d.chars).forEach(([k,n])=>{const ch=Object.prototype.hasOwnProperty.call(CHAR_BY,k)?CHAR_BY[k]:null;if(!ch)e.push('不明なキャラがあります');else if(n>maxCopies(ch))e.push('「'+ch.name+'」は'+maxCopies(ch)+'枚までです');});
   Object.entries(d.skills).forEach(([id,n])=>{const [t,k]=id.split('.');if(!SK[t]||!Object.prototype.propertyIsEnumerable.call(SK[t],k)||!SK[t][k])e.push('不明なスキルがあります');else if(n>3)e.push('「'+SK[t][k].name+'」は3枚までです');});
   if(bigCnt(d.chars)>BIG_MAX)e.push('レア3は'+BIG_MAX+'枚までです(いま'+bigCnt(d.chars)+'枚)');
-  if(!ABIL[d.ab])e.push('能力を選んでください');
+  {const al=abList(d.ab);if(!al.length)e.push('能力を選んでください');else if(abCost(al)>AB_BUDGET)e.push('能力コストの合計は'+AB_BUDGET+'までです(いま'+abCost(al)+')');}
   return e;
 }
 const pc=(s2)=>{const o={};s2.split(' ').forEach(x=>{const m=x.split(':');o[m[0]]=+(m[1]||1);});return o;};
@@ -2252,7 +2288,7 @@ function loadDecks(){
 function storeLocal(a){memDecks=a;try{localStorage.setItem(LS_KEY,JSON.stringify(a));}catch(e){storageOk=false;}}
 function storeDecks(a){storeLocal(a);accPush(a);}
 /* ---------- お知らせ(オンライン: サーバー、オフライン: 同梱の一覧。配布の受け取りはオンラインのみ) ---------- */
-const NEWS_BUILTIN=[{"id": "2026-11-16-gravechange", "date": "2026-11-16", "title": "墓地まわりの調整、第4〜6弾と常設パックのガチャ(11/16)", "body": "【調整】\n・自壊サポート「墓穴掘り」を削除しました(自分で場に出して墓地に送れば足りるため)。まだ誰も持っていないカードなので、所持への影響はありません。\n・条件「自分のキャラ墓地が12枚以上のとき」(旧:5枚以上。コスト+2):自分のターン開始時にも、相手のターン開始時にも、条件を満たしていれば発動します(毎ターン2回)。以前の「自分のターンのとき」とほぼ同じだった5枚では、使う意味が薄かったためです。\n・「墓荒らし」の効果を、わかりにくかった「墓地から取り除く」から、「相手のキャラ墓地3枚につき、相手のライフに1ダメージ(最大3)」に変えました。\n\n【ガチャ】\nオンライン版でも、第4弾「朽ちる契約」・第5弾「死者の行進」・第6弾「適応の森」のガチャを引けるようになりました(新しい状態異常・墓地スキル・サポートカードも入っています)。\n・新しく「常設パック スタンダード」を追加しました(ガチャ画面の一番左)。他の弾の目玉(一閃の槍帝・無類の護神・韋駄天・愚者の城・アンデッドモンスター・不屈の戦王)を除く、全種類のカードが出ます。このパックに目玉はありません。\n\n実戦のデータでは、キャラ墓地が12枚に届くのは、中盤の終わり(自分の10〜12ターン目ごろ)から、およそ10〜40%の試合でした。終盤向けの条件です。"}, {"id": "2026-11-16-burncharge", "date": "2026-11-16", "title": "新しい状態異常「火傷」と「帯電」(11/16)", "body": "【新スキル(効果・ガチャ・デッキ構築ですぐ使えます。コストは各+1)】\n・「火傷にする」:火傷のカードは、攻撃するたび(基本攻撃・「攻撃する」・「攻撃させる」。1回の攻撃ごと)に自分が1ダメージ(装甲・シールドは関係なし)。持ち主の次の3ターンの終わりまで続く。火傷の間は凍結せず、すでに凍結していたら解ける。\n・「帯電させる」:帯電のカードがダメージを受けると、両隣のカードがそれぞれ1ダメージ(装甲は無視)を受け、帯電は解ける。倒されたときも放電する。持ち主の次の2ターンの終わりまで続く。\n\n火傷・帯電も「状態異常」です。適応で防がれ、「状態異常を治す」「聖なる癒し」で治り、「敵が状態異常になったとき」「状態異常なら2ダメージ」「状態異常のキャラを全て」の対象になります。\n\n【調整の根拠】\n・火傷は「相手が攻撃しなければ0ダメージ」なので、毒(3ダメージ確定)より弱め。継続を3ターンにして釣り合わせました。\n・帯電は敵の場が広いほど強く、全体帯電+全体1ダメージだと、同じコストの全体1ダメージ2枚より約3割多く削れます。ただしCPU対戦では毒や凍結より勝率が上がらなかったため、コストは+1のままにしています。"}, {"id": "2026-11-15-graveparts", "date": "2026-11-15", "title": "墓地・状態異常向けの新スキル4つと自壊サポート3枚(11/15)", "body": "【新スキル(ガチャ・デッキ構築ですぐ使えます)】\n・条件「自分のキャラ墓地が5枚以上のとき」(コスト+2):自分のターン開始時に、条件を満たしている間は毎ターン発動。\n・条件「敵が状態異常になったとき」(コスト+2):敵が毒・凍結・沈黙・封印を受けるたびに発動(適応で防がれたときは発動しない)。\n・効果「墓地のキャラ5枚につき、ATK+1(このターン・最大+2)」(コスト+2):5〜9枚で+1、10枚以上で+2。\n・効果「状態異常なら2ダメージを与える」(コスト+2):対象が毒・凍結・沈黙・封印のときだけ。装甲は無視。\n\n【自壊サポート3枚(レア2・第4〜6弾に収録)】\n・墓穴掘り(獣・合計コスト1):<場に出たとき><自分のプレイヤーを><キャラ山札の上から1枚を墓地に送る>\n・墓荒らし(獣・合計コスト2):<場に出たとき><相手のプレイヤーを><相手の墓地からランダムに3枚を取り除く>\n・号砲(戦士・合計コスト3):<場に出たとき><敵1枚を選択><このターンに出した自分のカードの枚数ぶんのダメージ(最大6)>\n\n実戦のデータでは、墓地は中盤に5枚以上たまるのが普通だったため、墓地の枚数ぶんの強化は「5枚につき+1(最大+2)」に抑えています。"}, {"id": "2026-11-15-abilities", "date": "2026-11-15", "title": "新しい能力を2つ追加(11/15)", "body": "【新能力】\n・やり直しの一手(再使用まで10ターン):お互いの墓地のカードをすべて山札に戻して、山札をシャッフルする。山札切れのダメージを避けたいときや、相手の墓地を使うデッキへの対策に。\n・万全な対策(再使用まで12ターン):相手は、次の4ターンの間、能力を使えなくなる。使うと相手に知られ、相手の能力欄に「封じられている」と表示される。\n\nデッキ構築の「能力」から選べます。"}, {"id": "2026-11-15-supports", "date": "2026-11-15", "title": "自壊型サポート9枚を追加/いくつかの仕様変更(11/15)", "body": "【新カード(すべてレア2・自壊型サポート)】\n・臨時徴兵令:このターン、場のコスト上限+8\n・群れの急襲:このターンに出た味方が、出したターンでも攻撃できる\n・墓所の写本:スキル墓地からランダムで2枚を手札に戻す\n・蘇生の禁術:キャラ墓地から1枚を選んで手札に戻す(戻したカードは相手のログにも出ます)\n・弔砲:自分のキャラ墓地の枚数ぶん(最大6)のダメージを敵のカード1枚に与える\n・縄張りの結界:自分以外の味方全員に、次の相手のターンの終わりまで「適応」を与える\n・梟の盗み見:相手の手札を見て1枚を捨てさせる\n・封印装置:敵1枚のスキルを永久に封じる\n・決闘状:味方1枚と敵1枚がお互いにATK分のダメージを与え合う\n(4〜6弾のパックに入ります)\n\n【仕様変更】\n・条件「効果を受けたとき」のコストを2に変更。敵の「手札に戻す」で戻されるときも、戻る直前に発動するようになりました。\n・条件「状態異常になったとき」が、沈黙でも(封じられる直前に1回)発動するようになりました。\n・能力「蘇生の魔術」を「生贄の取引」(手札のキャラ1枚を捨てて、スキルを2枚引く)に変更しました。"}, {"id": "2026-11-14-instant", "date": "2026-11-14", "title": "お知らせの即時反映(11/14 その2)", "body": "・フレンド申請・承認・削除や、対戦の招待が終了したときなどが、30秒待たずにすぐ反映されるようになりました。\n・フレンド一覧のオンライン表示の凡例を外しました。"}, {"id": "2026-11-14-presence", "date": "2026-11-14", "title": "フレンドのオンライン表示と申し込み通知(11/14)", "body": "・フレンド一覧の名前の手前に、オンライン状態の丸が付きました(緑=見ている / 黄=別のタブを見ている / 灰=オフライン)。\n・フレンドから対戦の申し込みが来ると、画面の右下に5秒間だけ通知が出ます(どの画面でも出ます。参加はお知らせから行います)。\n・「ルール」の内容を、短く読みやすく整理しました。"}, {"id": "2026-11-13-debug", "date": "2026-11-13", "title": "全体デバッグを行いました(11/13 その5)", "body": "・未発売の新カード(レア2)が、登録ボーナスや天井交換で出てしまう不具合を修正しました。\n・対戦相手の名前に特殊な文字が入っていてもログが崩れないようにしました。\n・デッキの検証・保存まわりを強化し、不正なデータが保存されないようにしました。\n・通信エラー時の応答を整理しました。\n・ランダム対戦4000戦などの自動テストで、停止やエラーが起きないことを確認しました。"}, {"id": "2026-11-13-chat", "date": "2026-11-13", "title": "対人戦にチャットを追加しました(11/13 その4)", "body": "・対人戦の画面で、ログの欄を「ログ/チャット」で切り替えられるようになりました(オンライン版)。\n・チャットは1回100文字まで、連投はできません。対戦が終わると消えます。\n・ログを見ている間に相手から届くと、「チャット」のタブに赤い丸が出ます。"}, {"id": "2026-11-13-cpu2", "date": "2026-11-13", "title": "CPUのデッキを調整しました(11/13 その3)", "body": "・CPU「かんたん」は、デッキにレア3を入れなくなりました。\n・CPU「ふつう」は、デッキのレア3が1体か2体だけになりました。2体のときは、「つよい」デッキからの入れ替え(ランダム性)を増やして、強さが変わらないようにしています。"}, {"id": "2026-11-13-cpu", "date": "2026-11-13", "title": "CPUの強さとフレンド画面を調整しました(11/13 その2)", "body": "・CPU「つよい」のデッキを作り直しました。属性統一(戦士・魔術・機械・獣)のデッキを、自己対戦で探索して最強の構成にしています(レア3は3枚まで)。\n・CPU「ふつう」の強さをほんの少し上げました。\n・フレンド画面で、フレンドごとのフレンドコードが見られるようになりました。"}, {"id": "2026-11-13-newcards", "date": "2026-11-13", "title": "新カード6枚を追加しました(11/13)", "body": "新カードを6枚追加しました。第4〜6弾のパックで登場予定です(まだ引けません)。\n\n【自壊型サポート(レア2)】基本コスト0で、出したターンの終わりに自壊するお手軽サポートです。\n・正義の剣(コスト3):場に出たとき、自分以外の味方全員のATKを永続+1。\n・聖なる灯(コスト3):場に出たとき、自分以外の味方全員にシールド。\n・爆裂機(コスト1+スキル):自分が墓地に送られたときが固定。対象と効果は自由に組めます。\n\n【専用スキル持ち(レア2)】そのキャラにだけ付く専用スキルが、スロットのどれかに固定されています。\n・自動追撃機(コスト4+スキル):条件が「味方が攻撃したとき」で固定。\n・報復の番人(コスト5+効果):条件「味方が攻撃されたとき」、対象「その相手を」が固定。\n・追い毒の司祭(コスト5+スキル):対象が「状態異常のキャラを全て」(敵味方どちらも)で固定。\n\n新カード実装のお祝いとして、正義の剣・自動追撃機・聖なる灯を1枚ずつ配布します。下の「受け取る」を押してください。", "grant": {"chars": {"sword": 1, "chaser": 1, "lamp": 1}}}, {"id": "2026-11-12-update2", "date": "2026-11-12", "title": "アップデート(11/12 その2)", "body": "・フレンド機能を追加しました(オンライン版)。タイトルの「フレンド」からフレンドコードで申請でき、承認されるとフレンドになります。対人戦のルームコード画面の「フレンドに転送」で、フレンドに対戦を申し込めます。\n・プレイヤー名はアカウント画面で設定する形に変更しました(対人戦の画面では入力しません)。\n・対人戦・CPU戦に「墓地を見る」ボタンを追加しました。\n・対人戦の終了後、ルームに参加した側がエナジーをもらえない不具合を修正しました。\n・デッキに入れられるレア3を4枚から3枚までに変更しました(CPU「つよい」のデッキも調整)。\n・デッキ構築画面で、キャラをレア順(1→3)に並べ、全キャラにレア度を★で表示するようにしました。\n・「手札に戻す」の制限を「同一ターン中に同一カードにつき1回まで」に変更しました。"}, {"id": "2026-11-12-update", "date": "2026-11-12", "title": "アップデート(11/12)", "body": "・場のユニットを、自分のターン中に左右へ並べ替えられるようになりました(ドラッグ、または「◀左へ」「右へ▶」ボタン)。\n・スキルが同時に発動するときは、同じ側では場の左のユニットから順に発動します(「HP最小」などの同点も左優先)。\n・能力「経費削減」の再使用ターンを3から5に増やしました。\n・このお知らせ機能を追加しました。"}, {"id": "2026-11-11-update", "date": "2026-11-11", "title": "アップデート(11/11)", "body": "・CPU戦に「かんたん/ふつう/つよい」の強さ選択を追加しました。\n・タイトル画面に「戦績」を追加しました(デッキ別・キャラ別の勝率など)。\n・レア3の調整: 無類の護神の固定スキルを変更、不屈の戦王のHPを7に、黒死の毒機を3/5に、アンデッドモンスターのATKを3に変更しました。"}];
+const NEWS_BUILTIN=[{"id": "2026-11-17-multiabil", "date": "2026-11-17", "title": "能力を複数持てるようになりました(11/17)", "body": "デッキに入れられる能力が、1つから「能力コスト合計3まで」に変わりました。\n\n【能力コスト】\n・コスト1:聖なる癒し/生贄の取引/経費削減/やり直しの一手\n・コスト2:籠城の構え/予知の眼/追い討ち/巧妙な罠/万全な対策\n・コスト3:死神の鎌\n(コスト3を1つ、2+1、1+1+1などの組み合わせ。同じ能力は重複できません)\n\n【ルール】\n・能力を使えるのは、1ターンに1回だけ(どれを使うかは自由)。\n・再使用までのターン数は、能力ごとに別々に数えます。\n・「能力を使ったとき」の条件は、どの能力を使っても発動します。\n・相手の能力は、使われるまで分かりません(使った能力だけが公開されます)。\n・「万全な対策」は、相手の全能力を4ターン封じます。\n\n【調整】\n自己対戦での計測をもとに、籠城の構えを1→2、やり直しの一手を2→1、万全な対策を3→2にしました。\n\n今まで保存したデッキは、そのままの能力1つで使えます(デッキ編集画面で追加できます)。"}, {"id": "2026-11-17-p0cards", "date": "2026-11-17", "title": "常設パックに新カード4枚(11/17)", "body": "常設パックだけに入る、性質(キーワード)つきの低レアカードを4枚追加しました。\n\n・双牙の狼(レア1/獣/コスト2/2-3):連撃\n・鏡の見習い(レア1/魔術/コスト2/2-4):反撃。「攻撃されたとき」を最初から持つ\n・自動治療機(レア2/機械/コスト3/2-4):適応。「状態異常を治す」を最初から持つ\n・不屈の傭兵(レア2/戦士/コスト3/3-3):耐久\n\nこれに合わせて、性質つき=レア3というルールを「基本はレア3、ただしこの4枚のように例外あり」に変更しました。"}, {"id": "2026-11-16-undeadshield", "date": "2026-11-16", "title": "「死者」のシールドを調整(11/16)", "body": "キーワード「死者」(アンデッドモンスターなど)は、これまでシールドを張ると、回復(ダメージが回復に変わる)を受けない限りシールドが剥がれず、強すぎました。\n\n調整後は、死者のシールドも普通のカードと同じく、攻撃を受けると剥がれます(その攻撃は防ぐので、回復もしません)。「貫通」の攻撃は、シールドを剥がしたうえで、ダメージが回復になります。"}, {"id": "2026-11-16-gravechange", "date": "2026-11-16", "title": "墓地まわりの調整、第4〜6弾と常設パックのガチャ(11/16)", "body": "【調整】\n・自壊サポート「墓穴掘り」を削除しました(自分で場に出して墓地に送れば足りるため)。まだ誰も持っていないカードなので、所持への影響はありません。\n・条件「自分のキャラ墓地が12枚以上のとき」(旧:5枚以上。コスト+2):自分のターン開始時にも、相手のターン開始時にも、条件を満たしていれば発動します(毎ターン2回)。以前の「自分のターンのとき」とほぼ同じだった5枚では、使う意味が薄かったためです。\n・「墓荒らし」の効果を、わかりにくかった「墓地から取り除く」から、「相手のキャラ墓地3枚につき、相手のライフに1ダメージ(最大3)」に変えました。\n\n【ガチャ】\nオンライン版でも、第4弾「朽ちる契約」・第5弾「死者の行進」・第6弾「適応の森」のガチャを引けるようになりました(新しい状態異常・墓地スキル・サポートカードも入っています)。\n・新しく「常設パック スタンダード」を追加しました(ガチャ画面の一番左)。他の弾の目玉(一閃の槍帝・無類の護神・韋駄天・愚者の城・アンデッドモンスター・不屈の戦王)を除く、全種類のカードが出ます。このパックに目玉はありません。\n\n実戦のデータでは、キャラ墓地が12枚に届くのは、中盤の終わり(自分の10〜12ターン目ごろ)から、およそ10〜40%の試合でした。終盤向けの条件です。"}, {"id": "2026-11-16-burncharge", "date": "2026-11-16", "title": "新しい状態異常「火傷」と「帯電」(11/16)", "body": "【新スキル(効果・ガチャ・デッキ構築ですぐ使えます。コストは各+1)】\n・「火傷にする」:火傷のカードは、攻撃するたび(基本攻撃・「攻撃する」・「攻撃させる」。1回の攻撃ごと)に自分が1ダメージ(装甲・シールドは関係なし)。持ち主の次の3ターンの終わりまで続く。火傷の間は凍結せず、すでに凍結していたら解ける。\n・「帯電させる」:帯電のカードがダメージを受けると、両隣のカードがそれぞれ1ダメージ(装甲は無視)を受け、帯電は解ける。倒されたときも放電する。持ち主の次の2ターンの終わりまで続く。\n\n火傷・帯電も「状態異常」です。適応で防がれ、「状態異常を治す」「聖なる癒し」で治り、「敵が状態異常になったとき」「状態異常なら2ダメージ」「状態異常のキャラを全て」の対象になります。\n\n【調整の根拠】\n・火傷は「相手が攻撃しなければ0ダメージ」なので、毒(3ダメージ確定)より弱め。継続を3ターンにして釣り合わせました。\n・帯電は敵の場が広いほど強く、全体帯電+全体1ダメージだと、同じコストの全体1ダメージ2枚より約3割多く削れます。ただしCPU対戦では毒や凍結より勝率が上がらなかったため、コストは+1のままにしています。"}, {"id": "2026-11-15-graveparts", "date": "2026-11-15", "title": "墓地・状態異常向けの新スキル4つと自壊サポート3枚(11/15)", "body": "【新スキル(ガチャ・デッキ構築ですぐ使えます)】\n・条件「自分のキャラ墓地が5枚以上のとき」(コスト+2):自分のターン開始時に、条件を満たしている間は毎ターン発動。\n・条件「敵が状態異常になったとき」(コスト+2):敵が毒・凍結・沈黙・封印を受けるたびに発動(適応で防がれたときは発動しない)。\n・効果「墓地のキャラ5枚につき、ATK+1(このターン・最大+2)」(コスト+2):5〜9枚で+1、10枚以上で+2。\n・効果「状態異常なら2ダメージを与える」(コスト+2):対象が毒・凍結・沈黙・封印のときだけ。装甲は無視。\n\n【自壊サポート3枚(レア2・第4〜6弾に収録)】\n・墓穴掘り(獣・合計コスト1):<場に出たとき><自分のプレイヤーを><キャラ山札の上から1枚を墓地に送る>\n・墓荒らし(獣・合計コスト2):<場に出たとき><相手のプレイヤーを><相手の墓地からランダムに3枚を取り除く>\n・号砲(戦士・合計コスト3):<場に出たとき><敵1枚を選択><このターンに出した自分のカードの枚数ぶんのダメージ(最大6)>\n\n実戦のデータでは、墓地は中盤に5枚以上たまるのが普通だったため、墓地の枚数ぶんの強化は「5枚につき+1(最大+2)」に抑えています。"}, {"id": "2026-11-15-abilities", "date": "2026-11-15", "title": "新しい能力を2つ追加(11/15)", "body": "【新能力】\n・やり直しの一手(再使用まで10ターン):お互いの墓地のカードをすべて山札に戻して、山札をシャッフルする。山札切れのダメージを避けたいときや、相手の墓地を使うデッキへの対策に。\n・万全な対策(再使用まで12ターン):相手は、次の4ターンの間、能力を使えなくなる。使うと相手に知られ、相手の能力欄に「封じられている」と表示される。\n\nデッキ構築の「能力」から選べます。"}, {"id": "2026-11-15-supports", "date": "2026-11-15", "title": "自壊型サポート9枚を追加/いくつかの仕様変更(11/15)", "body": "【新カード(すべてレア2・自壊型サポート)】\n・臨時徴兵令:このターン、場のコスト上限+8\n・群れの急襲:このターンに出た味方が、出したターンでも攻撃できる\n・墓所の写本:スキル墓地からランダムで2枚を手札に戻す\n・蘇生の禁術:キャラ墓地から1枚を選んで手札に戻す(戻したカードは相手のログにも出ます)\n・弔砲:自分のキャラ墓地の枚数ぶん(最大6)のダメージを敵のカード1枚に与える\n・縄張りの結界:自分以外の味方全員に、次の相手のターンの終わりまで「適応」を与える\n・梟の盗み見:相手の手札を見て1枚を捨てさせる\n・封印装置:敵1枚のスキルを永久に封じる\n・決闘状:味方1枚と敵1枚がお互いにATK分のダメージを与え合う\n(4〜6弾のパックに入ります)\n\n【仕様変更】\n・条件「効果を受けたとき」のコストを2に変更。敵の「手札に戻す」で戻されるときも、戻る直前に発動するようになりました。\n・条件「状態異常になったとき」が、沈黙でも(封じられる直前に1回)発動するようになりました。\n・能力「蘇生の魔術」を「生贄の取引」(手札のキャラ1枚を捨てて、スキルを2枚引く)に変更しました。"}, {"id": "2026-11-14-instant", "date": "2026-11-14", "title": "お知らせの即時反映(11/14 その2)", "body": "・フレンド申請・承認・削除や、対戦の招待が終了したときなどが、30秒待たずにすぐ反映されるようになりました。\n・フレンド一覧のオンライン表示の凡例を外しました。"}, {"id": "2026-11-14-presence", "date": "2026-11-14", "title": "フレンドのオンライン表示と申し込み通知(11/14)", "body": "・フレンド一覧の名前の手前に、オンライン状態の丸が付きました(緑=見ている / 黄=別のタブを見ている / 灰=オフライン)。\n・フレンドから対戦の申し込みが来ると、画面の右下に5秒間だけ通知が出ます(どの画面でも出ます。参加はお知らせから行います)。\n・「ルール」の内容を、短く読みやすく整理しました。"}, {"id": "2026-11-13-debug", "date": "2026-11-13", "title": "全体デバッグを行いました(11/13 その5)", "body": "・未発売の新カード(レア2)が、登録ボーナスや天井交換で出てしまう不具合を修正しました。\n・対戦相手の名前に特殊な文字が入っていてもログが崩れないようにしました。\n・デッキの検証・保存まわりを強化し、不正なデータが保存されないようにしました。\n・通信エラー時の応答を整理しました。\n・ランダム対戦4000戦などの自動テストで、停止やエラーが起きないことを確認しました。"}, {"id": "2026-11-13-chat", "date": "2026-11-13", "title": "対人戦にチャットを追加しました(11/13 その4)", "body": "・対人戦の画面で、ログの欄を「ログ/チャット」で切り替えられるようになりました(オンライン版)。\n・チャットは1回100文字まで、連投はできません。対戦が終わると消えます。\n・ログを見ている間に相手から届くと、「チャット」のタブに赤い丸が出ます。"}, {"id": "2026-11-13-cpu2", "date": "2026-11-13", "title": "CPUのデッキを調整しました(11/13 その3)", "body": "・CPU「かんたん」は、デッキにレア3を入れなくなりました。\n・CPU「ふつう」は、デッキのレア3が1体か2体だけになりました。2体のときは、「つよい」デッキからの入れ替え(ランダム性)を増やして、強さが変わらないようにしています。"}, {"id": "2026-11-13-cpu", "date": "2026-11-13", "title": "CPUの強さとフレンド画面を調整しました(11/13 その2)", "body": "・CPU「つよい」のデッキを作り直しました。属性統一(戦士・魔術・機械・獣)のデッキを、自己対戦で探索して最強の構成にしています(レア3は3枚まで)。\n・CPU「ふつう」の強さをほんの少し上げました。\n・フレンド画面で、フレンドごとのフレンドコードが見られるようになりました。"}, {"id": "2026-11-13-newcards", "date": "2026-11-13", "title": "新カード6枚を追加しました(11/13)", "body": "新カードを6枚追加しました。第4〜6弾のパックで登場予定です(まだ引けません)。\n\n【自壊型サポート(レア2)】基本コスト0で、出したターンの終わりに自壊するお手軽サポートです。\n・正義の剣(コスト3):場に出たとき、自分以外の味方全員のATKを永続+1。\n・聖なる灯(コスト3):場に出たとき、自分以外の味方全員にシールド。\n・爆裂機(コスト1+スキル):自分が墓地に送られたときが固定。対象と効果は自由に組めます。\n\n【専用スキル持ち(レア2)】そのキャラにだけ付く専用スキルが、スロットのどれかに固定されています。\n・自動追撃機(コスト4+スキル):条件が「味方が攻撃したとき」で固定。\n・報復の番人(コスト5+効果):条件「味方が攻撃されたとき」、対象「その相手を」が固定。\n・追い毒の司祭(コスト5+スキル):対象が「状態異常のキャラを全て」(敵味方どちらも)で固定。\n\n新カード実装のお祝いとして、正義の剣・自動追撃機・聖なる灯を1枚ずつ配布します。下の「受け取る」を押してください。", "grant": {"chars": {"sword": 1, "chaser": 1, "lamp": 1}}}, {"id": "2026-11-12-update2", "date": "2026-11-12", "title": "アップデート(11/12 その2)", "body": "・フレンド機能を追加しました(オンライン版)。タイトルの「フレンド」からフレンドコードで申請でき、承認されるとフレンドになります。対人戦のルームコード画面の「フレンドに転送」で、フレンドに対戦を申し込めます。\n・プレイヤー名はアカウント画面で設定する形に変更しました(対人戦の画面では入力しません)。\n・対人戦・CPU戦に「墓地を見る」ボタンを追加しました。\n・対人戦の終了後、ルームに参加した側がエナジーをもらえない不具合を修正しました。\n・デッキに入れられるレア3を4枚から3枚までに変更しました(CPU「つよい」のデッキも調整)。\n・デッキ構築画面で、キャラをレア順(1→3)に並べ、全キャラにレア度を★で表示するようにしました。\n・「手札に戻す」の制限を「同一ターン中に同一カードにつき1回まで」に変更しました。"}, {"id": "2026-11-12-update", "date": "2026-11-12", "title": "アップデート(11/12)", "body": "・場のユニットを、自分のターン中に左右へ並べ替えられるようになりました(ドラッグ、または「◀左へ」「右へ▶」ボタン)。\n・スキルが同時に発動するときは、同じ側では場の左のユニットから順に発動します(「HP最小」などの同点も左優先)。\n・能力「経費削減」の再使用ターンを3から5に増やしました。\n・このお知らせ機能を追加しました。"}, {"id": "2026-11-11-update", "date": "2026-11-11", "title": "アップデート(11/11)", "body": "・CPU戦に「かんたん/ふつう/つよい」の強さ選択を追加しました。\n・タイトル画面に「戦績」を追加しました(デッキ別・キャラ別の勝率など)。\n・レア3の調整: 無類の護神の固定スキルを変更、不屈の戦王のHPを7に、黒死の毒機を3/5に、アンデッドモンスターのATKを3に変更しました。"}];
 const NK='kumitate-tcg-news-read';
 const NEWSD={items:[],inbox:{requests:[],invites:[]}};
 const nEsc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -2473,7 +2509,7 @@ const allDecks=()=>PRESETS.concat(loadDecks());
 function pickW(list,w){let t=0;const ws=list.map(x=>{const v=w(x);t+=v;return v;});let r=Math.random()*t;for(let i=0;i<list.length;i++){r-=ws[i];if(r<=0)return list[i];}return list[list.length-1];}
 function randomDeck(base,limit,maxBig){
   if(maxBig===undefined)maxBig=BIG_MAX;
-  const d=base?cloneDeck(base):{name:'CPUデッキ',chars:{},skills:{},ab:AB_KEYS[Math.floor(Math.random()*AB_KEYS.length)]};
+  const d=base?cloneDeck(base):{name:'CPUデッキ',chars:{},skills:{},ab:randAbs()};
   let n=cnt(d.chars),g=0;
   const w=c=>isBig(c)?0.5:(c.cost<=2?3:(c.cost<=4?2:1));
   while(n<DECK_C&&g++<4000){const c=pickW(CHARS,w);if((d.chars[c.key]||0)>=(limit?capC(c):maxCopies(c))||(isBig(c)&&bigCnt(d.chars)>=maxBig))continue;d.chars[c.key]=(d.chars[c.key]||0)+1;n++;}
@@ -2484,10 +2520,10 @@ function randomDeck(base,limit,maxBig){
     const keys=Object.keys(SK[t]),key=keys[Math.floor(Math.random()*keys.length)],id=t+'.'+key;
     if((d.skills[id]||0)>=(limit?capS(t,key):3))continue;d.skills[id]=(d.skills[id]||0)+1;m++;
   }
-  if(!ABIL[d.ab])d.ab=AB_KEYS[Math.floor(Math.random()*AB_KEYS.length)];
+  d.ab=abFit(d.ab);if(!d.ab.length)d.ab=randAbs();
   return d;
 }
-const deckSummary=d=>'キャラ'+cnt(d.chars)+'/'+DECK_C+' スキル'+cnt(d.skills)+'/'+DECK_S+' ・能力:'+(ABIL[d.ab]?ABIL[d.ab].name:'未選択');
+const deckSummary=d=>'キャラ'+cnt(d.chars)+'/'+DECK_C+' スキル'+cnt(d.skills)+'/'+DECK_S+' ・能力:'+(abList(d.ab).length?abList(d.ab).map(k=>ABIL[k].name).join('・'):'未選択');
 /* CPUの「つよい」用デッキ(自己対戦の探索で選ばれた構築) */
 /* CPU「つよい」用: 自己対戦で探索した統一デッキ(レア3は3枚まで) */
 const STRONG=[{"name":"魔術統一","ab":"reaper","chars":{"general":1,"priest":2,"tide":2,"fool":1,"wardgod":1,"curse":2,"undead":1,"archmage":2,"mistwitch":2,"medic":1,"drummer":1,"bombmaker":1,"dragoon":1,"giant":1,"mage":1},"skills":{"eff.makeattack":3,"cond.foeattacks":1,"targ.enemies":3,"targ.all":1,"eff.bounce":3,"targ.tagfoe":3,"targ.lowfoe":3,"targ.foetwo":1,"targ.foeone":1,"cond.allygrave":1,"targ.friends":1,"targ.select":2,"cond.foeenter":3,"eff.attack":1,"cond.enter":2,"targ.tagself":1}},{"name":"戦士統一","ab":"reaper","chars":{"heavy":2,"general":2,"elite":2,"plaguelord":1,"mercenary":1,"captain":2,"knight":1,"priest":1,"tide":2,"veteran":1,"warking":1,"paladin":2,"mistwitch":1,"warlord":1},"skills":{"eff.makeattack":3,"cond.foeattacks":1,"targ.enemies":3,"targ.all":2,"eff.bounce":3,"targ.tagfoe":2,"cond.foeturn":2,"targ.lowfoe":1,"eff.silence":1,"targ.foetwo":2,"eff.atkdown":1,"cond.allygrave":1,"targ.friends":1,"cond.foeenter":3,"cond.allyenter":1,"targ.foeone":1,"cond.wounded":1,"cond.enter":1}},{"name":"機械統一","ab":"fortress","chars":{"plaguelord":1,"veteran":2,"ambush":3,"assassin":2,"bastion":1,"bombmaker":2,"ironclad":1,"sentinel":2,"glacier":1,"tide":2,"mistwitch":1,"sniper":1,"shield":1},"skills":{"eff.makeattack":3,"cond.foeattacks":2,"targ.enemies":3,"targ.all":1,"eff.bounce":3,"targ.tagfoe":1,"targ.lowfoe":2,"targ.foetwo":2,"eff.atkdown":2,"cond.allygrave":1,"targ.friends":3,"cond.enter":2,"cond.allyenter":2,"cond.attacked":1,"targ.tagally":1,"eff.shield":1}},{"name":"獣統一","ab":"reaper","chars":{"dragoon":2,"venomblade":2,"giant":2,"trainer":2,"swift":1,"charger":1,"watch":1,"avenger":2,"mistwitch":1,"warking":1,"bombmaker":1,"priest":1,"plaguelord":1,"berserk":2},"skills":{"eff.makeattack":3,"targ.enemies":3,"targ.all":2,"eff.bounce":3,"cond.foeturn":1,"targ.foetwo":1,"targ.tagself":2,"targ.foeone":1,"targ.friends":2,"eff.freeze":2,"eff.trigger":1,"cond.enter":3,"targ.tagally":2,"cond.foeenter":1,"eff.ping":1,"cond.allyenter":1,"cond.foegrave":1}}];
@@ -2590,8 +2626,9 @@ function edSideHTML(){
    const best=Object.entries(cn).sort((a,b)=>b[1]-a[1])[0];
    h+='<div class="unitybar '+(ut?'on':'')+'">'+(ut?'✨ <b>'+TAGNAME[ut]+'統一</b>:'+UNITY_TXT[ut]:'属性統一:同じ属性のキャラを'+UNITY_MIN+'枚以上入れると恩恵'+(best?'(いま最多は'+TAGNAME[best[0]]+' '+best[1]+'枚)':''))+'</div>';}
   h+='<div class="derr '+(errs.length?'bad':'ok')+'">'+(errs.length?errs.slice(0,3).join('<br>'):'このデッキで遊べます')+'</div>';
-  h+='<h3>能力(1つ選ぶ)</h3><div class="dabs">'+AB_KEYS.map(k=>'<button class="dab '+(d.ab===k?'on':'')+'" data-d="ab" data-id="'+k+'" title="'+ABIL[k].desc+'"><b>'+ABIL[k].name+'</b><span>再使用'+ABIL[k].cd+'</span></button>').join('')+'</div>';
-  h+='<div class="dabdesc">'+(ABIL[d.ab]?ABIL[d.ab].desc:'')+'</div>';
+  {const al=abList(d.ab);
+   h+='<h3>能力(コスト合計'+AB_BUDGET+'まで・いま'+abCost(al)+')</h3><div class="dabs">'+AB_ORDER.map(k=>'<button class="dab '+(al.includes(k)?'on':'')+'" data-d="ab" data-id="'+k+'" title="'+ABIL[k].desc+'"><b>'+ABIL[k].name+'</b><span>コスト'+ABIL[k].c+'・再使用'+ABIL[k].cd+'</span></button>').join('')+'</div>';
+   h+='<div class="dabdesc">'+(al.length?al.map(k=>'<b>'+ABIL[k].name+'</b>:'+ABIL[k].desc).join('<br>'):'')+'</div>';}
   h+='<div class="dbtnrow"><button class="btn primary" data-d="save">保存</button><button class="btn" data-d="fill">おまかせで埋める</button><button class="btn" data-d="clear">'+({char:'キャラ',cond:'条件',targ:'対象',eff:'効果'}[ED.tab]||'')+'を空にする</button></div>';
   h+='<div class="dbtnrow"><button class="btn primary" data-d="play"'+(errs.length?' disabled':'')+'>このデッキでCPU戦</button></div>';
   if(ED.msg)h+='<div class="dmsg">'+ED.msg+'</div>';
@@ -2627,7 +2664,7 @@ function edClick(e){
   }
   else if(a==='own')ED.onlyOwn=!ED.onlyOwn;
   else if(a==='tagf')ED.tagF=id;
-  else if(a==='ab')d.ab=id;
+  else if(a==='ab'){const l=abList(d.ab),i=l.indexOf(id),gone=[];if(i>=0)l.splice(i,1);else{while(l.length&&abCost(l)+ABIL[id].c>AB_BUDGET)gone.push(ABIL[l.shift()].name);l.push(id);if(gone.length)ED.msg='コスト上限のため「'+gone.join('」「')+'」を外しました。';}d.ab=l;}
   else if(a==='save')edSave();
   else if(a==='fill'){ED.d=randomDeck(d,true);ED.d.name=d.name;ED.msg='空きをおまかせで埋めました。';}
   else if(a==='clear'){
@@ -2672,7 +2709,7 @@ const PACKS=[
 /* 常設パック: 他の弾の目玉(レア3)を除く、発売済みの全カードが出る。目玉はなし */
 {const feats=new Set(PACKS.map(p=>p.feature)),live=PACKS.filter(p=>p.live),u=a=>[...new Set(a)];
  PACKS.unshift({id:'p0',name:'常設パック スタンダード',art:['常設','定番'],feature:null,featW:1,live:true,open:true,
-  r3:u([].concat(...live.map(p=>p.r3))).filter(k=>!feats.has(k)),r2:u([].concat(...live.map(p=>p.r2))),
+  r3:u([].concat(...live.map(p=>p.r3))).filter(k=>!feats.has(k)),r2:u([].concat(...live.map(p=>p.r2)).concat(P0ONLY.filter(k=>rare(CHAR_BY[k])===2))),
   blurb:'いつでも引ける定番パック。各弾の目玉を除く、ほぼ全種類のカードが出る。目玉はなし。'});}
 const packLive=p=>p.live||!!window.__OFFLINE__, packOpen=p=>p.open||!!window.__OFFLINE__;
 const openPacks=()=>PACKS.filter(packOpen);
@@ -2684,7 +2721,7 @@ const starterInv=()=>{const i={chars:{},skills:{}};Object.entries(STARTER_DECK.c
 function gaBonus(inv){ // 登録ボーナス:スターターに加え10枚(レア3を1・レア2を2・レア1を2・スキル5)。上限枚数は超えない
   const pk=a=>a[Math.floor(Math.random()*a.length)];
   const takeC=(list,n)=>{for(let i=0,g=0;i<n&&g++<300;){const c=pk(list);if((inv.chars[c.key]||0)>=maxCopies(c))continue;inv.chars[c.key]=(inv.chars[c.key]||0)+1;i++;}};
-  takeC(CHARS.filter(c=>rare(c)===3&&released(c)),1);takeC(CHARS.filter(c=>rare(c)===2&&released(c)),2);takeC(CHARS.filter(c=>rare(c)===1),2);
+  takeC(CHARS.filter(c=>rare(c)===3&&released(c)),1);takeC(CHARS.filter(c=>rare(c)===2&&released(c)&&!P0ONLY.includes(c.key)),2);takeC(CHARS.filter(c=>rare(c)===1&&!P0ONLY.includes(c.key)),2);
   for(let i=0,g=0;i<5&&g++<300;){const id=pk(SKILL_IDS);if((inv.skills[id]||0)>=3)continue;inv.skills[id]=(inv.skills[id]||0)+1;i++;}
 }
 function gaFresh(){const inv=starterInv();gaBonus(inv);return{v:1,inv,energy:E_START,t:Date.now(),pity:0,opened:0,bonus:1};}
@@ -2714,7 +2751,7 @@ const OWN=()=>ACC.on?ACC.owned:(GA.on?GA.s.inv:null);
 const SKILL_IDS=[].concat(...TYPES.map(t=>Object.keys(SK[t]).map(k=>t+'.'+k)));
 function rollPack(pack,rng){
   rng=rng||Math.random;
-  const r1=CHARS.filter(c=>rare(c)===1),r2=pack.r2.map(k=>CHAR_BY[k]),r3=pack.r3.concat(pack.feature?[pack.feature]:[]).map(k=>CHAR_BY[k]);
+  const r1=CHARS.filter(c=>rare(c)===1&&(pack.id==='p0'||!P0ONLY.includes(c.key))),r2=pack.r2.map(k=>CHAR_BY[k]),r3=pack.r3.concat(pack.feature?[pack.feature]:[]).map(k=>CHAR_BY[k]);
   const pick=a=>a[Math.floor(rng()*a.length)];
   const char=(p2,p3)=>{
     const x=rng();
@@ -2986,12 +3023,12 @@ async function sim(n,opt){
   try{
     for(let i=0;i<n;i++){
       await startGame(true,opt.decks==='random'?{decks:[randomDeck(),randomDeck()]}:(typeof opt.decks==='function'?{decks:opt.decks()}:undefined));
-      out.push({over:G.over,turn:G.turn,first:G.first,plays:G.plays,l0:G.p[0].life,l1:G.p[1].life,abil:[G.p[0].ab,G.p[1].ab],sw:[G.p[0].swept,G.p[1].swept],uses:G.abUses});
+      out.push({over:G.over,turn:G.turn,first:G.first,plays:G.plays,l0:G.p[0].life,l1:G.p[1].life,abil:[G.p[0].abs.slice(),G.p[1].abs.slice()],sw:[G.p[0].swept,G.p[1].swept],uses:G.abUses});
     }
   }finally{HEADLESS=sv.HEADLESS;CPURANDOM=sv.CPURANDOM;LIFE=sv.LIFE;HPMULT=sv.HPMULT;speed=sv.speed;}
   return out;
 }
-window.__tcg={eng:{init:(a,d,o)=>init(a,d,o),makeUnit:(o,ch,pk)=>makeUnit(o,ch,pk),act:fn=>act(fn),playBody:(i,c,p)=>playBody(i,c,p),basic:(u,t)=>basicAttackBody(u,t),hit:(a,b,d,m)=>hit(a,b,d,m),decay:i=>decayTick(i),poison:i=>poisonTick(i),emitEnter:u=>emitEnter(u),ucost:u=>ucost(u),setHead:()=>{HEADLESS=true;speed=0;},abil:i=>abilityBody(i),abReady,abNext,abCan,ts:i=>emitTurnStart(i),hook:f=>{TURNHOOK=f;}},gv:{graveView},checkOver:()=>checkOver(),fr:{friendsOpen,friendsAdd,inviteSendUI,acctSaveName},news:{newsLoad,NEWSD,nDot,nGrantText,NEWS_BUILTIN},ord:{byTurn,posOf,moveUnit,setG:g=>{G=g;if(!UI)UI={flash:{}};},qpush,drainQ:()=>queue.map(q=>q.unit.name)},st:{LV1P,stRecord,stLoad,stShow,cpuDeck,STRONG,setLV:v=>{LV=v;}},bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover,rewardReport},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({maxCopies,KWD,ABIL,AB_KEYS,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
+window.__tcg={eng:{init:(a,d,o)=>init(a,d,o),makeUnit:(o,ch,pk)=>makeUnit(o,ch,pk),act:fn=>act(fn),playBody:(i,c,p)=>playBody(i,c,p),basic:(u,t)=>basicAttackBody(u,t),hit:(a,b,d,m)=>hit(a,b,d,m),decay:i=>decayTick(i),poison:i=>poisonTick(i),emitEnter:u=>emitEnter(u),ucost:u=>ucost(u),setHead:()=>{HEADLESS=true;speed=0;},abil:(i,k)=>abilityBody(i,k),atkOf:u=>atkOf(u),abReady,abNext,abCan,ts:i=>emitTurnStart(i),hook:f=>{TURNHOOK=f;}},gv:{graveView},checkOver:()=>checkOver(),fr:{friendsOpen,friendsAdd,inviteSendUI,acctSaveName},news:{newsLoad,NEWSD,nDot,nGrantText,NEWS_BUILTIN},ord:{byTurn,posOf,moveUnit,setG:g=>{G=g;if(!UI)UI={flash:{}};},qpush,drainQ:()=>queue.map(q=>q.unit.name)},st:{LV1P,stRecord,stLoad,stShow,cpuDeck,STRONG,setLV:v=>{LV=v;}},bi:()=>({builderInfo,UI}),ga:{GA,PACKS,rollPack,gaOpen,gaTick,gaExcess,gaConvert,gaExchange,gaInit,starterInv,STARTER_DECK,ownErr,OWN,E_CAP,PACK_COST},recost,trace:()=>({TRACE,inbox:inbox.length,waiters:waiters.length}),acc:{ACC,accPull,storeDecks,loadDecks,api,acctRecover,rewardReport},pv:{start:pvStart,PV,leave:pvLeave},decks:{randomDeck,validateDeck,PRESETS,OLD_PRESETS,CHAR_BY},direct1:v=>{DIRECT1=v;},atklim:v=>{ATKLIM=v;},bundle:v=>{BUNDLE_SET(v);},setSpeed:v=>{speed=v;},state:()=>G,start:a=>startGame(a),sim,defs:()=>({rare,P0ONLY,maxCopies,KWD,ABIL,AB_KEYS,AB_BUDGET,abList,CHARS,COND,TARG,EFF,DESC,SKILL_DECK,sur,cardCost,CAP,LIFE}),
   tune:m=>{Object.keys(m).forEach(k=>{if(k==='sur'){SURV=m[k];return;}if(k==='gp_step'){GPSTEP=m[k];return;}if(k==='gp_max'){GPMAX=m[k];return;}if(k==='gf_n'){GFN=m[k];return;}if(k==='ah_dmg'){AHDMG=m[k];return;}if(k==='burn_n'){BURN_N=m[k];return;}if(k==='charge_n'){CHARGE_N=m[k];return;}const [ty,key]=k.split('.');if(ty==='ab'){if(key.endsWith('_s'))ABIL[key.slice(0,-2)].start=m[k];else if(key.endsWith('_n'))ABIL[key.slice(0,-2)].len=m[k];else ABIL[key].cd=m[k];return;}SK[ty][key].inc=m[k];});recost();},
   cfg:o=>{if(o.cap!==undefined)CAP=o.cap;if(o.firstdraw!==undefined)FIRSTDRAW=o.firstdraw;if(o.hp!==undefined)HPMULT=o.hp;if(o.life!==undefined)LIFE=o.life;if(o.handmax!==undefined)HANDMAX=o.handmax;if(o.atkq!==undefined)ATKQ=o.atkq;if(o.ctr!==undefined)CTR=o.ctr;if(o.untg!==undefined)UNTG=o.untg;if(o.autosw!==undefined)AUTOSW=o.autosw;if(o.catch!==undefined)CATCH=o.catch;if(o.catchn!==undefined)CATCHN=o.catchn;if(o.grace!==undefined)GRACE=o.grace;if(o.haste!==undefined)HASTE=o.haste;if(o.sweep){const w=o.sweep;if(w.on!==undefined)SWEEP_ON=w.on;if(w.t!==undefined)SWEEP_T=w.t;if(w.life!==undefined)SWEEP_LIFE=w.life;if(w.diff!==undefined)SWEEP_DIFF=w.diff;}}};
 if(typeof document!=='undefined'&&$('board')){initMenus();showTitle();accInit().then(()=>{if(!ACC.on&&!GA.on)gaInit();newsLoad();});}
