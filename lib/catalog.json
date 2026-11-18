@@ -234,7 +234,8 @@
   "eff.gravepow": 3,
   "eff.ailedhit": 3,
   "eff.burn": 3,
-  "eff.charge": 3
+  "eff.charge": 3,
+  "eff.lock": 3
  },
  "abilities": [
   "fortress",
