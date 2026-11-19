@@ -5,6 +5,10 @@
   "autocure",
   "tough"
  ],
+ "dist": [
+  "crown",
+  "calamity"
+ ],
  "chars": {
   "apprentice": 3,
   "scout": 3,
@@ -90,7 +94,9 @@
   "scribe": 2,
   "curse": 2,
   "tide": 2,
-  "venomblade": 2
+  "venomblade": 2,
+  "crown": 1,
+  "calamity": 1
  },
  "rar": {
   "apprentice": 1,
@@ -177,7 +183,9 @@
   "scribe": 2,
   "curse": 2,
   "tide": 2,
-  "venomblade": 2
+  "venomblade": 2,
+  "crown": 4,
+  "calamity": 4
  },
  "skills": {
   "cond.attacked": 3,
